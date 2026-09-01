@@ -16,7 +16,7 @@ Proyecto de tesis — Universidad de Colima.
 ```
 Ecocampus - copia/
 ├── README.md
-└── frontend-ecocampus/          # aplicación React (única app del proyecto por ahora)
+└── frontend/                    # aplicación React (única app del proyecto por ahora)
     ├── public/                  # assets estáticos (logos, fotos de depósitos, favicon...)
     └── src/
         ├── App.jsx              # define las rutas de la app
@@ -44,18 +44,18 @@ Ecocampus - copia/
 ## Cómo correr el proyecto localmente
 
 ```bash
-cd frontend-ecocampus
+cd frontend
 npm install
 npm start
 ```
 
 La app queda disponible en [http://localhost:3000](http://localhost:3000).
 
-Otros scripts disponibles dentro de `frontend-ecocampus/`:
+Otros scripts disponibles dentro de `frontend/`:
 
-- `npm run build` — genera el build de producción en `frontend-ecocampus/build/`
+- `npm run build` — genera el build de producción en `frontend/build/`
 - `npm test` — corre las pruebas
 
 ## Despliegue
 
-El proyecto está configurado para publicarse en GitHub Pages (ver el campo `homepage` en `frontend-ecocampus/package.json`), bajo la ruta base `/Eco-Campus2`.
+El proyecto está configurado para publicarse en GitHub Pages (ver el campo `homepage` en `frontend/package.json`), bajo la ruta base `/Eco-Campus2`.
