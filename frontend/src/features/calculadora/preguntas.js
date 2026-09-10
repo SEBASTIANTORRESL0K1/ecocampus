@@ -177,6 +177,7 @@ const preguntasHuellaEcologica = {
         pregunta: "¿Cuántas veces a la semana tomas refresco?",
         nota: "Considera como base una lata de refresco de 355 mL. Si no consumes refresco, omite esta pregunta.",
         opciones: [
+          { label: "No consumo refresco", valor: 0 },
           { label: "1 a 2 veces a la semana", valor: 1 },
           { label: "2 a 4 veces a la semana", valor: 2 },
           { label: "4 a 6 veces a la semana", valor: 4 },
@@ -190,6 +191,7 @@ const preguntasHuellaEcologica = {
         pregunta: "¿Cuántos cigarrillos fumas al día?",
         nota: "Si no fumas, omite esta pregunta",
         opciones: [
+          { label: "No fumo", valor: 0 },
           { label: "1 al día", valor: 3 },
           { label: "Entre 2 y 5", valor: 10 },
           { label: "Entre 6 y 10", valor: 24 },
@@ -203,6 +205,7 @@ const preguntasHuellaEcologica = {
         pregunta: "¿En cuánto estimas tu consumo a la semana de cerveza?",
         nota: "Toma como base una lata de cerveza de 355 mL. Si no consumes, pasa a la siguiente pregunta.",
         opciones: [
+          { label: "No consumo cerveza", valor: 0 },
           { label: "1 a 2 cervezas a la semana", valor: 40 },
           { label: "2 a 4 cervezas a la semana", valor: 79 },
           { label: "4 a 6 cervezas a la semana", valor: 131 },
@@ -262,6 +265,7 @@ const preguntasHuellaEcologica = {
         nota:
           "Considera recorridos de ida y vuelta. Si no utilizas este transporte, pasa a la siguiente pregunta.",
         opciones: [
+          { label: "No viajo en avión", valor: 0 },
           { label: "Menos de 2 horas (ej. Méx-Acapulco-Méx)", valor: 1100 },
           { label: "Entre 2 y 7 horas (ej. Méx-Los Ángeles-Méx)", valor: 4400 },
           { label: "Entre 7 y 15 horas (ej. 2 viajes Méx-EUA-Méx)", valor: 8800 },
@@ -285,6 +289,7 @@ const preguntasHuellaEcologica = {
         nota:
           "Considera recorridos de ida y vuelta. Si no usas este transporte, omite la respuesta y pasa a la siguiente pregunta.",
         opciones: [
+          { label: "No uso auto propio ni taxi", valor: 0 },
           { label: "2-6 kilómetros diarios", valor: 520 },
           { label: "7-12 kilómetros diarios", valor: 1200 },
           { label: "13-18 kilómetros diarios", valor: 2000 },
@@ -447,12 +452,6 @@ const preguntasHuellaEcologica = {
     valorFijo: 6400,
     descripcion: "Valor fijo que se suma una sola vez al puntaje total del test.",
   },
-
-  interpretacion: [
-    { max: 16000, hagMin: 0.1, hagMax: 1.6, mensaje: "Dentro de los límites del planeta. ¡Bien hecho!" },
-    { min: 16000, max: 32000, hagMin: 1.6, hagMax: 3.2, mensaje: "Por arriba del umbral de sostenibilidad. ¡Cuidado!" },
-    { min: 32000, hagMin: 3.2, hagMax: null, mensaje: "Ritmo de vida completamente insostenible." },
-  ],
 };
 
 /**
@@ -535,6 +534,7 @@ function interpretarPuntaje(totalGeneral) {
         "Requieres menos de 1.6 hectáreas globales (hag) y vives dentro de los límites del planeta. ¡Bien hecho!",
       planetasMin: 0.06,
       planetasMax: 1,
+      planetasTexto: "menos de 1",
     };
   }
   if (totalGeneral <= 32000) {
@@ -546,6 +546,7 @@ function interpretarPuntaje(totalGeneral) {
         "Tu impacto ambiental individual está por arriba del umbral de sostenibilidad del planeta. ¡Cuidado!",
       planetasMin: 1,
       planetasMax: 2,
+      planetasTexto: "entre 1 y 2",
     };
   }
   return {
@@ -556,6 +557,7 @@ function interpretarPuntaje(totalGeneral) {
       "Tu ritmo de vida es completamente insostenible; tu Huella Ecológica es muy superior a 1.6 hectáreas globales.",
     planetasMin: 2,
     planetasMax: null,
+    planetasTexto: "más de 2",
   };
 }
 

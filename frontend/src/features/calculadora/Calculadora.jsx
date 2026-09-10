@@ -333,16 +333,12 @@ const Calculadora = () => {
                   : `más de ${resultado.interpretacion.hagMin}`}
               </span>{" "}
               hectáreas globales (hag)
-              {resultado.interpretacion.planetasMax !== null && (
-                <>
-                  {" "}
-                  ≈{" "}
-                  <span className="font-bold text-lime-700 text-3xl">
-                    {resultado.interpretacion.planetasMax}
-                  </span>{" "}
-                  planetas
-                </>
-              )}
+              {" "}
+              ≈{" "}
+              <span className="font-bold text-lime-700 text-3xl">
+                {resultado.interpretacion.planetasTexto}
+              </span>{" "}
+              planetas
             </p>
 
             <p className="mt-4 text-xl text-gray-800">{resultado.interpretacion.mensaje}</p>
