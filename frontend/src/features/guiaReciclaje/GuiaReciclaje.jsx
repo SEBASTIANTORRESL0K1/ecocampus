@@ -67,7 +67,7 @@ const GuiaReciclaje = () => {
         <h3 className="text-2xl font-bold text-lime-800 mb-4">Infografía informativa</h3>
         <div className="flex justify-center">
           <img
-            src={process.env.PUBLIC_URL + "/infografia_guia.jpeg"}
+            src={`${import.meta.env.BASE_URL}infografia_guia.jpeg`}
             alt="Infografía Guía de Reciclaje"
             className="w-full max-w-4xl rounded-lg shadow-lg"
           />

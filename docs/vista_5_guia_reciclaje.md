@@ -51,7 +51,7 @@ Seccion con tres tarjetas blancas organizadas igual que las 3 R's:
 
 ### Infografia
 
-Imagen a todo el ancho (maximo `max-w-4xl`) cargada desde `public/infografia_guia.jpeg`. Se referencia con `process.env.PUBLIC_URL` para compatibilidad con el despliegue en GitHub Pages.
+Imagen a todo el ancho (maximo `max-w-4xl`) cargada desde `public/infografia_guia.jpeg`. Se referencia con `` `${import.meta.env.BASE_URL}infografia_guia.jpeg` `` para compatibilidad con el despliegue en GitHub Pages.
 
 ---
 

@@ -27,7 +27,7 @@ const Mapa = () => {
               <Popup>
                 <div className="text-center">
                   <h2 className="font-bold text-lg">{punto.nombre}</h2>
-                  <img src={process.env.PUBLIC_URL + punto.imagen} alt={punto.nombre} className="w-40 h-32 object-cover rounded-lg mt-2" />
+                  <img src={`${import.meta.env.BASE_URL}${punto.imagen.slice(1)}`} alt={punto.nombre} className="w-40 h-32 object-cover rounded-lg mt-2" />
                 </div>
               </Popup>
             </Marker>
