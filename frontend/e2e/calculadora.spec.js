@@ -16,6 +16,12 @@
 
 import { test, expect } from '@playwright/test';
 
+// Wait for React to mount before asserting — Vite compiles on first request so
+// the initial cold-start can exceed the default assertion timeout.
+test.beforeEach(async ({ page }) => {
+  await page.waitForLoadState('networkidle');
+});
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
