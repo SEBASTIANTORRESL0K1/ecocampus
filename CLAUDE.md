@@ -15,9 +15,23 @@ Siempre que se asigne una actividad de escritura (código, pruebas, UI, backend,
 - Mobile → `voltagent-core-dev:mobile-developer`
 - Sin categoría especializada → agente general `claude`
 
+## Documentacion de vistas
+
+Antes de realizar cualquier cambio en una vista, leer el archivo de documentacion correspondiente en `docs/`:
+
+| Vista | Archivo |
+|-------|---------|
+| Inicio / LandingPage | `docs/vista_1_inicio.md` |
+| Calculadora | `docs/vista_2_calculadora.md` |
+| Mapa | `docs/vista_3_mapa.md` |
+| Comunidad | `docs/vista_4_comunidad.md` |
+| Guia de reciclaje | `docs/vista_5_guia_reciclaje.md` |
+
+Esta regla aplica a cambios de codigo, pruebas, estilos y cualquier modificacion funcional relacionada con la vista.
+
 ## Estilo
 
-- No usar emojis en archivos de documentación (.md).
+- No usar emojis en archivos de documentacion (.md).
 
 ## Entorno de pruebas (Jest + CRA)
 
