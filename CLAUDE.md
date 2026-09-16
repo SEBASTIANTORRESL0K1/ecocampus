@@ -33,35 +33,22 @@ Esta regla aplica a cambios de codigo, pruebas, estilos y cualquier modificacion
 
 - No usar emojis en archivos de documentacion (.md).
 
-## Entorno de pruebas (Jest + CRA)
+## Entorno de pruebas (Vite + Vitest)
 
-El stack de testing tiene incompatibilidades conocidas entre CRA (`react-scripts` 5 / Jest 27 / jsdom 16) y dependencias modernas. Las siguientes soluciones ya están aplicadas en `setupTests.js` y `package.json`:
+El proyecto usa **Vite 8** como bundler y **Vitest** como runner de pruebas con jsdom moderno. No hay workarounds de compatibilidad: ESM, subpath exports y TextEncoder/TextDecoder funcionan de forma nativa.
 
-### React Router v7 + Jest 27
+### Configuracion
 
-**Problema 1 — subpath exports:** Jest 27 no resuelve `react-router/dom` porque no soporta el campo `exports` de `package.json` con subpaths.
-**Solucion:** `moduleNameMapper` en `package.json`:
-```json
-"jest": {
-  "moduleNameMapper": {
-    "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js"
-  }
-}
-```
+La configuracion de Vitest vive en `vite.config.js` (campo `test`):
+- `environment: 'jsdom'` — DOM moderno, sin polyfills manuales
+- `globals: true` — `describe`, `test`, `expect`, `vi` disponibles globalmente en los tests
+- `setupFiles: './src/setupTests.js'` — solo importa `@testing-library/jest-dom`
 
-**Problema 2 — TextEncoder/TextDecoder:** jsdom 16 no incluye estas APIs del navegador que React Router v7 usa internamente.
-**Solucion:** polyfill en `setupTests.js` usando la implementacion real de Node.js:
+### react-leaflet (ESM)
+
+`react-leaflet` es ESM puro. Mockear el componente que lo importa directamente en cada test:
 ```js
-const { TextEncoder, TextDecoder } = require('util');
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
+vi.mock('./features/mapa/Mapa', () => ({ default: () => null }));
 ```
 
-### react-leaflet + Jest (ESM)
-
-**Problema:** `react-leaflet` distribuye ESM puro (`export` syntax). Jest 27 no transpila `node_modules` por defecto.
-**Solucion:** mockear el componente que lo importa directamente en el test (`jest.mock('./features/mapa/Mapa', () => () => null)`). No modificar `transformIgnorePatterns` porque CRA no lo expone sin eject.
-
-### Deuda tecnica pendiente
-
-CRA esta abandonado desde 2023. Migrar a **Vite + Vitest** elimina todos estos problemas de raiz (soporte nativo ESM, jsdom moderno, configuracion explicita). Considerar para cuando el proyecto escale.
+Nota: la factory debe devolver `{ default: ... }` (sintaxis de modulo ES) en lugar de una funcion directamente.
