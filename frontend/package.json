@@ -40,6 +40,11 @@
       "last 1 safari version"
     ]
   },
+  "jest": {
+    "moduleNameMapper": {
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js"
+    }
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.9",
     "autoprefixer": "^10.4.20",
