@@ -84,7 +84,7 @@ Los 21 puntos cubren las siguientes zonas del campus:
 
 ## Imagenes de los Depositos
 
-Las fotografias estan almacenadas en `public/Depositos/` y se referencian mediante `process.env.PUBLIC_URL + punto.imagen`. Esto garantiza que las rutas sean correctas tanto en desarrollo local como en el despliegue en GitHub Pages con el `basename` `/ecocampus`.
+Las fotografias estan almacenadas en `public/Depositos/` y se referencian mediante `` `${import.meta.env.BASE_URL}${punto.imagen.slice(1)}` ``. `BASE_URL` incluye el trailing slash y resuelve a `/ecocampus/` en produccion y `/` en desarrollo, garantizando rutas correctas en ambos entornos.
 
 ---
 
