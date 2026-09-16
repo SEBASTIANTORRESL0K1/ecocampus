@@ -16,15 +16,16 @@
 
 import { test, expect } from '@playwright/test';
 
-// Wait for React to mount before asserting — Vite compiles on first request so
-// the initial cold-start can exceed the default assertion timeout.
-test.beforeEach(async ({ page }) => {
-  await page.waitForLoadState('networkidle');
-});
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+// Vite compiles on first request so the cold-start can be slow.
+// Always use this helper instead of page.goto directly.
+async function gotoCalculadora(page) {
+  await gotoCalculadora(page);
+  await page.waitForLoadState('networkidle');
+}
 
 /**
  * Clicks the "Siguiente" button and waits until the progress counter changes
@@ -258,7 +259,7 @@ async function answerForestal(page, pick) {
 // ---------------------------------------------------------------------------
 
 test('Test 1 - Navegacion basica: primer paso visible con progreso y botones correctos', async ({ page }) => {
-  await page.goto('/ecocampus/calculadora');
+  await gotoCalculadora(page);
 
   // The first question heading should be visible
   await expect(
@@ -294,7 +295,7 @@ test('Test 1 - Navegacion basica: primer paso visible con progreso y botones cor
 // ---------------------------------------------------------------------------
 
 test('Test 2 - Avanzar y retroceder entre pasos', async ({ page }) => {
-  await page.goto('/ecocampus/calculadora');
+  await gotoCalculadora(page);
 
   // Select any option in step 1 to ensure state is set
   await page.locator('div.space-y-3 > button').first().click();
@@ -319,7 +320,7 @@ test('Test 2 - Avanzar y retroceder entre pasos', async ({ page }) => {
 // ---------------------------------------------------------------------------
 
 test('Test 3 - Flujo completo con respuestas minimas (resultado sustentable)', async ({ page }) => {
-  await page.goto('/ecocampus/calculadora');
+  await gotoCalculadora(page);
 
   await answerAlimentos(page, 'first');       // steps 1-15, ends at step 16
   await answerTransporte(page, 'first');      // steps 16-20, ends at step 21
@@ -342,7 +343,7 @@ test('Test 3 - Flujo completo con respuestas minimas (resultado sustentable)', a
 // ---------------------------------------------------------------------------
 
 test('Test 4 - Flujo completo con respuestas maximas (resultado insostenible)', async ({ page }) => {
-  await page.goto('/ecocampus/calculadora');
+  await gotoCalculadora(page);
 
   await answerAlimentos(page, 'last');        // steps 1-15, ends at step 16
   await answerTransporte(page, 'last');       // steps 16-20, ends at step 21
@@ -372,7 +373,7 @@ test('Test 4 - Flujo completo con respuestas maximas (resultado insostenible)', 
 // ---------------------------------------------------------------------------
 
 test('Test 5 - Input de celulares (Q24) acepta valor 3 y permite continuar', async ({ page }) => {
-  await page.goto('/ecocampus/calculadora');
+  await gotoCalculadora(page);
 
   // Advance through Alimentos (steps 1-15)
   await answerAlimentos(page, 'first');
@@ -411,7 +412,7 @@ test('Test 5 - Input de celulares (Q24) acepta valor 3 y permite continuar', asy
 // ---------------------------------------------------------------------------
 
 test('Test 6 - Paso habitantesHogar acepta valor 4 y avanza correctamente', async ({ page }) => {
-  await page.goto('/ecocampus/calculadora');
+  await gotoCalculadora(page);
 
   // Advance through Alimentos (steps 1-15)
   await answerAlimentos(page, 'first');
