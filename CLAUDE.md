@@ -29,6 +29,18 @@ Antes de realizar cualquier cambio en una vista, leer el archivo de documentacio
 
 Esta regla aplica a cambios de codigo, pruebas, estilos y cualquier modificacion funcional relacionada con la vista.
 
+## Documentacion de pruebas
+
+Antes de realizar cualquier cambio en pruebas (componentes o E2E), leer el archivo de documentacion correspondiente en `docs/testing/`:
+
+| Tipo de cambio | Archivo |
+|----------------|---------|
+| Inicio rapido, filosofia, cuando agregar pruebas | `docs/testing/README.md` |
+| Pruebas de componentes con Vitest | `docs/testing/vitest-guidelines.md` |
+| Pruebas E2E con Playwright | `docs/testing/playwright-e2e.md` |
+
+Esta regla aplica a nuevas pruebas, modificacion de tests existentes y cambios en la configuracion de Vitest o Playwright.
+
 ## Estilo
 
 - No usar emojis en archivos de documentacion (.md).
