@@ -23,7 +23,7 @@ import { test, expect } from '@playwright/test';
 // Vite compiles on first request so the cold-start can be slow.
 // Always use this helper instead of page.goto directly.
 async function gotoCalculadora(page) {
-  await gotoCalculadora(page);
+  await page.goto('/ecocampus/calculadora');
   await page.waitForLoadState('networkidle');
 }
 
@@ -71,9 +71,10 @@ async function answerAlimentos(page, pick) {
     await clickSiguiente(page, step + 1);
   }
 
-  // Q11 – multipleCantidad: inputs default to 0 for min; set 10 each for max
+  // Q11 – multipleCantidad: scoped selector avoids capturing unrelated number inputs
+  await expect(page.getByText(/cuál de los siguientes alimentos/i)).toBeVisible();
   if (pick === 'last') {
-    const inputs = page.locator('input[type="number"]');
+    const inputs = page.locator('div.space-y-3 input[type="number"]');
     const count = await inputs.count();
     for (let i = 0; i < count; i++) {
       await inputs.nth(i).fill('10');
@@ -95,14 +96,21 @@ async function answerAlimentos(page, pick) {
 
 /**
  * Advances through all Transporte steps (Q16-Q20), step counter starts at 16.
+ *
+ * Q19 ("¿Cuentas con auto propio?"): first=last button ("No", 0) / last=first button ("Sí", 12000)
+ * Q20 ("distancia en auto/taxi"):    first=first button ("No uso", 0) / last=last button ("25-30 km", 3500)
+ * Q16-Q18: first=first button / last=last button
  */
 async function answerTransporte(page, pick) {
   for (let step = 16; step <= 20; step++) {
     const buttons = page.locator('div.space-y-3 > button');
-    if (pick === 'first') {
-      await buttons.first().click();
+    if (step === 19) {
+      // "No" (0) minimiza; "Sí" (12000) maximiza — orden inverso al resto
+      if (pick === 'first') { await buttons.last().click(); }
+      else                  { await buttons.first().click(); }
     } else {
-      await buttons.last().click();
+      if (pick === 'first') { await buttons.first().click(); }
+      else                  { await buttons.last().click(); }
     }
     await clickSiguiente(page, step + 1);
   }
@@ -189,17 +197,11 @@ async function answerEnergia(page, pick) {
   }
   await clickSiguiente(page, 27);
 
-  // Q26 unica (step 27): "Gas LP" is the first option and has the highest value (500)
-  // For min we still click first (Gas LP = 300 or lower, but there are only 3 options
-  // and the lowest is Electricidad at 300). For simplicity: first click for both,
-  // but for 'last' click last.
+  // Q26 unica (step 27): Gas LP=500 (first), Gas natural=400 (second), Electricidad=300 (last)
   {
     const buttons = page.locator('div.space-y-3 > button');
-    if (pick === 'first') {
-      await buttons.first().click();
-    } else {
-      await buttons.first().click(); // Gas LP (500) is the highest
-    }
+    if (pick === 'first') { await buttons.last().click();  } // Electricidad (300) -> lowest
+    else                  { await buttons.first().click(); } // Gas LP (500)       -> highest
     await clickSiguiente(page, 28);
   }
 
