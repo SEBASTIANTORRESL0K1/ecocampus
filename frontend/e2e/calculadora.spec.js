@@ -24,7 +24,7 @@ import { test, expect } from '@playwright/test';
 // Always use this helper instead of page.goto directly.
 async function gotoCalculadora(page) {
   await page.goto('/ecocampus/calculadora');
-  await page.waitForLoadState('networkidle');
+  await expect(page.getByText('Pregunta 1 de 31')).toBeVisible();
 }
 
 /**

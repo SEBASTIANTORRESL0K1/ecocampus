@@ -71,7 +71,7 @@ const Calculadora = () => {
   };
 
   const actualizarGrupo25 = (nombreGrupo, valor) => {
-    const detalle = { ...(respuestas.detalle25 || {}), [nombreGrupo]: valor };
+    const detalle = { ...respuestas.detalle25, [nombreGrupo]: valor };
     const total = Object.values(detalle).reduce((acc, v) => acc + (Number(v) || 0), 0);
     setRespuestas({ ...respuestas, detalle25: detalle, 25: total });
   };
@@ -204,8 +204,9 @@ const Calculadora = () => {
                   <p className="text-sm text-gray-500 text-center mb-4">{paso.pregunta.nota}</p>
                 )}
                 <div className="flex flex-col items-center gap-2">
-                  <label className="text-sm text-gray-600">Número de celulares</label>
+                  <label htmlFor="celulares-input" className="text-sm text-gray-600">Número de celulares</label>
                   <input
+                    id="celulares-input"
                     type="number"
                     min="0"
                     value={respuestas.cantidadCelulares ?? 0}
