@@ -255,9 +255,12 @@ async function answerForestal(page, pick) {
 }
 
 // ---------------------------------------------------------------------------
-// Test 1 – Basic navigation: verify step 1 renders correctly
+// Suite
 // ---------------------------------------------------------------------------
 
+test.describe('Calculadora de Huella Ecologica', () => {
+
+// Test 1 – Basic navigation: verify step 1 renders correctly
 test('Test 1 - Navegacion basica: primer paso visible con progreso y botones correctos', async ({ page }) => {
   await gotoCalculadora(page);
 
@@ -437,3 +440,5 @@ test('Test 6 - Paso habitantesHogar acepta valor 4 y avanza correctamente', asyn
   await clickSiguiente(page, 22);
   await expect(page.getByText('Pregunta 22 de 31')).toBeVisible();
 });
+
+}); // end test.describe
