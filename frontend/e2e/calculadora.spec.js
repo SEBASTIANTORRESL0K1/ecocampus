@@ -484,4 +484,110 @@ test('Test 7 - Seleccion obligatoria y opcion nula', async ({ page }) => {
   await clickSiguiente(page, 4);
 });
 
+// ---------------------------------------------------------------------------
+// Test 8 – Progress persists across reload (localStorage)
+// ---------------------------------------------------------------------------
+
+test('Test 8 - El progreso se conserva al recargar la pagina', async ({ page }) => {
+  await gotoCalculadora(page);
+
+  await page.getByRole('button', { name: '1 a 2 raciones a la semana' }).click();
+  await clickSiguiente(page, 2);
+  await page.getByRole('button', { name: '2 a 4 raciones a la semana' }).click();
+  await clickSiguiente(page, 3);
+  await page.getByRole('button', { name: 'No consumo pan' }).click();
+
+  await page.reload();
+
+  // Same step and same selection after reload, with the restored notice
+  await expect(page.getByText('Pregunta 3 de 31')).toBeVisible();
+  await expect(page.getByText('Recuperamos tus respuestas guardadas.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'No consumo pan' })).toHaveClass(/bg-lime-500/);
+  await expect(page.getByRole('button', { name: 'Siguiente' })).toBeEnabled();
+
+  // Previous answers are also restored
+  await page.getByRole('button', { name: 'Anterior' }).click();
+  await expect(page.getByText('Pregunta 2 de 31')).toBeVisible();
+  await expect(page.getByRole('button', { name: '2 a 4 raciones a la semana' })).toHaveClass(/bg-lime-500/);
+
+  // The restored-progress toast auto-dismisses after ~5 s (plus exit transition)
+  const toast = page.getByRole('status').filter({ hasText: 'Recuperamos tus respuestas guardadas.' });
+  await expect(toast).toBeHidden({ timeout: 8000 });
+});
+
+// ---------------------------------------------------------------------------
+// Test 9 – Clear saved progress from the questionnaire
+// ---------------------------------------------------------------------------
+
+test('Test 9 - Borrar respuestas pide confirmacion en un modal y reinicia el cuestionario', async ({ page }) => {
+  await gotoCalculadora(page);
+
+  await page.getByRole('button', { name: '1 a 2 raciones a la semana' }).click();
+  await clickSiguiente(page, 2);
+
+  // exact avoids matching the toast action "Borrar respuestas y empezar de nuevo"
+  const borrar = page.getByRole('button', { name: 'Borrar respuestas', exact: true });
+  const dialogo = page.getByRole('dialog', { name: '¿Borrar tus respuestas?' });
+
+  // Escape closes the modal without clearing and returns focus to the trigger
+  await borrar.click();
+  await expect(dialogo).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cancelar' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(dialogo).toBeHidden();
+  await expect(borrar).toBeFocused();
+  await expect(page.getByText('Pregunta 2 de 31')).toBeVisible();
+
+  // Cancel keeps the progress
+  await borrar.click();
+  await page.getByRole('button', { name: 'Cancelar' }).click();
+  await expect(dialogo).toBeHidden();
+  let guardado = await page.evaluate(() => localStorage.getItem('ecocampus:calculadora:v1'));
+  expect(guardado).not.toBeNull();
+
+  // Confirm clears storage and goes back to step 1
+  await borrar.click();
+  await page.getByRole('button', { name: 'Sí, borrar respuestas' }).click();
+  await expect(dialogo).toBeHidden();
+  await expect(page.getByText('Pregunta 1 de 31')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
+  guardado = await page.evaluate(() => localStorage.getItem('ecocampus:calculadora:v1'));
+  expect(guardado).toBeNull();
+
+  // After a reload nothing is restored
+  await page.reload();
+  await expect(page.getByText('Pregunta 1 de 31')).toBeVisible();
+  await expect(page.getByText('Recuperamos tus respuestas guardadas.')).toBeHidden();
+});
+
+// ---------------------------------------------------------------------------
+// Test 10 – Results survive reload, then "Contestar de nuevo"
+// ---------------------------------------------------------------------------
+
+test('Test 10 - Resultado restaurado tras recargar y Contestar de nuevo', async ({ page }) => {
+  await gotoCalculadora(page);
+
+  await answerAlimentos(page, 'first');
+  await answerTransporte(page, 'first');
+  await answerHabitantesHogar(page, 1);
+  await answerEnergia(page, 'first');
+  await answerForestal(page, 'first');
+
+  // The results screen is recomputed from the saved answers after reload
+  await page.reload();
+  await expect(page.getByText('Tu resultado')).toBeVisible();
+
+  // "Revisar mis respuestas" goes back to the last step keeping the answers
+  await page.getByRole('button', { name: 'Revisar mis respuestas' }).click();
+  await expect(page.getByText('Pregunta 31 de 31')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Finalizar' })).toBeEnabled();
+  await clickFinalizar(page);
+
+  await page.getByRole('button', { name: 'Contestar de nuevo' }).click();
+  await expect(page.getByText('Pregunta 1 de 31')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
+  const guardado = await page.evaluate(() => localStorage.getItem('ecocampus:calculadora:v1'));
+  expect(guardado).toBeNull();
+});
+
 }); // end test.describe

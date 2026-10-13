@@ -45,6 +45,8 @@ Archivos existentes:
 |---------|-----------|
 | `frontend/src/App.test.jsx` | Montaje de la aplicacion completa |
 | `frontend/src/features/landing/LandingPage.test.jsx` | Contenido y estructura de la pagina de inicio |
+| `frontend/src/features/calculadora/Calculadora.test.jsx` | Seleccion obligatoria, imagen ilustrativa, `pasoRespondido`, persistencia del progreso, toast y modal de confirmacion |
+| `frontend/src/features/calculadora/progresoGuardado.test.js` | Lectura, escritura, validacion y errores de localStorage del progreso |
 
 ### Pruebas E2E
 

@@ -5,6 +5,9 @@
 - Datos de preguntas: `src/features/calculadora/preguntas.js`
 - Validacion de pasos: `src/features/calculadora/pasoRespondido.js`
 - Imagen ilustrativa: `src/features/calculadora/ImagenTema.jsx`
+- Persistencia del progreso: `src/features/calculadora/progresoGuardado.js`
+- Aviso flotante (toast): `src/features/calculadora/ToastAviso.jsx`
+- Modal de confirmacion: `src/features/calculadora/ModalConfirmacion.jsx`
 
 ---
 
@@ -95,10 +98,79 @@ https://loremflickr.com/640/320/{palabraClave}?lock={id}
 ## Flujo de Navegacion
 
 1. La vista construye una lista ordenada de pasos al montarse (`construirPasos()`).
-2. Se muestra un paso a la vez con barra de progreso en la parte superior.
-3. El usuario puede avanzar ("Siguiente") o retroceder ("Anterior") entre preguntas.
-4. En el ultimo paso, el boton cambia a "Finalizar" y ejecuta `calcularHuellaEcologica(respuestas)`.
-5. Se presenta la pantalla de resultados.
+2. Si hay progreso guardado en localStorage, el estado se inicializa con el (paso, respuestas y, si aplica, pantalla de resultados) y se muestra el toast "Recuperamos tus respuestas guardadas.", que se cierra solo a los 5 segundos. Si no, empieza en la pregunta 1.
+3. Se muestra un paso a la vez con barra de progreso en la parte superior.
+4. El usuario puede avanzar ("Siguiente") o retroceder ("Anterior") entre preguntas. Cada cambio se guarda automaticamente.
+5. Mientras haya alguna respuesta, el boton "Borrar respuestas" abre un modal de confirmacion para reiniciar el cuestionario.
+6. En el ultimo paso, el boton cambia a "Finalizar" y ejecuta `calcularHuellaEcologica(respuestas)`.
+7. Se presenta la pantalla de resultados, desde la que se puede:
+   - "Volver al Inicio" (el progreso queda guardado).
+   - "Contestar de nuevo": borra el progreso y vuelve a la pregunta 1 directamente (sin modal, porque el usuario ya termino).
+   - "Revisar mis respuestas": vuelve al ultimo paso conservando las respuestas para cambiarlas.
+
+---
+
+## Persistencia en localStorage
+
+El progreso del cuestionario se guarda en el navegador para que no se pierda al recargar la pagina o al perder la conexion. La logica vive en `progresoGuardado.js` (funciones `cargarProgreso(totalPasos)`, `guardarProgreso(estado)`, `borrarProgreso()` y `tieneRespuestas(respuestas)`).
+
+### Clave y formato
+
+- Clave: `ecocampus:calculadora:v1` (constante `CLAVE_PROGRESO`).
+- Valor: JSON `{ version: 1, respuestas, pasoActual, verResultado }`.
+- `resultado` no se guarda: al restaurar con `verResultado: true` se recalcula con `calcularHuellaEcologica(respuestas)`.
+- Se guarda con un `useEffect` cada vez que cambian `respuestas`, `pasoActual` o `verResultado`. Si el estado vuelve a ser el inicial (pregunta 1, sin respuestas, sin resultado), la clave se elimina en lugar de guardarse.
+- Todo acceso a localStorage esta envuelto en `try/catch`: en modo privado, con la cuota llena o con el almacenamiento deshabilitado, la calculadora funciona igual pero sin persistencia.
+
+### Validacion al cargar
+
+El estado se inicializa de forma perezosa (`useState(() => cargarProgreso(...))`), por lo que no hay parpadeo de la primera pregunta. Los datos leidos se descartan (y se empieza de cero) si:
+
+- El JSON esta corrupto o no es un objeto.
+- `version` no es `1`.
+- `respuestas` no es un objeto.
+- `pasoActual` no es un entero.
+
+Ademas se normalizan:
+
+- `pasoActual` se limita al rango `[0, pasos.length - 1]`.
+- `habitantesHogar` toma el valor 1 si falta o no es un numero mayor o igual a 1.
+- `verResultado` solo es verdadero si el valor guardado es exactamente `true`.
+
+JSON convierte las claves numericas de `respuestas` en texto (`"1"` en lugar de `1`). Como en JavaScript `respuestas[1]` y `respuestas["1"]` son equivalentes, `calcularHuellaEcologica` y `pasoRespondido` se comportan igual con datos restaurados (cubierto por pruebas).
+
+### Toast de progreso recuperado
+
+Si al cargar la pagina habia progreso guardado con al menos una respuesta real (cualquier clave distinta de `habitantesHogar`, o `habitantesHogar` distinto de 1), se muestra una sola vez el toast `ToastAviso` con el texto "Recuperamos tus respuestas guardadas.":
+
+- Posicion fija: abajo a la derecha en escritorio (`sm:right-6 sm:bottom-6 sm:w-96`) y abajo, casi a todo el ancho, en movil (`inset-x-4 bottom-4`).
+- Tarjeta blanca con borde izquierdo lima (`border-l-4 border-lime-500`) y sombra (`shadow-xl`).
+- `role="status"` y `aria-live="polite"`, para que los lectores de pantalla lo anuncien sin interrumpir.
+- Entra y sale con transicion de opacidad y desplazamiento (`opacity-0 translate-y-4` a `opacity-100 translate-y-0`, `duration-300`); con `motion-reduce:transition-none` se omite la animacion.
+- Se cierra solo a los 5 segundos y se desmonta al terminar la transicion de salida (300 ms). El temporizador se pausa mientras el cursor o el foco estan dentro del toast y mientras el modal de confirmacion esta abierto; al reanudar conserva el tiempo restante.
+- Boton de cierre con icono X y `aria-label="Cerrar aviso"`. Cerrar el toast no borra nada.
+- Boton de accion "Borrar respuestas y empezar de nuevo": abre el mismo modal de confirmacion que "Borrar respuestas" (no borra directamente).
+
+### Borrar respuestas durante el cuestionario
+
+Mientras haya alguna respuesta, debajo de los botones de navegacion aparece el boton "Borrar respuestas": ancho completo, `min-h-12` (48 px), `text-base font-semibold`, texto y borde de 2 px `red-700` sobre blanco, icono de papelera en SVG con `aria-hidden="true"` y anillo de foco visible (`focus-visible:ring-4 focus-visible:ring-red-300 focus-visible:ring-offset-2`). Al pulsarlo se abre el modal de confirmacion.
+
+### Modal de confirmacion
+
+`ModalConfirmacion` es un componente reutilizable (props `abierto`, `titulo`, `descripcion`, `textoConfirmar`, `textoCancelar`, `onConfirmar`, `onCancelar`). Lo abren "Borrar respuestas" y la accion del toast; "Contestar de nuevo" no lo usa.
+
+- Titulo "¿Borrar tus respuestas?" y descripcion indicando que se perderan las respuestas guardadas y que el cuestionario volvera a la pregunta 1.
+- Botones "Cancelar" (secundario, borde gris) y "Sí, borrar respuestas" (`bg-red-700 text-white`), ambos con `min-h-12`.
+- Solo "Sí, borrar respuestas" borra: elimina la clave de localStorage y restablece el estado inicial (`pasoActual` 0, `respuestas` `{ habitantesHogar: 1 }`, `verResultado` false, `resultado` null). Tambien cierra el toast si estaba visible.
+- "Cancelar", la tecla Escape o un clic en el fondo cierran el modal sin borrar.
+
+### Botones de la pantalla de resultados
+
+| Boton | Accion |
+| :--- | :--- |
+| Volver al Inicio | Enlace a `/`; el progreso sigue guardado |
+| Contestar de nuevo | Borra el progreso y vuelve a la pregunta 1 con el estado inicial |
+| Revisar mis respuestas | `verResultado` a false y `pasoActual` al ultimo paso, conservando las respuestas |
 
 ---
 
@@ -126,10 +198,15 @@ La funcion `calcularHuellaEcologica` (definida en `preguntas.js`) recibe el obje
 | Variable | Descripcion |
 | :--- | :--- |
 | `pasos` | Lista calculada con `useMemo` de todos los pasos del cuestionario |
-| `pasoActual` | Indice del paso actualmente visible |
-| `respuestas` | Objeto acumulador donde cada clave es el ID de la pregunta y el valor es la respuesta |
-| `verResultado` | Booleano que activa la pantalla de resultados |
-| `resultado` | Objeto devuelto por `calcularHuellaEcologica` |
+| `progresoInicial` | Progreso leido una sola vez de localStorage al montar (o `null`) |
+| `pasoActual` | Indice del paso actualmente visible (persistido) |
+| `respuestas` | Objeto acumulador donde cada clave es el ID de la pregunta y el valor es la respuesta (persistido) |
+| `verResultado` | Booleano que activa la pantalla de resultados (persistido) |
+| `resultado` | Objeto devuelto por `calcularHuellaEcologica`; no se persiste, se recalcula al restaurar |
+| `avisoRecuperado` | Booleano que monta el toast "Recuperamos tus respuestas guardadas."; pasa a false cuando el toast termina de cerrarse o al borrar |
+| `modalBorrarAbierto` | Booleano que abre el modal de confirmacion de borrado |
+
+`pasoActual`, `respuestas` y `verResultado` se inicializan de forma perezosa desde `progresoInicial`. Ver la seccion "Persistencia en localStorage".
 
 Claves especiales en `respuestas`:
 
@@ -149,6 +226,8 @@ Claves especiales en `respuestas`:
 | `PageLayout` | `src/components/layout/PageLayout.jsx` | Estructura global con Navbar y Footer |
 | `Link` | React Router DOM | Boton "Volver al Inicio" en la pantalla de resultados |
 | `ImagenTema` | `src/features/calculadora/ImagenTema.jsx` | Imagen ilustrativa del tema de cada paso (LoremFlickr) con espacio reservado y respaldo "Imagen no disponible" |
+| `ToastAviso` | `src/features/calculadora/ToastAviso.jsx` | Aviso flotante con cierre automatico (5 s), pausa al pasar el cursor o enfocar, boton "Cerrar aviso" y accion opcional |
+| `ModalConfirmacion` | `src/features/calculadora/ModalConfirmacion.jsx` | Dialogo modal accesible de confirmacion (foco atrapado, Escape, clic en el fondo, bloqueo de scroll) |
 
 ---
 
@@ -161,3 +240,15 @@ Claves especiales en `respuestas`:
 - Imagen ilustrativa de 160 px de alto (`h-40 object-cover`) en la parte superior de la tarjeta.
 - Boton "Siguiente" / "Finalizar" semitransparente y no clicable mientras el paso no tenga respuesta.
 - La pantalla de resultados usa una tarjeta amplia con tipografia grande para destacar el total.
+- El toast de progreso recuperado es una tarjeta blanca flotante con borde izquierdo lima y sombra (ver "Toast de progreso recuperado").
+- "Borrar respuestas" es un boton grande rojo con borde (ver "Borrar respuestas durante el cuestionario"); el modal usa un fondo `bg-black/50` y un dialogo blanco centrado que entra con transicion de opacidad y escala (`scale-95` a `scale-100`, `duration-200`).
+- "Contestar de nuevo" es un boton con borde lima junto a "Volver al Inicio"; "Revisar mis respuestas" es texto gris subrayado.
+
+### Accesibilidad
+
+- Contraste: `red-700` sobre blanco y blanco sobre `red-700` superan la relacion 4.5:1 de WCAG AA; el texto del toast es `gray-800` y su accion `lime-800` sobre blanco.
+- Botones de borrado y del modal con area de toque minima de 48 px (`min-h-12`) y texto de 16 px o mas.
+- Anillo de foco visible (`focus-visible:ring-4`) en los botones del modal y en "Borrar respuestas"; `focus-visible:ring-2` en los botones del toast.
+- Iconos SVG decorativos con `aria-hidden="true"`; el boton de cierre del toast tiene `aria-label="Cerrar aviso"`.
+- El modal tiene `role="dialog"`, `aria-modal="true"`, `aria-labelledby` (titulo) y `aria-describedby` (descripcion). Al abrir, el foco va a "Cancelar"; Tab y Shift+Tab quedan atrapados dentro; al cerrar, el foco vuelve al boton que lo abrio (si sigue en la pagina). El scroll del body se bloquea mientras esta abierto. Durante la transicion de salida el modal queda con `aria-hidden`.
+- Todas las transiciones usan `motion-reduce:transition-none`.

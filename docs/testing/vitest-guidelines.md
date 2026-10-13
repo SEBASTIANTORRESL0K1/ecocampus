@@ -139,6 +139,17 @@ Pruebas:
 - `muestra el dato estadístico de 3.1 hectáreas globales` — verifica el dato estadistico.
 - `muestra el dato estadístico de 20.1 µg/m³` — verifica el dato estadistico de calidad del aire.
 
+### `frontend/src/features/calculadora/Calculadora.test.jsx`
+
+Incluye pruebas de persistencia: respuestas que sobreviven a desmontar y montar, JSON corrupto, y los botones "Contestar de nuevo" y "Revisar mis respuestas". Limpia localStorage en `beforeEach`.
+
+- Toast de progreso recuperado: usa `vi.useFakeTimers()` y `act(() => vi.advanceTimersByTime(...))` para comprobar el cierre automatico a los 5 s, la pausa con el cursor encima y el boton "Cerrar aviso". El avance se divide en dos llamadas (fin de los 5 s y luego los 300 ms de salida) porque el temporizador de salida se programa despues de que React procesa el cambio de estado. Restaurar con `vi.useRealTimers()` en `afterEach`.
+- Modal de confirmacion: foco inicial en "Cancelar", bloqueo de scroll, Cancelar, Escape, clic en el fondo, trampa de foco con Tab / Shift+Tab, retorno del foco y que el almacenamiento solo se borra al confirmar.
+
+### `frontend/src/features/calculadora/progresoGuardado.test.js`
+
+Pruebas unitarias del modulo de persistencia: ida y vuelta guardar/cargar, JSON corrupto o con forma invalida, limites de `pasoActual`, localStorage que lanza errores (con `vi.spyOn(Storage.prototype, ...)`) y equivalencia del calculo con claves numericas convertidas a texto.
+
 ---
 
 ## Ubicacion de nuevos archivos de prueba
