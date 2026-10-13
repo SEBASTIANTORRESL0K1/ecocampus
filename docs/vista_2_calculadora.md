@@ -143,10 +143,11 @@ JSON convierte las claves numericas de `respuestas` en texto (`"1"` en lugar de 
 
 Si al cargar la pagina habia progreso guardado con al menos una respuesta real (cualquier clave distinta de `habitantesHogar`, o `habitantesHogar` distinto de 1), se muestra una sola vez el toast `ToastAviso` con el texto "Recuperamos tus respuestas guardadas.":
 
-- Posicion fija: abajo a la derecha en escritorio (`sm:right-6 sm:bottom-6 sm:w-96`) y abajo, casi a todo el ancho, en movil (`inset-x-4 bottom-4`).
+- Posicion fija arriba a la derecha, debajo del navbar para no taparlo: `top-24` (96 px). El navbar mide 80 px en movil y 68 px en escritorio, no es fijo y no tiene `z-index`; el toast usa `z-40`.
+- En escritorio (`sm` en adelante): esquina superior derecha con ancho fijo (`sm:right-6 sm:w-96`). En movil: arriba, casi a todo el ancho con margenes laterales de 16 px (`inset-x-4`).
 - Tarjeta blanca con borde izquierdo lima (`border-l-4 border-lime-500`) y sombra (`shadow-xl`).
 - `role="status"` y `aria-live="polite"`, para que los lectores de pantalla lo anuncien sin interrumpir.
-- Entra y sale con transicion de opacidad y desplazamiento (`opacity-0 translate-y-4` a `opacity-100 translate-y-0`, `duration-300`); con `motion-reduce:transition-none` se omite la animacion.
+- Entra y sale con transicion de opacidad y desplazamiento (`duration-300`): en movil baja desde arriba (`-translate-y-4` a `translate-y-0`) y en escritorio entra desde la derecha (`sm:translate-x-8` a `translate-x-0`). Con `motion-reduce:transition-none` se omite la animacion.
 - Se cierra solo a los 5 segundos y se desmonta al terminar la transicion de salida (300 ms). El temporizador se pausa mientras el cursor o el foco estan dentro del toast y mientras el modal de confirmacion esta abierto; al reanudar conserva el tiempo restante.
 - Boton de cierre con icono X y `aria-label="Cerrar aviso"`. Cerrar el toast no borra nada.
 - Boton de accion "Borrar respuestas y empezar de nuevo": abre el mismo modal de confirmacion que "Borrar respuestas" (no borra directamente).
@@ -240,7 +241,8 @@ Claves especiales en `respuestas`:
 - Imagen ilustrativa de 160 px de alto (`h-40 object-cover`) en la parte superior de la tarjeta.
 - Boton "Siguiente" / "Finalizar" semitransparente y no clicable mientras el paso no tenga respuesta.
 - La pantalla de resultados usa una tarjeta amplia con tipografia grande para destacar el total.
-- El toast de progreso recuperado es una tarjeta blanca flotante con borde izquierdo lima y sombra (ver "Toast de progreso recuperado").
+- El toast de progreso recuperado es una tarjeta blanca flotante con borde izquierdo lima y sombra, en la esquina superior derecha debajo del navbar (ver "Toast de progreso recuperado").
+- El boton "Anterior" es un boton secundario: fondo blanco, texto `gray-900`, borde de 2 px `border-gray-900`, `rounded` y `font-semibold`, con la misma altura que "Siguiente" (`py-1.5` mas el borde equivale a `py-2`). Al pasar el cursor se rellena con la paleta lima (`hover:bg-lime-100 hover:border-lime-700 hover:text-lime-900`). Deshabilitado en la pregunta 1 (`disabled:opacity-50 disabled:cursor-not-allowed`, sin cambio al pasar el cursor).
 - "Borrar respuestas" es un boton grande rojo con borde (ver "Borrar respuestas durante el cuestionario"); el modal usa un fondo `bg-black/50` y un dialogo blanco centrado que entra con transicion de opacidad y escala (`scale-95` a `scale-100`, `duration-200`).
 - "Contestar de nuevo" es un boton con borde lima junto a "Volver al Inicio"; "Revisar mis respuestas" es texto gris subrayado.
 
@@ -248,7 +250,8 @@ Claves especiales en `respuestas`:
 
 - Contraste: `red-700` sobre blanco y blanco sobre `red-700` superan la relacion 4.5:1 de WCAG AA; el texto del toast es `gray-800` y su accion `lime-800` sobre blanco.
 - Botones de borrado y del modal con area de toque minima de 48 px (`min-h-12`) y texto de 16 px o mas.
-- Anillo de foco visible (`focus-visible:ring-4`) en los botones del modal y en "Borrar respuestas"; `focus-visible:ring-2` en los botones del toast.
+- Anillo de foco visible (`focus-visible:ring-4`) en los botones del modal, en "Borrar respuestas" y en "Anterior" (`ring-lime-300`); `focus-visible:ring-2` en los botones del toast.
+- "Anterior": `gray-900` sobre blanco y `lime-900` sobre `lime-100` superan ampliamente la relacion 4.5:1 de WCAG AA.
 - Iconos SVG decorativos con `aria-hidden="true"`; el boton de cierre del toast tiene `aria-label="Cerrar aviso"`.
 - El modal tiene `role="dialog"`, `aria-modal="true"`, `aria-labelledby` (titulo) y `aria-describedby` (descripcion). Al abrir, el foco va a "Cancelar"; Tab y Shift+Tab quedan atrapados dentro; al cerrar, el foco vuelve al boton que lo abrio (si sigue en la pagina). El scroll del body se bloquea mientras esta abierto. Durante la transicion de salida el modal queda con `aria-hidden`.
 - Todas las transiciones usan `motion-reduce:transition-none`.

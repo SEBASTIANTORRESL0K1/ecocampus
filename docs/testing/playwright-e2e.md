@@ -176,7 +176,7 @@ Esta logica esta encapsulada dentro de `answerTransporte`; quien llama al helper
 
 ### Test 8 — El progreso se conserva al recargar
 
-**Que verifica:** tras responder tres preguntas y hacer `page.reload()`, se restaura el mismo paso ("Pregunta 3 de 31") con la opcion seleccionada, aparece el toast "Recuperamos tus respuestas guardadas." y las respuestas anteriores siguen marcadas. Al final verifica que el toast se oculta solo (espera hasta 8 s con `toBeHidden({ timeout: 8000 })`).
+**Que verifica:** tras responder tres preguntas y hacer `page.reload()`, se restaura el mismo paso ("Pregunta 3 de 31") con la opcion seleccionada, aparece el toast "Recuperamos tus respuestas guardadas." y las respuestas anteriores siguen marcadas. Comprueba que el toast queda debajo del navbar y en la mitad derecha de la pantalla. Al final verifica que el toast se oculta solo (espera hasta 8 s con `toBeHidden({ timeout: 8000 })`).
 
 ### Test 9 — Borrar respuestas con modal de confirmacion
 

@@ -53,10 +53,14 @@ const ToastAviso = ({ mensaje, textoAccion, onAccion, onCerrar, duracion = 5000,
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) setConFoco(false);
       }}
-      className={`fixed z-40 inset-x-4 bottom-4 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-96
+      // Arriba a la derecha, debajo del navbar (80 px en móvil, 68 px en escritorio).
+      // En móvil entra desde arriba; desde sm entra desde la derecha.
+      className={`fixed z-40 inset-x-4 top-24 sm:inset-x-auto sm:right-6 sm:w-96
       bg-white border-l-4 border-lime-500 rounded-md shadow-xl p-4
       transition-all duration-300 ease-out motion-reduce:transition-none
-      ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+      ${visible
+        ? "opacity-100 translate-x-0 translate-y-0"
+        : "opacity-0 -translate-y-4 sm:translate-y-0 sm:translate-x-8"}`}
     >
       <div className="flex items-start gap-3">
         <p className="flex-grow text-base text-gray-800 font-medium">{mensaje}</p>

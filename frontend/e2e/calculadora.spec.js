@@ -510,8 +510,15 @@ test('Test 8 - El progreso se conserva al recargar la pagina', async ({ page }) 
   await expect(page.getByText('Pregunta 2 de 31')).toBeVisible();
   await expect(page.getByRole('button', { name: '2 a 4 raciones a la semana' })).toHaveClass(/bg-lime-500/);
 
-  // The restored-progress toast auto-dismisses after ~5 s (plus exit transition)
+  // The toast sits in the top-right corner, below the navbar (does not cover it)
   const toast = page.getByRole('status').filter({ hasText: 'Recuperamos tus respuestas guardadas.' });
+  const navBox = await page.locator('nav').boundingBox();
+  const toastBox = await toast.boundingBox();
+  const viewport = page.viewportSize();
+  expect(toastBox.y).toBeGreaterThanOrEqual(navBox.y + navBox.height);
+  expect(toastBox.x + toastBox.width / 2).toBeGreaterThan(viewport.width / 2);
+
+  // The restored-progress toast auto-dismisses after ~5 s (plus exit transition)
   await expect(toast).toBeHidden({ timeout: 8000 });
 });
 
