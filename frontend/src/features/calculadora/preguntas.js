@@ -8,7 +8,9 @@
  *  - tipo: "unica" (radio/select, un solo valor) | "multiple" (checkbox, se suman los valores marcados)
  *  - pregunta: texto de la pregunta
  *  - nota: aclaración de la pregunta (si aplica)
- *  - opciones: [{ label, valor }]
+ *  - imagen: palabra clave en inglés para la imagen ilustrativa del tema (ver ImagenTema.jsx)
+ *  - opciones: [{ label, valor }]. En las preguntas "unica" la primera opción con
+ *    valor 0 es la opción nula ("No consumo...") para quien no consume/usa ese tema.
  *
  * Notas de cálculo:
  *  - Preguntas 21, 22 y 23 se suman entre sí y el resultado se divide entre
@@ -32,6 +34,7 @@ const preguntasHuellaEcologica = {
     preguntas: [
       {
         id: 1,
+        imagen: "fruit",
         tipo: "unica",
         pregunta: "¿Cuántas raciones de fruta consumes a la semana?",
         nota: "Considera una ración de fruta mixta de 200 g",
@@ -45,6 +48,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 2,
+        imagen: "vegetables",
         tipo: "unica",
         pregunta: "¿Cuántas raciones de verdura consumes a la semana?",
         nota: "Considera una ración de verdura mixta de 200 g",
@@ -58,9 +62,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 3,
+        imagen: "bread",
         tipo: "unica",
         pregunta: "¿Cuántas piezas de pan (dulce y/o salado) consumes a la semana?",
         opciones: [
+          { label: "No consumo pan", valor: 0 },
           { label: "1 a 2 piezas a la semana", valor: 27 },
           { label: "2 a 4 piezas a la semana", valor: 55 },
           { label: "4 a 6 piezas a la semana", valor: 93 },
@@ -70,9 +76,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 4,
+        imagen: "tortilla",
         tipo: "unica",
         pregunta: "¿Qué cantidad de tortilla consumes en promedio al día (piezas)?",
         opciones: [
+          { label: "No consumo tortilla", valor: 0 },
           { label: "1 a 2 piezas al día", valor: 91 },
           { label: "2 a 4 piezas al día", valor: 182 },
           { label: "4 a 6 piezas al día", valor: 295 },
@@ -82,9 +90,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 5,
+        imagen: "beef",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana consumes carne de res?",
         opciones: [
+          { label: "No como carne de res", valor: 0 },
           { label: "1 a 2 veces por semana", valor: 57 },
           { label: "2 a 4 veces por semana", valor: 121 },
           { label: "4 a 6 veces por semana", valor: 190 },
@@ -94,9 +104,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 6,
+        imagen: "chicken",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana consumes carne de pollo?",
         opciones: [
+          { label: "No como carne de pollo", valor: 0 },
           { label: "1 a 2 veces por semana", valor: 234 },
           { label: "2 a 4 veces por semana", valor: 470 },
           { label: "4 a 6 veces por semana", valor: 789 },
@@ -105,9 +117,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 7,
+        imagen: "pork",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana consumes carne de cerdo?",
         opciones: [
+          { label: "No como carne de cerdo", valor: 0 },
           { label: "1 a 2 veces por semana", valor: 12 },
           { label: "2 a 4 veces por semana", valor: 25 },
           { label: "4 a 6 veces por semana", valor: 41 },
@@ -117,9 +131,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 8,
+        imagen: "seafood",
         tipo: "unica",
         pregunta: "¿Cuántas veces al mes consumes pescado y/o mariscos?",
         opciones: [
+          { label: "No como pescado ni mariscos", valor: 0 },
           { label: "1 a 2 veces al mes", valor: 217 },
           { label: "2 a 4 veces al mes", valor: 425 },
           { label: "4 a 6 veces al mes", valor: 711 },
@@ -129,10 +145,12 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 9,
+        imagen: "yogurt",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana consumes yoghurt?",
         nota: "Considera una ración en presentación individual de vaso o para beber",
         opciones: [
+          { label: "No consumo yoghurt", valor: 0 },
           { label: "1 a 2 veces a la semana", valor: 104 },
           { label: "3 a 4 veces a la semana", valor: 243 },
           { label: "5 a 6 veces a la semana", valor: 382 },
@@ -142,10 +160,12 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 10,
+        imagen: "milk",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana tomas leche?",
         nota: "Considera una ración de 250 mL",
         opciones: [
+          { label: "No tomo leche", valor: 0 },
           { label: "1 a 2 veces a la semana", valor: 130 },
           { label: "3 a 4 veces a la semana", valor: 304 },
           { label: "5 a 6 veces a la semana", valor: 478 },
@@ -155,6 +175,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 11,
+        imagen: "snacks",
         tipo: "multiple",
         pregunta:
           "¿Cuál de los siguientes alimentos consumes durante una semana promedio? Indica cuántas veces por semana consumes cada uno; el valor de cada ítem se multiplica por el número de veces marcado.",
@@ -173,9 +194,10 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 12,
+        imagen: "soda",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana tomas refresco?",
-        nota: "Considera como base una lata de refresco de 355 mL. Si no consumes refresco, omite esta pregunta.",
+        nota: "Considera como base una lata de refresco de 355 mL. Si no consumes refresco, elige \"No consumo refresco\".",
         opciones: [
           { label: "No consumo refresco", valor: 0 },
           { label: "1 a 2 veces a la semana", valor: 1 },
@@ -187,9 +209,10 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 13,
+        imagen: "cigarette",
         tipo: "unica",
         pregunta: "¿Cuántos cigarrillos fumas al día?",
-        nota: "Si no fumas, omite esta pregunta",
+        nota: "Si no fumas, elige \"No fumo\".",
         opciones: [
           { label: "No fumo", valor: 0 },
           { label: "1 al día", valor: 3 },
@@ -201,9 +224,10 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 14,
+        imagen: "beer",
         tipo: "unica",
         pregunta: "¿En cuánto estimas tu consumo a la semana de cerveza?",
-        nota: "Toma como base una lata de cerveza de 355 mL. Si no consumes, pasa a la siguiente pregunta.",
+        nota: "Toma como base una lata de cerveza de 355 mL. Si no consumes, elige \"No consumo cerveza\".",
         opciones: [
           { label: "No consumo cerveza", valor: 0 },
           { label: "1 a 2 cervezas a la semana", valor: 40 },
@@ -215,9 +239,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 15,
+        imagen: "waterbottle",
         tipo: "unica",
         pregunta: "¿Cuántos litros (L) de agua embotellada consumes aproximadamente a la semana?",
         opciones: [
+          { label: "No consumo agua embotellada", valor: 0 },
           { label: "1 a 2 L", valor: 4 },
           { label: "3 a 4 L", valor: 10 },
           { label: "5 a 6 L", valor: 14 },
@@ -234,10 +260,12 @@ const preguntasHuellaEcologica = {
     preguntas: [
       {
         id: 16,
+        imagen: "subway",
         tipo: "unica",
         pregunta: "¿Cuántos kilómetros recorres diariamente en el Sistema Colectivo Metro?",
         nota: "Considera recorridos de ida y vuelta",
         opciones: [
+          { label: "No uso el Metro", valor: 0 },
           { label: "2-6 kilómetros diarios", valor: 68 },
           { label: "7-12 kilómetros diarios", valor: 160 },
           { label: "13-18 kilómetros diarios", valor: 260 },
@@ -247,10 +275,12 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 17,
+        imagen: "bus",
         tipo: "unica",
         pregunta: "¿Cuántos kilómetros recorres diariamente en transporte colectivo (combi, microbús o autobús)?",
         nota: "Considera recorridos de ida y vuelta",
         opciones: [
+          { label: "No uso transporte colectivo", valor: 0 },
           { label: "5-7 kilómetros diarios", valor: 250 },
           { label: "8-10 kilómetros diarios", valor: 380 },
           { label: "11-13 kilómetros diarios", valor: 510 },
@@ -260,10 +290,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 18,
+        imagen: "airplane",
         tipo: "unica",
         pregunta: "¿Cuántas horas, en promedio, viajas en avión al año?",
         nota:
-          "Considera recorridos de ida y vuelta. Si no utilizas este transporte, pasa a la siguiente pregunta.",
+          "Considera recorridos de ida y vuelta. Si no utilizas este transporte, elige \"No viajo en avión\".",
         opciones: [
           { label: "No viajo en avión", valor: 0 },
           { label: "Menos de 2 horas (ej. Méx-Acapulco-Méx)", valor: 1100 },
@@ -275,6 +306,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 19,
+        imagen: "car",
         tipo: "unica",
         pregunta: "¿Cuentas con auto propio?",
         opciones: [
@@ -284,10 +316,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 20,
+        imagen: "taxi",
         tipo: "unica",
         pregunta: "¿Qué distancia recorres (km) en auto propio o taxi, diariamente?",
         nota:
-          "Considera recorridos de ida y vuelta. Si no usas este transporte, omite la respuesta y pasa a la siguiente pregunta.",
+          "Considera recorridos de ida y vuelta. Si no usas este transporte, elige \"No uso auto propio ni taxi\".",
         opciones: [
           { label: "No uso auto propio ni taxi", valor: 0 },
           { label: "2-6 kilómetros diarios", valor: 520 },
@@ -307,6 +340,7 @@ const preguntasHuellaEcologica = {
     preguntas: [
       {
         id: 21,
+        imagen: "appliances",
         tipo: "multiple",
         pregunta:
           "De los siguientes aparatos electrodomésticos, si cuentas con ellos suma la cantidad indicada; de lo contrario no sumes nada.",
@@ -321,9 +355,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 22,
+        imagen: "lightbulb",
         tipo: "unica",
         pregunta: "¿Cuántos focos convencionales hay en tu casa?",
         opciones: [
+          { label: "No hay focos convencionales en mi casa", valor: 0 },
           { label: "1-3", valor: 190 },
           { label: "4-6", valor: 480 },
           { label: "7-9", valor: 780 },
@@ -333,9 +369,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 23,
+        imagen: "lightbulb",
         tipo: "unica",
         pregunta: "¿Cuántos focos ahorradores hay en tu casa?",
         opciones: [
+          { label: "No hay focos ahorradores en mi casa", valor: 0 },
           { label: "1-3", valor: 78 },
           { label: "4-6", valor: 190 },
           { label: "7-9", valor: 310 },
@@ -345,6 +383,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 24,
+        imagen: "smartphone",
         tipo: "unica",
         pregunta: "¿Cuentas con teléfono celular propio?",
         nota: "Si tienes más de 1, multiplica el valor por el número de dispositivos.",
@@ -355,6 +394,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 25,
+        imagen: "television",
         tipo: "multiple",
         pregunta:
           "De los siguientes aparatos electrónicos, ¿cuánto tiempo a la semana los mantienes encendidos? Selecciona el rango correspondiente para cada aparato; los valores se suman.",
@@ -387,9 +427,11 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 26,
+        imagen: "waterheater",
         tipo: "unica",
         pregunta: "Tu calentador o \"boiler\" utiliza:",
         opciones: [
+          { label: "No tengo calentador / boiler", valor: 0 },
           { label: "Gas LP", valor: 500 },
           { label: "Gas natural", valor: 400 },
           { label: "Electricidad", valor: 300 },
@@ -397,6 +439,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 27,
+        imagen: "shower",
         tipo: "unica",
         pregunta: "¿Cuánto tiempo tardas en bañarte?",
         opciones: [
@@ -408,6 +451,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 28,
+        imagen: "toothbrush",
         tipo: "unica",
         pregunta: "Cuando me lavo los dientes…",
         opciones: [
@@ -417,6 +461,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 29,
+        imagen: "toilet",
         tipo: "unica",
         pregunta: "¿Cuántas veces por día vacías el escusado o WC?",
         opciones: [
@@ -434,9 +479,11 @@ const preguntasHuellaEcologica = {
     preguntas: [
       {
         id: 30,
+        imagen: "notebook",
         tipo: "unica",
         pregunta: "¿Cuántas libretas profesionales de 100 hojas usas en un semestre?",
         opciones: [
+          { label: "No uso libretas", valor: 0 },
           { label: "2 a 3 libretas por semestre", valor: 58 },
           { label: "3 a 4 libretas por semestre", valor: 81 },
           { label: "4 a 5 libretas por semestre", valor: 105 },
@@ -458,7 +505,7 @@ const preguntasHuellaEcologica = {
  * Calcula el puntaje total de la huella ecológica a partir de las respuestas del usuario.
  *
  * @param {Object} respuestas - Respuestas del usuario, indexadas por id de pregunta.
- *   - Para tipo "unica": respuestas[id] = valor numérico de la opción elegida (o 0/undefined si se omitió).
+ *   - Para tipo "unica": respuestas[id] = valor numérico de la opción elegida (0 si eligió la opción nula).
  *   - Para tipo "multiple" normal (ninguna en este test aparte de los casos especiales abajo):
  *     respuestas[id] = suma de valores ya calculada, o array de valores seleccionados.
  *   - Casos especiales que debes construir tú en el formulario antes de llamar a esta función:

@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import PageLayout from "../../components/layout/PageLayout";
 import { preguntasHuellaEcologica, calcularHuellaEcologica } from "./preguntas";
+import ImagenTema from "./ImagenTema";
+import { pasoRespondido } from "./pasoRespondido";
 
 const SECCIONES = ["alimentos", "transporte", "energia", "forestal"];
 const GRUPOS_25 = ["Televisor", "Computadora", "DVD", "Estéreo"];
@@ -15,7 +17,7 @@ function construirPasos() {
     const seccion = preguntasHuellaEcologica[clave];
     seccion.preguntas.forEach((pregunta) => {
       if (pregunta.id === 21) {
-        pasos.push({ tipo: "habitantesHogar", seccionTitulo: seccion.titulo });
+        pasos.push({ tipo: "habitantesHogar", imagen: "family", seccionTitulo: seccion.titulo });
       }
       let tipo = "unica";
       if (pregunta.id === 11) tipo = "multipleCantidad";
@@ -36,6 +38,20 @@ const Calculadora = () => {
   const [resultado, setResultado] = useState(null);
 
   const paso = pasos[pasoActual];
+  const respondido = pasoRespondido(paso, respuestas);
+
+  // Imagen ilustrativa del paso (el paso habitantesHogar no tiene pregunta propia).
+  const imagenPaso = paso.pregunta
+    ? {
+        palabraClave: paso.pregunta.imagen,
+        lock: paso.pregunta.id,
+        alt: `Imagen ilustrativa: ${paso.pregunta.pregunta}`,
+      }
+    : {
+        palabraClave: paso.imagen,
+        lock: 0,
+        alt: "Imagen ilustrativa: personas que viven en el hogar",
+      };
 
   const gruposDe25 = useMemo(() => {
     if (paso.tipo !== "multiGrupo") return [];
@@ -62,7 +78,18 @@ const Calculadora = () => {
     const detalle = respuestas.detalle21 ? [...respuestas.detalle21] : opciones.map(() => false);
     detalle[index] = !detalle[index];
     const total = detalle.reduce((acc, marcado, i) => acc + (marcado ? opciones[i].valor : 0), 0);
-    setRespuestas({ ...respuestas, detalle21: detalle, 21: total });
+    setRespuestas({ ...respuestas, detalle21: detalle, 21: total, ninguno21: false });
+  };
+
+  // "Ninguno de estos" desmarca todos los electrodomésticos (Q21 = 0).
+  const toggleNinguno21 = () => {
+    const opciones = paso.pregunta.opciones;
+    setRespuestas({
+      ...respuestas,
+      ninguno21: !respuestas.ninguno21,
+      detalle21: opciones.map(() => false),
+      21: 0,
+    });
   };
 
   const actualizarCantidadCelulares = (cantidad) => {
@@ -81,6 +108,7 @@ const Calculadora = () => {
   };
 
   const handleSiguiente = () => {
+    if (!respondido) return;
     if (pasoActual < pasos.length - 1) {
       setPasoActual(pasoActual + 1);
     } else {
@@ -114,6 +142,8 @@ const Calculadora = () => {
       {!verResultado && (
         <div className="flex-grow flex flex-col items-center justify-center p-6">
           <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-md">
+            <ImagenTema key={pasoActual} {...imagenPaso} />
+
             {/* --- Pregunta de una sola opción --- */}
             {paso.tipo === "unica" && (
               <>
@@ -190,6 +220,15 @@ const Calculadora = () => {
                       </button>
                     );
                   })}
+                </div>
+                <div className="mt-3">
+                  <button
+                    onClick={toggleNinguno21}
+                    className={`w-full py-3 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 text-left
+                    ${respuestas.ninguno21 ? "bg-lime-500 border-lime-600 font-bold text-white" : ""}`}
+                  >
+                    Ninguno de estos
+                  </button>
                 </div>
               </>
             )}
@@ -268,6 +307,12 @@ const Calculadora = () => {
               </>
             )}
 
+            {!respondido && (
+              <p className="text-sm text-gray-500 text-center mt-4">
+                Selecciona una opción para continuar.
+              </p>
+            )}
+
             {/* Botones de navegación */}
             <div className="flex justify-between mt-6">
               <button
@@ -279,7 +324,8 @@ const Calculadora = () => {
               </button>
               <button
                 onClick={handleSiguiente}
-                className="px-4 py-2 bg-lime-500 text-white rounded hover:bg-lime-700"
+                disabled={!respondido}
+                className="px-4 py-2 bg-lime-500 text-white rounded hover:bg-lime-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-lime-500"
               >
                 {pasoActual < pasos.length - 1 ? "Siguiente" : "Finalizar"}
               </button>
