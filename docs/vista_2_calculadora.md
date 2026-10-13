@@ -3,6 +3,8 @@
 - Ruta: `/calculadora`
 - Componente: `src/features/calculadora/Calculadora.jsx`
 - Datos de preguntas: `src/features/calculadora/preguntas.js`
+- Validacion de pasos: `src/features/calculadora/pasoRespondido.js`
+- Imagen ilustrativa: `src/features/calculadora/ImagenTema.jsx`
 
 ---
 
@@ -37,6 +39,56 @@ Ademas existe un **paso especial de infraestructura** previo a la seccion C dond
 | `cantidadDispositivo` | Input numerico para cantidad de telefonos moviles | Q24 |
 | `multiGrupo` | Dropdown por tipo de dispositivo (Televisor, Computadora, DVD, Estereo) con horas semanales de uso | Q25 |
 | `habitantesHogar` | Input numerico para numero de personas en el hogar | Paso especial antes de Q21 |
+
+### Opcion nula
+
+Las preguntas `unica` que no tenian una opcion con `valor: 0` incluyen ahora una **opcion nula** como primera opcion, para quien no consume o no usa ese tema. Su valor es 0 y no altera los puntajes del resto de opciones.
+
+| Pregunta | Opcion nula |
+| :--- | :--- |
+| Q3 | No consumo pan |
+| Q4 | No consumo tortilla |
+| Q5 | No como carne de res |
+| Q6 | No como carne de pollo |
+| Q7 | No como carne de cerdo |
+| Q8 | No como pescado ni mariscos |
+| Q9 | No consumo yoghurt |
+| Q10 | No tomo leche |
+| Q15 | No consumo agua embotellada |
+| Q16 | No uso el Metro |
+| Q17 | No uso transporte colectivo |
+| Q22 | No hay focos convencionales en mi casa |
+| Q23 | No hay focos ahorradores en mi casa |
+| Q26 | No tengo calentador / boiler |
+| Q30 | No uso libretas |
+
+Q1, Q2, Q12, Q13, Q14, Q18, Q19 y Q20 ya tenian una opcion con valor 0. Q27 (bano), Q28 (lavado de dientes) y Q29 (WC) no tienen opcion nula porque son habitos que siempre aplican. Las notas de Q12, Q13, Q14, Q18 y Q20 ya no indican omitir la pregunta, sino elegir su opcion nula.
+
+### Seleccion obligatoria
+
+El boton "Siguiente" / "Finalizar" permanece deshabilitado (`disabled:opacity-50 disabled:cursor-not-allowed`) hasta que el paso actual tenga respuesta, y bajo las opciones se muestra el texto "Selecciona una opcion para continuar.". La regla vive en la funcion pura `pasoRespondido(paso, respuestas)`:
+
+| Tipo de paso | Condicion para avanzar |
+| :--- | :--- |
+| `unica` | `respuestas[id] !== undefined` (la opcion nula con valor 0 es una respuesta valida) |
+| `multipleCheckbox` (Q21) | Al menos un electrodomestico marcado, o el boton "Ninguno de estos" activo (`ninguno21`) |
+| `multipleCantidad`, `cantidadDispositivo`, `multiGrupo`, `habitantesHogar` | Siempre respondido: sus valores por defecto (0, "No tengo / no lo uso", 1 habitante) ya son una respuesta valida |
+
+En Q21, "Ninguno de estos" desmarca todos los electrodomesticos y deja `respuestas[21] = 0`; marcar cualquier electrodomestico desactiva "Ninguno de estos".
+
+### Imagen ilustrativa
+
+Cada pregunta en `preguntas.js` tiene un campo `imagen` con una palabra clave en ingles del tema (por ejemplo `fruit`, `bread`, `subway`, `lightbulb`, `notebook`); el paso `habitantesHogar` usa `family`. En la parte superior de la tarjeta de cada paso se muestra una imagen obtenida de **LoremFlickr** (gratuito, sin API key):
+
+```
+https://loremflickr.com/640/320/{palabraClave}?lock={id}
+```
+
+- `lock` usa el id de la pregunta (0 para `habitantesHogar`), de modo que cada pregunta muestra siempre la misma imagen.
+- La URL se construye en `urlImagenTema()` (en `ImagenTema.jsx`); para cambiar de proveedor basta con modificar esa funcion.
+- El contenedor gris (`bg-gray-100`, `h-40`) reserva el espacio mientras la imagen carga (`loading="lazy"`).
+- El texto `alt` es `Imagen ilustrativa: {texto de la pregunta}`.
+- Si la imagen falla (`onError`), se oculta y el contenedor muestra "Imagen no disponible". El componente recibe `key={pasoActual}` para reiniciar ese estado al cambiar de paso.
 
 ---
 
@@ -83,6 +135,7 @@ Claves especiales en `respuestas`:
 
 - `detalle11`: array de frecuencias para los alimentos de Q11
 - `detalle21`: array de booleanos para los electrodomesticos de Q21
+- `ninguno21`: `true` cuando se eligio "Ninguno de estos" en Q21 (en ese caso `respuestas[21] = 0`)
 - `cantidadCelulares`: cantidad de celulares ingresada en Q24
 - `detalle25`: objeto con horas de uso por tipo de dispositivo para Q25
 - `habitantesHogar`: numero de habitantes del hogar
@@ -95,6 +148,7 @@ Claves especiales en `respuestas`:
 | :--- | :--- | :--- |
 | `PageLayout` | `src/components/layout/PageLayout.jsx` | Estructura global con Navbar y Footer |
 | `Link` | React Router DOM | Boton "Volver al Inicio" en la pantalla de resultados |
+| `ImagenTema` | `src/features/calculadora/ImagenTema.jsx` | Imagen ilustrativa del tema de cada paso (LoremFlickr) con espacio reservado y respaldo "Imagen no disponible" |
 
 ---
 
@@ -104,4 +158,6 @@ Claves especiales en `respuestas`:
 - Barra de progreso verde lima en la parte superior que avanza con cada pregunta.
 - Tarjeta blanca centrada con sombra que contiene cada pregunta.
 - Opciones seleccionadas se resaltan en verde lima (`bg-lime-500`).
+- Imagen ilustrativa de 160 px de alto (`h-40 object-cover`) en la parte superior de la tarjeta.
+- Boton "Siguiente" / "Finalizar" semitransparente y no clicable mientras el paso no tenga respuesta.
 - La pantalla de resultados usa una tarjeta amplia con tipografia grande para destacar el total.

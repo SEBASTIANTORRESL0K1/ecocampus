@@ -12,6 +12,10 @@
  *   - 1  Forestal (Q30)
  *
  * Infrastructure (6,400 pts) is always added to the total; it is not a step.
+ *
+ * Selection is mandatory: "Siguiente"/"Finalizar" stays disabled until the
+ * current step is answered. Most unica questions start with a null option
+ * (valor 0, e.g. "No consumo pan"), so pick='first' selects it as the minimum.
  */
 
 import { test, expect } from '@playwright/test';
@@ -53,8 +57,8 @@ async function clickFinalizar(page) {
 }
 
 /**
- * Advances through all Alimentos steps (Q1-Q15) choosing the FIRST option of
- * every unica question and leaving multipleCantidad (Q11) inputs at 0.
+ * Advances through all Alimentos steps (Q1-Q15) choosing the first/last option of
+ * every unica question and leaving multipleCantidad (Q11) inputs at 0 for 'first'.
  *
  * @param {import('@playwright/test').Page} page
  * @param {'first'|'last'} pick - which option to choose for unica questions
@@ -99,7 +103,7 @@ async function answerAlimentos(page, pick) {
  *
  * Q19 ("¿Cuentas con auto propio?"): first=last button ("No", 0) / last=first button ("Sí", 12000)
  * Q20 ("distancia en auto/taxi"):    first=first button ("No uso", 0) / last=last button ("25-30 km", 3500)
- * Q16-Q18: first=first button / last=last button
+ * Q16-Q18: first=first button (null option, 0) / last=last button
  */
 async function answerTransporte(page, pick) {
   for (let step = 16; step <= 20; step++) {
@@ -142,13 +146,17 @@ async function answerHabitantesHogar(page, value) {
  *   step 30 -> Q29 unica
  */
 async function answerEnergia(page, pick) {
-  // Q21 – multipleCheckbox (step 22): toggle all for max, none for min
+  // Q21 – multipleCheckbox (step 22): toggle every appliance for max,
+  // "Ninguno de estos" for min (selection is mandatory). The "Ninguno" button
+  // lives outside div.space-y-3, so the appliance loop never toggles it.
   if (pick === 'last') {
     const buttons = page.locator('div.space-y-3 > button');
     const count = await buttons.count();
     for (let i = 0; i < count; i++) {
       await buttons.nth(i).click();
     }
+  } else {
+    await page.getByRole('button', { name: 'Ninguno de estos' }).click();
   }
   await clickSiguiente(page, 23);
 
@@ -197,11 +205,14 @@ async function answerEnergia(page, pick) {
   }
   await clickSiguiente(page, 27);
 
-  // Q26 unica (step 27): Gas LP=500 (first), Gas natural=400 (second), Electricidad=300 (last)
+  // Q26 unica (step 27): "No tengo calentador / boiler"=0 (first), Gas LP=500,
+  // Gas natural=400, Electricidad=300 (last). Highest is not at either end.
   {
-    const buttons = page.locator('div.space-y-3 > button');
-    if (pick === 'first') { await buttons.last().click();  } // Electricidad (300) -> lowest
-    else                  { await buttons.first().click(); } // Gas LP (500)       -> highest
+    if (pick === 'first') {
+      await page.getByRole('button', { name: 'No tengo calentador / boiler' }).click(); // 0 -> lowest
+    } else {
+      await page.getByRole('button', { name: 'Gas LP' }).click(); // 500 -> highest
+    }
     await clickSiguiente(page, 28);
   }
 
@@ -289,10 +300,10 @@ test('Test 1 - Navegacion basica: primer paso visible con progreso y botones cor
   const anteriorBtn = page.getByRole('button', { name: 'Anterior' });
   await expect(anteriorBtn).toBeDisabled();
 
-  // "Siguiente" button is visible and enabled
+  // "Siguiente" button is visible but disabled until an option is chosen
   const siguienteBtn = page.getByRole('button', { name: 'Siguiente' });
   await expect(siguienteBtn).toBeVisible();
-  await expect(siguienteBtn).toBeEnabled();
+  await expect(siguienteBtn).toBeDisabled();
 });
 
 // ---------------------------------------------------------------------------
@@ -389,15 +400,16 @@ test('Test 5 - Input de celulares (Q24) acepta valor 3 y permite continuar', asy
   // habitantesHogar (step 21)
   await answerHabitantesHogar(page, 1);
 
-  // Q21 multipleCheckbox (step 22) – skip selection
+  // Q21 multipleCheckbox (step 22) – selection is mandatory, choose "Ninguno de estos"
+  await page.getByRole('button', { name: 'Ninguno de estos' }).click();
   await clickSiguiente(page, 23);
 
-  // Q22 unica (step 23)
-  await page.locator('div.space-y-3 > button').first().click();
+  // Q22 unica (step 23): null option
+  await page.getByRole('button', { name: 'No hay focos convencionales en mi casa' }).click();
   await clickSiguiente(page, 24);
 
-  // Q23 unica (step 24)
-  await page.locator('div.space-y-3 > button').first().click();
+  // Q23 unica (step 24): null option
+  await page.getByRole('button', { name: 'No hay focos ahorradores en mi casa' }).click();
   await clickSiguiente(page, 25);
 
   // Now at Q24 cantidadDispositivo (step 25)
@@ -441,6 +453,35 @@ test('Test 6 - Paso habitantesHogar acepta valor 4 y avanza correctamente', asyn
   // Click Siguiente and verify we advance to step 22 (Q21 multipleCheckbox)
   await clickSiguiente(page, 22);
   await expect(page.getByText('Pregunta 22 de 31')).toBeVisible();
+});
+
+// ---------------------------------------------------------------------------
+// Test 7 – Mandatory selection and null option
+// ---------------------------------------------------------------------------
+
+test('Test 7 - Seleccion obligatoria y opcion nula', async ({ page }) => {
+  await gotoCalculadora(page);
+
+  const siguienteBtn = page.getByRole('button', { name: 'Siguiente' });
+
+  // Step 1: disabled until an option is clicked
+  await expect(siguienteBtn).toBeDisabled();
+  await expect(page.getByText('Selecciona una opción para continuar.')).toBeVisible();
+  await page.getByRole('button', { name: '1 a 2 raciones a la semana' }).click();
+  await expect(siguienteBtn).toBeEnabled();
+  await expect(page.getByText('Selecciona una opción para continuar.')).toBeHidden();
+  await clickSiguiente(page, 2);
+
+  await page.getByRole('button', { name: '1 a 2 raciones a la semana' }).click();
+  await clickSiguiente(page, 3);
+
+  // Step 3 (Q3, pan): the null option exists and counts as an answer
+  await expect(siguienteBtn).toBeDisabled();
+  const nula = page.getByRole('button', { name: 'No consumo pan' });
+  await expect(nula).toBeVisible();
+  await nula.click();
+  await expect(siguienteBtn).toBeEnabled();
+  await clickSiguiente(page, 4);
 });
 
 }); // end test.describe
