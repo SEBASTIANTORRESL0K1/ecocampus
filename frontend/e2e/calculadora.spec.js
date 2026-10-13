@@ -545,6 +545,13 @@ test('Test 9 - Borrar respuestas pide confirmacion en un modal y reinicia el cue
   await expect(borrar).toBeFocused();
   await expect(page.getByText('Pregunta 2 de 31')).toBeVisible();
 
+  // Clicking the ::backdrop (outside the dialog box) closes it without clearing
+  await borrar.click();
+  await expect(dialogo).toBeVisible();
+  await page.mouse.click(5, 5);
+  await expect(dialogo).toBeHidden();
+  await expect(page.getByText('Pregunta 2 de 31')).toBeVisible();
+
   // Cancel keeps the progress
   await borrar.click();
   await page.getByRole('button', { name: 'Cancelar' }).click();

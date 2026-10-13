@@ -1,14 +1,16 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef } from "react";
 
-const DURACION_TRANSICION = 200;
 const SELECTOR_ENFOCABLES =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// Diálogo modal de confirmación accesible:
-//  - role="dialog" + aria-modal, con título y descripción enlazados.
-//  - Al abrir enfoca "Cancelar"; Tab / Shift+Tab quedan atrapados dentro.
-//  - Escape o clic en el fondo cancelan; al cerrar el foco vuelve al disparador.
-//  - Bloquea el scroll del body mientras está abierto.
+// Diálogo modal de confirmación sobre el elemento nativo <dialog>:
+//  - showModal() lo pone en la capa superior y vuelve inerte el resto de la página.
+//  - El estado `abierto` del padre es la fuente de verdad: Escape (evento
+//    `cancel`) y el clic en el fondo solo llaman a onCancelar.
+//  - Al abrir enfoca "Cancelar"; Tab / Shift+Tab rotan entre los botones.
+//  - Al cerrar el foco vuelve al disparador y se libera el scroll del body.
+//  - La entrada y salida usan transiciones CSS discretas (@starting-style),
+//    así el diálogo se cierra de inmediato sin esperar temporizadores.
 const ModalConfirmacion = ({
   abierto,
   titulo,
@@ -22,91 +24,81 @@ const ModalConfirmacion = ({
   const idDescripcion = useId();
   const dialogoRef = useRef(null);
   const cancelarRef = useRef(null);
-  const disparadorRef = useRef(null);
+  const abiertoRef = useRef(abierto);
+  abiertoRef.current = abierto;
   const onCancelarRef = useRef(onCancelar);
   onCancelarRef.current = onCancelar;
 
-  // `montado` mantiene el modal en el DOM durante la transición de salida.
-  const [montado, setMontado] = useState(abierto);
-  const [visible, setVisible] = useState(false);
-
   useEffect(() => {
-    if (abierto) {
-      setMontado(true);
-      const t = setTimeout(() => setVisible(true), 10);
-      return () => clearTimeout(t);
-    }
-    setVisible(false);
-    const t = setTimeout(() => setMontado(false), DURACION_TRANSICION);
-    return () => clearTimeout(t);
-  }, [abierto]);
+    const dialogo = dialogoRef.current;
+    if (!abierto || !dialogo) return undefined;
 
-  // Foco inicial, bloqueo de scroll y retorno del foco al cerrar.
-  useEffect(() => {
-    if (!abierto) return undefined;
-    disparadorRef.current = document.activeElement;
-    cancelarRef.current?.focus();
-    const overflowPrevio = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = overflowPrevio;
-      const disparador = disparadorRef.current;
-      if (disparador && disparador.isConnected && typeof disparador.focus === "function") {
-        disparador.focus();
-      }
+    // Escape: se cancela el cierre nativo y se delega en el estado del padre.
+    const alCancelar = (e) => {
+      e.preventDefault();
+      onCancelarRef.current();
     };
-  }, [abierto]);
-
-  // Escape cierra y Tab queda atrapado dentro del diálogo.
-  useEffect(() => {
-    if (!abierto) return undefined;
+    // Si el navegador cerró el diálogo por su cuenta, se sincroniza el estado.
+    const alCerrar = () => {
+      if (abiertoRef.current) onCancelarRef.current();
+    };
+    // El contenido está en un div interno, así que target === dialog solo
+    // ocurre al hacer clic en el fondo (::backdrop). Su equivalente de teclado es Escape.
+    const alHacerClic = (e) => {
+      if (e.target === dialogo) onCancelarRef.current();
+    };
+    // Mantiene Tab / Shift+Tab dentro del diálogo (sin saltar a la barra del navegador).
     const alPresionarTecla = (e) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onCancelarRef.current?.();
-        return;
-      }
-      if (e.key !== "Tab" || !dialogoRef.current) return;
-      const enfocables = Array.from(dialogoRef.current.querySelectorAll(SELECTOR_ENFOCABLES));
+      if (e.key !== "Tab") return;
+      const enfocables = Array.from(dialogo.querySelectorAll(SELECTOR_ENFOCABLES));
       if (enfocables.length === 0) return;
       const primero = enfocables[0];
-      const ultimo = enfocables[enfocables.length - 1];
-      const dentro = dialogoRef.current.contains(document.activeElement);
-      if (e.shiftKey && (document.activeElement === primero || !dentro)) {
+      const ultimo = enfocables.at(-1);
+      if (e.shiftKey && document.activeElement === primero) {
         e.preventDefault();
         ultimo.focus();
-      } else if (!e.shiftKey && (document.activeElement === ultimo || !dentro)) {
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
         e.preventDefault();
         primero.focus();
       }
     };
-    document.addEventListener("keydown", alPresionarTecla);
-    return () => document.removeEventListener("keydown", alPresionarTecla);
+
+    // Eventos propios del <dialog> nativo, registrados mientras está abierto.
+    dialogo.addEventListener("cancel", alCancelar);
+    dialogo.addEventListener("close", alCerrar);
+    dialogo.addEventListener("click", alHacerClic);
+    dialogo.addEventListener("keydown", alPresionarTecla);
+
+    const disparador = document.activeElement;
+    if (!dialogo.open) dialogo.showModal();
+    cancelarRef.current?.focus();
+    const overflowPrevio = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      dialogo.removeEventListener("cancel", alCancelar);
+      dialogo.removeEventListener("close", alCerrar);
+      dialogo.removeEventListener("click", alHacerClic);
+      dialogo.removeEventListener("keydown", alPresionarTecla);
+      document.body.style.overflow = overflowPrevio;
+      if (dialogo.open) dialogo.close();
+      if (disparador?.isConnected) disparador.focus?.();
+    };
   }, [abierto]);
 
-  if (!abierto && !montado) return null;
-
   return (
-    <div
-      // Durante la salida queda oculto para tecnologías de asistencia.
-      aria-hidden={abierto ? undefined : true}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onCancelar();
-      }}
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50
-      transition-opacity duration-200 motion-reduce:transition-none
-      ${visible ? "opacity-100" : "opacity-0"}`}
+    <dialog
+      ref={dialogoRef}
+      aria-labelledby={idTitulo}
+      aria-describedby={idDescripcion}
+      className="m-auto w-[calc(100%-2rem)] max-w-md p-0 bg-white rounded-md shadow-xl
+      opacity-0 scale-95 transition-all transition-discrete duration-200 ease-out
+      open:opacity-100 open:scale-100 starting:open:opacity-0 starting:open:scale-95
+      backdrop:bg-black/50 backdrop:opacity-0 backdrop:transition-all backdrop:transition-discrete backdrop:duration-200
+      open:backdrop:opacity-100 starting:open:backdrop:opacity-0
+      motion-reduce:transition-none motion-reduce:backdrop:transition-none"
     >
-      <div
-        ref={dialogoRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={idTitulo}
-        aria-describedby={idDescripcion}
-        className={`bg-white rounded-md shadow-xl w-full max-w-md p-6
-        transition-all duration-200 ease-out motion-reduce:transition-none
-        ${visible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
-      >
+      <div className="p-6">
         <h2 id={idTitulo} className="text-xl font-bold text-gray-900">
           {titulo}
         </h2>
@@ -129,7 +121,7 @@ const ModalConfirmacion = ({
           </button>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 };
 

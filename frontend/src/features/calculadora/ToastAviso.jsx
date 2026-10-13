@@ -11,6 +11,7 @@ const ToastAviso = ({ mensaje, textoAccion, onAccion, onCerrar, duracion = 5000,
   const [saliendo, setSaliendo] = useState(false);
   const [conCursor, setConCursor] = useState(false);
   const [conFoco, setConFoco] = useState(false);
+  const contenedorRef = useRef(null);
   const restanteRef = useRef(duracion);
   const onCerrarRef = useRef(onCerrar);
   onCerrarRef.current = onCerrar;
@@ -21,6 +22,29 @@ const ToastAviso = ({ mensaje, textoAccion, onAccion, onCerrar, duracion = 5000,
   useEffect(() => {
     const t = setTimeout(() => setEntrado(true), 10);
     return () => clearTimeout(t);
+  }, []);
+
+  // Pausa por cursor y por foco: escuchas nativas sobre el contenedor, que no
+  // es un control (el foco lo reciben sus botones; focusin/focusout burbujean).
+  useEffect(() => {
+    const contenedor = contenedorRef.current;
+    if (!contenedor) return undefined;
+    const alEntrar = () => setConCursor(true);
+    const alSalir = () => setConCursor(false);
+    const alEnfocar = () => setConFoco(true);
+    const alDesenfocar = (e) => {
+      if (!contenedor.contains(e.relatedTarget)) setConFoco(false);
+    };
+    contenedor.addEventListener("mouseenter", alEntrar);
+    contenedor.addEventListener("mouseleave", alSalir);
+    contenedor.addEventListener("focusin", alEnfocar);
+    contenedor.addEventListener("focusout", alDesenfocar);
+    return () => {
+      contenedor.removeEventListener("mouseenter", alEntrar);
+      contenedor.removeEventListener("mouseleave", alSalir);
+      contenedor.removeEventListener("focusin", alEnfocar);
+      contenedor.removeEventListener("focusout", alDesenfocar);
+    };
   }, []);
 
   // Cuenta regresiva que conserva el tiempo restante entre pausas.
@@ -44,15 +68,9 @@ const ToastAviso = ({ mensaje, textoAccion, onAccion, onCerrar, duracion = 5000,
   const visible = entrado && !saliendo;
 
   return (
+    // El contenedor solo pausa el temporizador; el anuncio vive en role="status".
     <div
-      role="status"
-      aria-live="polite"
-      onMouseEnter={() => setConCursor(true)}
-      onMouseLeave={() => setConCursor(false)}
-      onFocus={() => setConFoco(true)}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) setConFoco(false);
-      }}
+      ref={contenedorRef}
       // Arriba a la derecha, debajo del navbar (80 px en móvil, 68 px en escritorio).
       // En móvil entra desde arriba; desde sm entra desde la derecha.
       className={`fixed z-40 inset-x-4 top-24 sm:inset-x-auto sm:right-6 sm:w-96
@@ -63,7 +81,9 @@ const ToastAviso = ({ mensaje, textoAccion, onAccion, onCerrar, duracion = 5000,
         : "opacity-0 -translate-y-4 sm:translate-y-0 sm:translate-x-8"}`}
     >
       <div className="flex items-start gap-3">
-        <p className="flex-grow text-base text-gray-800 font-medium">{mensaje}</p>
+        <p role="status" aria-live="polite" className="flex-grow text-base text-gray-800 font-medium">
+          {mensaje}
+        </p>
         <button
           onClick={() => setSaliendo(true)}
           aria-label="Cerrar aviso"

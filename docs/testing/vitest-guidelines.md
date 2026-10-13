@@ -46,6 +46,23 @@ Reglas del mock:
 
 ---
 
+## `<dialog>` nativo en jsdom
+
+jsdom no implementa `HTMLDialogElement.prototype.showModal()` ni `close()`. `src/setupTests.js` agrega un stub minimo, protegido con `if (!HTMLDialogElement.prototype.showModal)` para que no actue si una version futura de jsdom los implementa:
+
+- `showModal()` / `show()` agregan el atributo `open`.
+- `close()` quita `open` y emite el evento `close` (de forma sincrona).
+
+El stub no simula la capa superior, el fondo inerte ni la tecla Escape. Un `<dialog>` cerrado tiene `display: none` en jsdom, por lo que `queryByRole('dialog')` devuelve `null`; abierto, se encuentra por su rol implicito `dialog`. Para probar Escape, disparar el evento `cancel` sobre el dialogo:
+
+```js
+fireEvent(dialogo, createEvent('cancel', dialogo, {}, { EventType: 'Event' }));
+```
+
+El clic en el fondo (`::backdrop`) se representa con `fireEvent.click(dialogo)`, porque en el navegador ese clic tiene como `target` el propio `<dialog>`.
+
+---
+
 ## Componentes con React Router
 
 Los componentes que usan hooks de React Router (`useNavigate`, `Link`, `NavLink`, etc.) deben envolverse en `MemoryRouter` al renderizarlos en pruebas:
@@ -144,7 +161,8 @@ Pruebas:
 Incluye pruebas de persistencia: respuestas que sobreviven a desmontar y montar, JSON corrupto, y los botones "Contestar de nuevo" y "Revisar mis respuestas". Limpia localStorage en `beforeEach`.
 
 - Toast de progreso recuperado: usa `vi.useFakeTimers()` y `act(() => vi.advanceTimersByTime(...))` para comprobar el cierre automatico a los 5 s, la pausa con el cursor encima y el boton "Cerrar aviso". El avance se divide en dos llamadas (fin de los 5 s y luego los 300 ms de salida) porque el temporizador de salida se programa despues de que React procesa el cambio de estado. Restaurar con `vi.useRealTimers()` en `afterEach`.
-- Modal de confirmacion: foco inicial en "Cancelar", bloqueo de scroll, Cancelar, Escape, clic en el fondo, trampa de foco con Tab / Shift+Tab, retorno del foco y que el almacenamiento solo se borra al confirmar.
+- Toast: la pausa por cursor se prueba con `fireEvent.mouseEnter` sobre el contenedor flotante (`closest('.fixed')`), no sobre el `role="status"` interno; la pausa por foco enfocando "Cerrar aviso" dentro de `act`.
+- Modal de confirmacion (`<dialog>` nativo, ver la seccion anterior): elemento `DIALOG` con atributo `open`, foco inicial en "Cancelar", bloqueo de scroll, Cancelar, Escape (evento `cancel`), clic en el fondo y clic en el contenido (no cierra), rotacion de foco con Tab / Shift+Tab (`keyDown` sobre el boton enfocado), retorno del foco y que el almacenamiento solo se borra al confirmar.
 
 ### `frontend/src/features/calculadora/progresoGuardado.test.js`
 

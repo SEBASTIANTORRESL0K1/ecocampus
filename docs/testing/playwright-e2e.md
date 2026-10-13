@@ -180,7 +180,7 @@ Esta logica esta encapsulada dentro de `answerTransporte`; quien llama al helper
 
 ### Test 9 — Borrar respuestas con modal de confirmacion
 
-**Que verifica:** "Borrar respuestas" abre el dialogo "¿Borrar tus respuestas?" con el foco en "Cancelar"; Escape lo cierra y devuelve el foco al boton; "Cancelar" conserva el progreso; "Sí, borrar respuestas" vuelve a la pregunta 1 y elimina la clave `ecocampus:calculadora:v1`. Tras recargar no se restaura nada. Usa `exact: true` para no confundir el boton con "Borrar respuestas y empezar de nuevo" del toast.
+**Que verifica:** "Borrar respuestas" abre el dialogo "¿Borrar tus respuestas?" con el foco en "Cancelar"; Escape lo cierra y devuelve el foco al boton; un clic en el fondo (`page.mouse.click(5, 5)`, sobre el `::backdrop` del `<dialog>` nativo) lo cierra sin borrar; "Cancelar" conserva el progreso; "Sí, borrar respuestas" vuelve a la pregunta 1 y elimina la clave `ecocampus:calculadora:v1`. Tras recargar no se restaura nada. Usa `exact: true` para no confundir el boton con "Borrar respuestas y empezar de nuevo" del toast.
 
 ### Test 10 — Resultado restaurado y Contestar de nuevo
 

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, createEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Calculadora from './Calculadora';
 import { pasoRespondido } from './pasoRespondido';
@@ -132,15 +132,33 @@ describe('Calculadora - persistencia en localStorage', () => {
       expect(leerGuardado()).not.toBeNull();
     });
 
+    // Contenedor flotante del toast (el role="status" esta en el mensaje interno).
+    const contenedorToast = () => screen.getByRole('status').closest('.fixed');
+
     test('el temporizador se pausa con el cursor encima', () => {
       vi.useFakeTimers();
       montarConProgreso();
 
-      fireEvent.mouseEnter(screen.getByRole('status'));
+      fireEvent.mouseEnter(contenedorToast());
       act(() => vi.advanceTimersByTime(10000));
       expect(screen.getByText('Recuperamos tus respuestas guardadas.')).toBeInTheDocument();
 
-      fireEvent.mouseLeave(screen.getByRole('status'));
+      fireEvent.mouseLeave(contenedorToast());
+      act(() => vi.advanceTimersByTime(5000));
+      act(() => vi.advanceTimersByTime(300));
+      expect(screen.queryByText('Recuperamos tus respuestas guardadas.')).not.toBeInTheDocument();
+    });
+
+    test('el temporizador se pausa mientras el foco esta dentro del toast', () => {
+      vi.useFakeTimers();
+      montarConProgreso();
+
+      const cerrar = screen.getByRole('button', { name: 'Cerrar aviso' });
+      act(() => cerrar.focus());
+      act(() => vi.advanceTimersByTime(10000));
+      expect(screen.getByText('Recuperamos tus respuestas guardadas.')).toBeInTheDocument();
+
+      act(() => cerrar.blur());
       act(() => vi.advanceTimersByTime(5000));
       act(() => vi.advanceTimersByTime(300));
       expect(screen.queryByText('Recuperamos tus respuestas guardadas.')).not.toBeInTheDocument();
@@ -171,6 +189,11 @@ describe('Calculadora - persistencia en localStorage', () => {
   });
 
   describe('modal de confirmacion de Borrar respuestas', () => {
+    // Escape en un <dialog> nativo dispara el evento `cancel` (jsdom no lo hace solo).
+    const presionarEscape = (dialogo) => {
+      fireEvent(dialogo, createEvent('cancel', dialogo, {}, { EventType: 'Event' }));
+    };
+
     const abrirModal = () => {
       renderCalculadora();
       responderPrimeraPregunta();
@@ -180,10 +203,11 @@ describe('Calculadora - persistencia en localStorage', () => {
       return disparador;
     };
 
-    test('abre un dialogo accesible con el foco en Cancelar y bloquea el scroll', () => {
+    test('abre un dialog nativo accesible con el foco en Cancelar y bloquea el scroll', () => {
       abrirModal();
       const dialogo = screen.getByRole('dialog', { name: '¿Borrar tus respuestas?' });
-      expect(dialogo).toHaveAttribute('aria-modal', 'true');
+      expect(dialogo.tagName).toBe('DIALOG');
+      expect(dialogo).toHaveAttribute('open');
       expect(dialogo).toHaveAccessibleDescription(/pregunta 1/i);
       expect(screen.getByRole('button', { name: 'Cancelar' })).toHaveFocus();
       expect(document.body.style.overflow).toBe('hidden');
@@ -201,14 +225,20 @@ describe('Calculadora - persistencia en localStorage', () => {
     });
 
     test('Escape y clic en el fondo cierran sin borrar', () => {
-      abrirModal();
-      fireEvent.keyDown(document, { key: 'Escape' });
+      const disparador = abrirModal();
+      presionarEscape(screen.getByRole('dialog'));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(disparador).toHaveFocus();
+
+      // Un clic en el ::backdrop tiene como target el propio <dialog>
+      fireEvent.click(disparador);
+      fireEvent.click(screen.getByRole('dialog'));
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole('button', { name: 'Borrar respuestas' }));
-      const fondo = screen.getByRole('dialog').parentElement;
-      fireEvent.click(fondo);
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      // Un clic dentro del contenido no cierra
+      fireEvent.click(disparador);
+      fireEvent.click(screen.getByText(/Se perderán todas las respuestas/));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(leerGuardado()).not.toBeNull();
     });
 
@@ -218,10 +248,10 @@ describe('Calculadora - persistencia en localStorage', () => {
       const confirmar = screen.getByRole('button', { name: 'Sí, borrar respuestas' });
 
       confirmar.focus();
-      fireEvent.keyDown(document, { key: 'Tab' });
+      fireEvent.keyDown(confirmar, { key: 'Tab' });
       expect(cancelar).toHaveFocus();
 
-      fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+      fireEvent.keyDown(cancelar, { key: 'Tab', shiftKey: true });
       expect(confirmar).toHaveFocus();
     });
 
