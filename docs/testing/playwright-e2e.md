@@ -170,6 +170,24 @@ Esta logica esta encapsulada dentro de `answerTransporte`; quien llama al helper
 - El input acepta el valor `4`.
 - Despues de hacer clic en "Siguiente", el contador muestra "Pregunta 22 de 31".
 
+### Test 7 — Seleccion obligatoria y opcion nula
+
+**Que verifica:** "Siguiente" esta deshabilitado hasta elegir una opcion y la opcion nula de Q3 ("No consumo pan") cuenta como respuesta.
+
+### Test 8 — El progreso se conserva al recargar
+
+**Que verifica:** tras responder tres preguntas y hacer `page.reload()`, se restaura el mismo paso ("Pregunta 3 de 31") con la opcion seleccionada, aparece el toast "Recuperamos tus respuestas guardadas." y las respuestas anteriores siguen marcadas. Comprueba que el toast queda debajo del navbar y en la mitad derecha de la pantalla. Al final verifica que el toast se oculta solo (espera hasta 8 s con `toBeHidden({ timeout: 8000 })`).
+
+### Test 9 — Borrar respuestas con modal de confirmacion
+
+**Que verifica:** "Borrar respuestas" abre el dialogo "¿Borrar tus respuestas?" con el foco en "Cancelar"; Escape lo cierra y devuelve el foco al boton; un clic en el fondo (`page.mouse.click(5, 5)`, sobre el `::backdrop` del `<dialog>` nativo) lo cierra sin borrar; "Cancelar" conserva el progreso; "Sí, borrar respuestas" vuelve a la pregunta 1 y elimina la clave `ecocampus:calculadora:v1`. Tras recargar no se restaura nada. Usa `exact: true` para no confundir el boton con "Borrar respuestas y empezar de nuevo" del toast.
+
+### Test 10 — Resultado restaurado y Contestar de nuevo
+
+**Que verifica:** al recargar en la pantalla de resultados el resultado se recalcula; "Revisar mis respuestas" vuelve al paso 31 con "Finalizar" habilitado; "Contestar de nuevo" vuelve a la pregunta 1 y borra el almacenamiento.
+
+Nota: cada prueba de Playwright usa un contexto de navegador nuevo, por lo que localStorage empieza vacio en cada test.
+
 ---
 
 ## Ubicacion de nuevos archivos E2E

@@ -1,9 +1,18 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import PageLayout from "../../components/layout/PageLayout";
 import { preguntasHuellaEcologica, calcularHuellaEcologica } from "./preguntas";
 import ImagenTema from "./ImagenTema";
+import ToastAviso from "./ToastAviso";
+import ModalConfirmacion from "./ModalConfirmacion";
 import { pasoRespondido } from "./pasoRespondido";
+import {
+  RESPUESTAS_INICIALES,
+  borrarProgreso,
+  cargarProgreso,
+  guardarProgreso,
+  tieneRespuestas,
+} from "./progresoGuardado";
 
 const SECCIONES = ["alimentos", "transporte", "energia", "forestal"];
 const GRUPOS_25 = ["Televisor", "Computadora", "DVD", "Estéreo"];
@@ -32,10 +41,33 @@ function construirPasos() {
 
 const Calculadora = () => {
   const pasos = useMemo(construirPasos, []);
-  const [pasoActual, setPasoActual] = useState(0);
-  const [respuestas, setRespuestas] = useState({ habitantesHogar: 1 });
-  const [verResultado, setVerResultado] = useState(false);
-  const [resultado, setResultado] = useState(null);
+  // El progreso guardado se lee una sola vez y de forma perezosa para que no
+  // haya un parpadeo de la primera pregunta antes de restaurar.
+  const [progresoInicial] = useState(() => cargarProgreso(pasos.length));
+  const [pasoActual, setPasoActual] = useState(() => progresoInicial?.pasoActual ?? 0);
+  const [respuestas, setRespuestas] = useState(
+    () => progresoInicial?.respuestas ?? { ...RESPUESTAS_INICIALES }
+  );
+  const [verResultado, setVerResultado] = useState(() => progresoInicial?.verResultado ?? false);
+  // El resultado no se guarda: se recalcula a partir de las respuestas restauradas.
+  const [resultado, setResultado] = useState(() =>
+    progresoInicial?.verResultado ? calcularHuellaEcologica(progresoInicial.respuestas) : null
+  );
+  const [avisoRecuperado, setAvisoRecuperado] = useState(
+    () => progresoInicial !== null && tieneRespuestas(progresoInicial.respuestas)
+  );
+  const [modalBorrarAbierto, setModalBorrarAbierto] = useState(false);
+
+  const hayRespuestas = tieneRespuestas(respuestas);
+
+  // Guarda el progreso en cada cambio; si el estado es el inicial, borra la clave.
+  useEffect(() => {
+    if (!verResultado && pasoActual === 0 && !hayRespuestas) {
+      borrarProgreso();
+    } else {
+      guardarProgreso({ respuestas, pasoActual, verResultado });
+    }
+  }, [respuestas, pasoActual, verResultado, hayRespuestas]);
 
   const paso = pasos[pasoActual];
   const respondido = pasoRespondido(paso, respuestas);
@@ -119,6 +151,24 @@ const Calculadora = () => {
 
   const handleAnterior = () => {
     if (pasoActual > 0) setPasoActual(pasoActual - 1);
+  };
+
+  // Borra lo guardado y vuelve a la pregunta 1 con los valores iniciales.
+  const reiniciarCuestionario = () => {
+    borrarProgreso();
+    setPasoActual(0);
+    setRespuestas({ ...RESPUESTAS_INICIALES });
+    setVerResultado(false);
+    setResultado(null);
+    setAvisoRecuperado(false);
+    setModalBorrarAbierto(false);
+  };
+
+  // Regresa al último paso conservando las respuestas para poder cambiarlas.
+  const revisarRespuestas = () => {
+    setVerResultado(false);
+    setResultado(null);
+    setPasoActual(pasos.length - 1);
   };
 
   return (
@@ -319,7 +369,8 @@ const Calculadora = () => {
               <button
                 onClick={handleAnterior}
                 disabled={pasoActual === 0}
-                className="px-4 py-2 bg-black-200 text-black-700 rounded hover:bg-black-300 disabled:opacity-50"
+                // py-1.5 + borde de 2 px iguala la altura de "Siguiente" (py-2 sin borde)
+                className="px-4 py-1.5 bg-white text-gray-900 font-semibold border-2 border-gray-900 rounded hover:bg-lime-100 hover:border-lime-700 hover:text-lime-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lime-300 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-900 disabled:hover:text-gray-900"
               >
                 Anterior
               </button>
@@ -331,6 +382,31 @@ const Calculadora = () => {
                 {pasoActual < pasos.length - 1 ? "Siguiente" : "Finalizar"}
               </button>
             </div>
+
+            {/* Borrar respuestas: abre el modal de confirmación */}
+            {hayRespuestas && (
+              <button
+                onClick={() => setModalBorrarAbierto(true)}
+                className="mt-6 w-full min-h-12 px-4 inline-flex items-center justify-center gap-2 text-base font-semibold text-red-700 bg-white border-2 border-red-700 rounded-md hover:bg-red-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-300 focus-visible:ring-offset-2"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-5 h-5"
+                >
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4h8v2" />
+                  <path d="M19 6l-1 14H6L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                </svg>
+                Borrar respuestas
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -395,17 +471,50 @@ const Calculadora = () => {
               Ibarra-Cisneros &amp; Monroy-Ata, 2014.)
             </p>
 
-            <div className="mt-8">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link
                 to="/"
                 className="px-6 py-3 bg-lime-600 text-white text-xl rounded hover:bg-lime-800"
               >
                 Volver al Inicio
               </Link>
+              <button
+                onClick={reiniciarCuestionario}
+                className="px-6 py-3 border border-lime-600 text-lime-700 text-xl rounded hover:bg-lime-50"
+              >
+                Contestar de nuevo
+              </button>
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={revisarRespuestas}
+                className="text-gray-600 underline hover:text-gray-800"
+              >
+                Revisar mis respuestas
+              </button>
             </div>
           </div>
         </div>
       )}
+      {/* Aviso flotante cuando se restauró progreso guardado */}
+      {avisoRecuperado && (
+        <ToastAviso
+          mensaje="Recuperamos tus respuestas guardadas."
+          textoAccion="Borrar respuestas y empezar de nuevo"
+          onAccion={() => setModalBorrarAbierto(true)}
+          onCerrar={() => setAvisoRecuperado(false)}
+          pausado={modalBorrarAbierto}
+        />
+      )}
+
+      <ModalConfirmacion
+        abierto={modalBorrarAbierto}
+        titulo="¿Borrar tus respuestas?"
+        descripcion="Se perderán todas las respuestas guardadas en este navegador y el cuestionario volverá a empezar desde la pregunta 1."
+        textoConfirmar="Sí, borrar respuestas"
+        onConfirmar={reiniciarCuestionario}
+        onCancelar={() => setModalBorrarAbierto(false)}
+      />
     </PageLayout>
   );
 };
