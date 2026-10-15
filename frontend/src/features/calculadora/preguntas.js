@@ -34,7 +34,7 @@ const preguntasHuellaEcologica = {
     preguntas: [
       {
         id: 1,
-        imagen: "fruit",
+        imagen: "/img/q1.webp",
         tipo: "unica",
         pregunta: "¿Cuántas raciones de fruta consumes a la semana?",
         nota: "Considera una ración de fruta mixta de 200 g",
@@ -48,7 +48,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 2,
-        imagen: "vegetables",
+        imagen: "/img/q2.webp",
         tipo: "unica",
         pregunta: "¿Cuántas raciones de verdura consumes a la semana?",
         nota: "Considera una ración de verdura mixta de 200 g",
@@ -62,7 +62,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 3,
-        imagen: "bread",
+        imagen: "/img/q3.webp",
         tipo: "unica",
         pregunta: "¿Cuántas piezas de pan (dulce y/o salado) consumes a la semana?",
         opciones: [
@@ -76,7 +76,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 4,
-        imagen: "tortilla",
+        imagen: "/img/q4.webp",
         tipo: "unica",
         pregunta: "¿Qué cantidad de tortilla consumes en promedio al día (piezas)?",
         opciones: [
@@ -90,7 +90,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 5,
-        imagen: "beef",
+        imagen: "/img/q5.webp",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana consumes carne de res?",
         opciones: [
@@ -104,7 +104,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 6,
-        imagen: "chicken",
+        imagen: "/img/q6.webp",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana consumes carne de pollo?",
         opciones: [
@@ -117,7 +117,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 7,
-        imagen: "pork",
+        imagen: "/img/q7.webp",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana consumes carne de cerdo?",
         opciones: [
@@ -131,7 +131,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 8,
-        imagen: "seafood",
+        imagen: "/img/q8.webp",
         tipo: "unica",
         pregunta: "¿Cuántas veces al mes consumes pescado y/o mariscos?",
         opciones: [
@@ -145,7 +145,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 9,
-        imagen: "yogurt",
+        imagen: "/img/q9.webp",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana consumes yoghurt?",
         nota: "Considera una ración en presentación individual de vaso o para beber",
@@ -160,7 +160,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 10,
-        imagen: "milk",
+        imagen: "/img/q10.webp",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana tomas leche?",
         nota: "Considera una ración de 250 mL",
@@ -175,7 +175,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 11,
-        imagen: "snacks",
+        imagen: "/img/q11.webp",
         tipo: "multiple",
         pregunta:
           "¿Cuál de los siguientes alimentos consumes durante una semana promedio? Indica cuántas veces por semana consumes cada uno; el valor de cada ítem se multiplica por el número de veces marcado.",
@@ -194,7 +194,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 12,
-        imagen: "soda",
+        imagen: "/img/q12.webp",
         tipo: "unica",
         pregunta: "¿Cuántas veces a la semana tomas refresco?",
         nota: "Considera como base una lata de refresco de 355 mL. Si no consumes refresco, elige \"No consumo refresco\".",
@@ -209,7 +209,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 13,
-        imagen: "cigarette",
+        imagen: "/img/q13.webp",
         tipo: "unica",
         pregunta: "¿Cuántos cigarrillos fumas al día?",
         nota: "Si no fumas, elige \"No fumo\".",
@@ -224,7 +224,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 14,
-        imagen: "beer",
+        imagen: "/img/q14.webp",
         tipo: "unica",
         pregunta: "¿En cuánto estimas tu consumo a la semana de cerveza?",
         nota: "Toma como base una lata de cerveza de 355 mL. Si no consumes, elige \"No consumo cerveza\".",
@@ -239,7 +239,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 15,
-        imagen: "waterbottle",
+        imagen: "/img/q15.webp",
         tipo: "unica",
         pregunta: "¿Cuántos litros (L) de agua embotellada consumes aproximadamente a la semana?",
         opciones: [
@@ -260,7 +260,7 @@ const preguntasHuellaEcologica = {
     preguntas: [
       {
         id: 16,
-        imagen: "subway",
+        imagen: "/img/q16.webp",
         tipo: "unica",
         pregunta: "¿Cuántos kilómetros recorres diariamente en el Sistema Colectivo Metro?",
         nota: "Considera recorridos de ida y vuelta",
@@ -275,7 +275,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 17,
-        imagen: "bus",
+        imagen: "/img/q17.webp",
         tipo: "unica",
         pregunta: "¿Cuántos kilómetros recorres diariamente en transporte colectivo (combi, microbús o autobús)?",
         nota: "Considera recorridos de ida y vuelta",
@@ -290,7 +290,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 18,
-        imagen: "airplane",
+        imagen: "/img/q18.webp",
         tipo: "unica",
         pregunta: "¿Cuántas horas, en promedio, viajas en avión al año?",
         nota:
@@ -306,7 +306,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 19,
-        imagen: "car",
+        imagen: "/img/q19.webp",
         tipo: "unica",
         pregunta: "¿Cuentas con auto propio?",
         opciones: [
@@ -316,7 +316,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 20,
-        imagen: "taxi",
+        imagen: "/img/q20.webp",
         tipo: "unica",
         pregunta: "¿Qué distancia recorres (km) en auto propio o taxi, diariamente?",
         nota:
@@ -340,7 +340,7 @@ const preguntasHuellaEcologica = {
     preguntas: [
       {
         id: 21,
-        imagen: "appliances",
+        imagen: "/img/q21.webp",
         tipo: "multiple",
         pregunta:
           "De los siguientes aparatos electrodomésticos, si cuentas con ellos suma la cantidad indicada; de lo contrario no sumes nada.",
@@ -355,7 +355,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 22,
-        imagen: "lightbulb",
+        imagen: "/img/q22.webp",
         tipo: "unica",
         pregunta: "¿Cuántos focos convencionales hay en tu casa?",
         opciones: [
@@ -369,7 +369,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 23,
-        imagen: "lightbulb",
+        imagen: "/img/q23.webp",
         tipo: "unica",
         pregunta: "¿Cuántos focos ahorradores hay en tu casa?",
         opciones: [
@@ -383,7 +383,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 24,
-        imagen: "smartphone",
+        imagen: "/img/q24.webp",
         tipo: "unica",
         pregunta: "¿Cuentas con teléfono celular propio?",
         nota: "Si tienes más de 1, multiplica el valor por el número de dispositivos.",
@@ -394,7 +394,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 25,
-        imagen: "television",
+        imagen: "/img/q25.webp",
         tipo: "multiple",
         pregunta:
           "De los siguientes aparatos electrónicos, ¿cuánto tiempo a la semana los mantienes encendidos? Selecciona el rango correspondiente para cada aparato; los valores se suman.",
@@ -427,7 +427,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 26,
-        imagen: "waterheater",
+        imagen: "/img/q26.webp",
         tipo: "unica",
         pregunta: "Tu calentador o \"boiler\" utiliza:",
         opciones: [
@@ -439,7 +439,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 27,
-        imagen: "shower",
+        imagen: "/img/q27.webp",
         tipo: "unica",
         pregunta: "¿Cuánto tiempo tardas en bañarte?",
         opciones: [
@@ -451,7 +451,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 28,
-        imagen: "toothbrush",
+        imagen: "/img/q28.webp",
         tipo: "unica",
         pregunta: "Cuando me lavo los dientes…",
         opciones: [
@@ -461,7 +461,7 @@ const preguntasHuellaEcologica = {
       },
       {
         id: 29,
-        imagen: "toilet",
+        imagen: "/img/q29.webp",
         tipo: "unica",
         pregunta: "¿Cuántas veces por día vacías el escusado o WC?",
         opciones: [
@@ -479,7 +479,7 @@ const preguntasHuellaEcologica = {
     preguntas: [
       {
         id: 30,
-        imagen: "notebook",
+        imagen: "/img/q30.webp",
         tipo: "unica",
         pregunta: "¿Cuántas libretas profesionales de 100 hojas usas en un semestre?",
         opciones: [

@@ -81,13 +81,13 @@ En Q21, "Ninguno de estos" desmarca todos los electrodomesticos y deja `respuest
 
 ### Imagen ilustrativa
 
-Cada pregunta en `preguntas.js` tiene un campo `imagen` con una palabra clave en ingles del tema (por ejemplo `fruit`, `bread`, `subway`, `lightbulb`, `notebook`); el paso `habitantesHogar` usa `family`. En la parte superior de la tarjeta de cada paso se muestra una imagen obtenida de **LoremFlickr** (gratuito, sin API key):
+Cada pregunta en `preguntas.js` tiene un campo `imagen`. Puede ser una ruta local como `/img/q1.webp` (archivo ubicado en `public/img/`) o una palabra clave en ingles del tema (por ejemplo `fruit`, `bread`, `subway`, `lightbulb`, `notebook`); el paso `habitantesHogar` usa `family`. Las rutas locales se muestran directamente y las palabras clave se convierten en una imagen de **LoremFlickr** (gratuito, sin API key):
 
 ```
 https://loremflickr.com/640/320/{palabraClave}?lock={id}
 ```
 
-- `lock` usa el id de la pregunta (0 para `habitantesHogar`), de modo que cada pregunta muestra siempre la misma imagen.
+- Para palabras clave, `lock` usa el id de la pregunta (0 para `habitantesHogar`), de modo que cada pregunta muestra siempre la misma imagen.
 - La URL se construye en `urlImagenTema()` (en `ImagenTema.jsx`); para cambiar de proveedor basta con modificar esa funcion.
 - El contenedor gris (`bg-gray-100`, `h-40`) reserva el espacio mientras la imagen carga (`loading="lazy"`).
 - El texto `alt` es `Imagen ilustrativa: {texto de la pregunta}`.
