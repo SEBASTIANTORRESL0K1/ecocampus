@@ -207,7 +207,7 @@ const Calculadora = () => {
   return (
     <PageLayout className="bg-[#f4f1ec]">
       {/* Barra de progreso */}
-      {!verResultado && (
+      {!verResultado && !verCuestionario && (
         <>
           <div className="w-full h-2 bg-gray-200">
             <div
@@ -222,7 +222,7 @@ const Calculadora = () => {
       )}
 
       {/* Contenido principal */}
-      {!verResultado && (
+      {!verResultado && !verCuestionario && (
         <div className="flex-grow flex flex-col items-center justify-center p-6">
           <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-md">
             <ImagenTema key={pasoActual} {...imagenPaso} />
@@ -541,7 +541,7 @@ const Calculadora = () => {
         </div>
       )}
       {/* Aviso flotante cuando se restauró progreso guardado */}
-      {avisoRecuperado && (
+      {avisoRecuperado && !verCuestionario && (
         <ToastAviso
           mensaje="Recuperamos tus respuestas guardadas."
           textoAccion="Borrar respuestas y empezar de nuevo"
@@ -551,14 +551,16 @@ const Calculadora = () => {
         />
       )}
 
-      <ModalConfirmacion
-        abierto={modalBorrarAbierto}
-        titulo="¿Borrar tus respuestas?"
-        descripcion="Se perderán todas las respuestas guardadas en este navegador y el cuestionario volverá a empezar desde la pregunta 1."
-        textoConfirmar="Sí, borrar respuestas"
-        onConfirmar={reiniciarCuestionario}
-        onCancelar={() => setModalBorrarAbierto(false)}
-      />
+      {!verCuestionario && (
+        <ModalConfirmacion
+          abierto={modalBorrarAbierto}
+          titulo="¿Borrar tus respuestas?"
+          descripcion="Se perderán todas las respuestas guardadas en este navegador y el cuestionario volverá a empezar desde la pregunta 1."
+          textoConfirmar="Sí, borrar respuestas"
+          onConfirmar={reiniciarCuestionario}
+          onCancelar={() => setModalBorrarAbierto(false)}
+        />
+      )}
     </PageLayout>
   );
 };
