@@ -45,7 +45,14 @@ export const cuestionarioExperimento = {
         {
           id: "3",
           texto: "¿En qué semestre o nivel vas?",
-          tipo: "texto_corto"
+          tipo: "select",
+          opciones: [
+            "1",
+            "3",
+            "5",
+            "7",
+            "No aplica"
+          ]
         },
         {
           id: "4",
