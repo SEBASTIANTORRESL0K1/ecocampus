@@ -16,7 +16,7 @@ const LoginGate = ({ children }) => {
       .then((datos) => {
         if (cancelado) return;
         setParticipante(datos.participante);
-        setEstado(datos.authenticated ? "autenticado" : "sin-sesion");
+        setEstado(!datos.authenticated ? "sin-sesion" : datos.permitido ? "autenticado" : "no-permitido");
       })
       .catch(() => !cancelado && setEstado("error"));
     return () => {
@@ -44,6 +44,22 @@ const LoginGate = ({ children }) => {
                 className="inline-block px-6 py-3 bg-lime-600 text-white text-lg rounded hover:bg-lime-800"
               >
                 Iniciar sesión con UCOL
+              </a>
+            </>
+          )}
+
+          {estado === "no-permitido" && (
+            <>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-3">Estudio solo para estudiantes</h2>
+              <p className="text-gray-600 mb-6">
+                Tu cuenta institucional no corresponde a un estudiante de la Universidad de Colima, por lo que
+                no puedes participar en esta evaluación.
+              </p>
+              <a
+                href={`${AUTH_URL}/logout`}
+                className="inline-block px-6 py-3 border border-lime-600 text-lime-700 text-lg rounded hover:bg-lime-50"
+              >
+                Cerrar sesión
               </a>
             </>
           )}

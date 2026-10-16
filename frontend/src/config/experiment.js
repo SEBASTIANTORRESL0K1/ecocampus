@@ -36,6 +36,12 @@ export const cuestionarioExperimento = {
           tipo: "texto_corto"
         },
         {
+          id: "S1",
+          texto: "¿Cuál es tu sexo?",
+          tipo: "select",
+          opciones: ["Femenino", "Masculino", "Prefiero no decirlo"]
+        },
+        {
           id: "2",
           texto: "¿Cuál es tu carrera o área?",
           tipo: "select",

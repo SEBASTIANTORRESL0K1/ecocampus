@@ -61,6 +61,7 @@ const Calculadora = ({ participanteId = null }) => {
   const [modalBorrarAbierto, setModalBorrarAbierto] = useState(false);
   const [tiempoInicio] = useState(() => Date.now());
   const [verCuestionario, setVerCuestionario] = useState(false);
+  const [avisoEnvio, setAvisoEnvio] = useState(null);
 
   const hayRespuestas = tieneRespuestas(respuestas);
 
@@ -208,10 +209,18 @@ const Calculadora = ({ participanteId = null }) => {
           method: 'POST',
           body: JSON.stringify(datosCompletos)
         });
-        console.log("Respuesta de AppScript:", await response.json());
+        const respuestaScript = await response.json();
+        if (!respuestaScript.success) {
+          setAvisoEnvio(
+            respuestaScript.error === "duplicado"
+              ? "Ya habías registrado tu participación; no se guardó una segunda respuesta."
+              : "No se pudo guardar tu respuesta. Avisa a la persona que aplica el estudio."
+          );
+        }
       }
     } catch (error) {
       console.error("Error al enviar datos a Google Sheets:", error);
+      setAvisoEnvio("No se pudo guardar tu respuesta. Avisa a la persona que aplica el estudio.");
     }
 
     // Mostrar resultado final
@@ -565,6 +574,8 @@ const Calculadora = ({ participanteId = null }) => {
           pausado={modalBorrarAbierto}
         />
       )}
+
+      {avisoEnvio && <ToastAviso mensaje={avisoEnvio} duracion={9000} onCerrar={() => setAvisoEnvio(null)} />}
 
       {!verCuestionario && (
         <ModalConfirmacion

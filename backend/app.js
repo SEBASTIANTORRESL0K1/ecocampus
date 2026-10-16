@@ -73,9 +73,14 @@ const autenticarCallback = passport.authenticate("saml", { failureRedirect: "/lo
 app.post("/login/callback", autenticarCallback, alTerminarLogin);
 app.post("/api/auth/login/callback", autenticarCallback, alTerminarLogin);
 
+// El estudio es solo para alumnos: uTipo lo asigna el IdP de la UCOL.
+const TIPO_PERMITIDO = "Estudiante";
+
 app.get("/api/me", (req, res) => {
-  const participante = req.isAuthenticated() ? participanteDe(req.user) : null;
-  res.json({ authenticated: Boolean(participante), participante });
+  const autenticado = req.isAuthenticated();
+  const participante = autenticado ? participanteDe(req.user) : null;
+  const permitido = Boolean(participante) && participante.tipo === TIPO_PERMITIDO;
+  res.json({ authenticated: autenticado, permitido, participante: permitido ? participante : null });
 });
 
 app.get("/logout", (req, res) => {
