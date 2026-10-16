@@ -41,7 +41,7 @@ function construirPasos() {
   return pasos;
 }
 
-const Calculadora = () => {
+const Calculadora = ({ participanteId = null }) => {
   const pasos = useMemo(construirPasos, []);
   // El progreso guardado se lee una sola vez y de forma perezosa para que no
   // haya un parpadeo de la primera pregunta antes de restaurar.
@@ -193,6 +193,7 @@ const Calculadora = () => {
     const datosCompletos = {
       ...datosCuestionario,
       tiempoTranscurrido,
+      participanteId,
       planesNecesarios: resultado.interpretacion.planetasTexto
     };
 

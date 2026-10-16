@@ -3,6 +3,10 @@
 
 export const EXPERIMENTO_ACTIVO = true;
 
+// URL del backend de login federado (UCOL). Si no esta definida, no se pide login.
+export const AUTH_URL = import.meta.env.VITE_AUTH_URL || "";
+export const LOGIN_REQUERIDO = EXPERIMENTO_ACTIVO && Boolean(AUTH_URL);
+
 export const cuestionarioExperimento = {
   titulo: "Cuestionario de evaluación: Eco-Campus",
   subtitulo: "Calculadora de huella ecológica del Campus Central, Universidad de Colima",
