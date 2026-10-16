@@ -124,7 +124,7 @@ docker compose up --build
 | Backend | http://localhost:4006 (`/health`, `/Metadata`) |
 | Adminer (consulta y exporta a CSV) | http://localhost:8081, servidor `db`, usuario `ecocampus`, base `ecocampus` |
 
-- `backend/cert/` debe contener `cert.pem`, `idp.crt` y `key.pem` (de desarrollo, tomados de https://github.com/Universidad-de-Colima/login-federado-node); se montan como volumen y `key.pem` no se versiona.
+- `backend/cert/` debe contener `cert.pem`, `idp.crt` y `key.pem` (de desarrollo, tomados de https://github.com/Universidad-de-Colima/login-federado-node); se montan como volumen; estan versionados en el repo con autorizacion del asesor (son credenciales de desarrollo, no de produccion).
 - Los datos viven en el volumen `db_data`; `docker compose down` los conserva y `docker compose down -v` los borra.
 - El esquema esta en `db/schema.sql` y solo se aplica al crear el volumen por primera vez.
 - Pruebas del backend: `cd backend && npm test`.

@@ -78,7 +78,7 @@ El login usa la configuracion y los certificados de desarrollo que proporciono e
 | `callbackUrl` | `http://localhost:4006/login/callback` |
 | `logoutCallbackUrl` | `http://localhost:4006/logout/callback` |
 | `entryPoint` | `https://wayf.ucol.mx/saml2/idp/SSOService.php` |
-| Certificados | `backend/cert/cert.pem` y `idp.crt` (versionados); `key.pem` esta en `.gitignore` y se monta por volumen |
+| Certificados | `backend/cert/cert.pem`, `idp.crt` y `key.pem` (llave de desarrollo, versionados con permiso del asesor); se montan por volumen en Docker |
 
 - El IdP de la UCOL hace el POST de vuelta a `/api/auth/login/callback`, no a `/login/callback`; el backend registra ambas rutas y deben conservarse las dos.
 - `acceptedClockSkewMs: -1` viene de la demo de la UCOL por el desfase de reloj del IdP.
@@ -91,7 +91,7 @@ El login usa la configuracion y los certificados de desarrollo que proporciono e
 - El navegador nunca recibe correo, nombre ni numero de cuenta. El backend lee la identidad de la sesion SAML y guarda un id pseudonimo (hash con `ID_SALT`) y el correo en MySQL.
 - Una respuesta por participante y por correo (indices `UNIQUE` en `db/schema.sql`).
 - Las listas de opciones (sexo, carrera, semestre, planetas) deben coincidir entre `frontend/src/config/experiment.js` y `backend/validacion.js`.
-- Los secretos (`.env`, `key.pem`) no se versionan ni se muestran en respuestas.
+- Los secretos de `.env` no se versionan ni se muestran en respuestas. La llave `key.pem` de desarrollo si se versiona (autorizado por el asesor); una llave propia de produccion no debe versionarse.
 
 ### Stack con Docker
 
