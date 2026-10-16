@@ -7,13 +7,32 @@ const passport = require("passport");
 const saml = require("@node-saml/passport-saml");
 const cors = require("cors");
 
-const PORT = 4006;
+const PORT = Number(process.env.PORT) || 4006;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/ecocampus/calculadora";
 const FRONTEND_ORIGIN = new URL(FRONTEND_URL).origin;
 const SESSION_SECRET = process.env.SESSION_SECRET || "ecocampus-dev-secret-cambiar-en-produccion";
 const ID_SALT = process.env.ID_SALT || "ecocampus-dev-salt-cambiar-en-produccion";
 
+// Logs con hora y nivel. Nunca se registran correos, nombres, cuentas ni respuestas SAML completas.
+function log(nivel, mensaje, extra) {
+  const linea = `${new Date().toISOString()} [${nivel.toUpperCase()}] ${mensaje}`;
+  const salida = nivel === "error" ? console.error : nivel === "warn" ? console.warn : console.log;
+  extra === undefined ? salida(linea) : salida(linea, extra);
+}
+
+process.on("unhandledRejection", (motivo) => log("error", "unhandledRejection", motivo));
+process.on("uncaughtException", (err) => log("error", "uncaughtException", err.stack || err));
+
 const app = express();
+
+app.use((req, res, next) => {
+  const inicio = Date.now();
+  res.on("finish", () => {
+    const nivel = res.statusCode >= 500 ? "error" : res.statusCode >= 400 ? "warn" : "info";
+    log(nivel, `${req.method} ${req.path} ${res.statusCode} ${Date.now() - inicio}ms`);
+  });
+  next();
+});
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
@@ -69,10 +88,30 @@ app.get(
 );
 
 // callbackUrl registrado ante el IdP es /login/callback; /api/auth/... se deja por compatibilidad con la demo original.
-const alTerminarLogin = (_req, res) => res.redirect(FRONTEND_URL);
-const autenticarCallback = passport.authenticate("saml", { failureRedirect: "/login/fail" });
-app.post("/login/callback", autenticarCallback, alTerminarLogin);
-app.post("/api/auth/login/callback", autenticarCallback, alTerminarLogin);
+const autenticarCallback = (req, res, next) => {
+  passport.authenticate("saml", (err, user, info) => {
+    if (err) {
+      log("error", `Login SAML fallo: ${err.message}`, err.stack);
+      return res.redirect("/login/fail");
+    }
+    if (!user) {
+      log("warn", "Login SAML sin usuario", info);
+      return res.redirect("/login/fail");
+    }
+    req.logIn(user, (errSesion) => {
+      if (errSesion) {
+        log("error", `No se pudo crear la sesion: ${errSesion.message}`, errSesion.stack);
+        return res.redirect("/login/fail");
+      }
+      const participante = participanteDe(user);
+      log("info", `Login OK participante=${participante?.id} tipo=${participante?.tipo}`);
+      if (!participante) log("warn", "El perfil SAML no trae uCuenta, uCorreo ni nameID");
+      res.redirect(FRONTEND_URL);
+    });
+  })(req, res, next);
+};
+app.post("/login/callback", autenticarCallback);
+app.post("/api/auth/login/callback", autenticarCallback);
 
 // El estudio es solo para alumnos: uTipo lo asigna el IdP de la UCOL.
 const TIPO_PERMITIDO = "Estudiante";
@@ -81,15 +120,26 @@ app.get("/api/me", (req, res) => {
   const autenticado = req.isAuthenticated();
   const participante = autenticado ? participanteDe(req.user) : null;
   const permitido = Boolean(participante) && participante.tipo === TIPO_PERMITIDO;
+  if (autenticado && !permitido) log("warn", `Acceso denegado participante=${participante?.id} tipo=${participante?.tipo}`);
   res.json({ authenticated: autenticado, permitido, participante: permitido ? participante : null });
 });
 
 app.get("/logout", (req, res) => {
   if (!req.user) return res.redirect(FRONTEND_URL);
-  samlStrategy.logout(req, (_err, url) => res.redirect(url));
+  samlStrategy.logout(req, (err, url) => {
+    if (err) {
+      log("error", `Logout SAML fallo: ${err.message}`, err.stack);
+      return res.redirect(FRONTEND_URL);
+    }
+    res.redirect(url);
+  });
 });
 
-const alTerminarLogout = (req, res) => req.logout(() => res.redirect(FRONTEND_URL));
+const alTerminarLogout = (req, res) =>
+  req.logout(() => {
+    log("info", "Logout completado");
+    res.redirect(FRONTEND_URL);
+  });
 app.post("/logout/callback", alTerminarLogout);
 app.post("/api/auth/logout/callback", alTerminarLogout);
 
@@ -100,9 +150,15 @@ app.get("/Metadata", (_req, res) => {
   res.send(samlStrategy.generateServiceProviderMetadata(fs.readFileSync(__dirname + "/cert/cert.pem", "utf8")));
 });
 
-app.use((err, _req, _res, next) => {
-  console.error("Error:", err.message);
-  next(err);
+app.use((err, req, res, _next) => {
+  log("error", `Error no controlado en ${req.method} ${req.path}: ${err.message}`, err.stack);
+  if (!res.headersSent) res.status(500).send("Error interno");
 });
 
-app.listen(PORT, () => console.log(`Backend de login escuchando en http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  log("info", `Backend de login escuchando en http://localhost:${PORT}`);
+  log("info", `FRONTEND_URL=${FRONTEND_URL} (origen CORS: ${FRONTEND_ORIGIN})`);
+  if (!process.env.SESSION_SECRET || !process.env.ID_SALT) {
+    log("warn", "SESSION_SECRET o ID_SALT no definidos: usando valores de desarrollo");
+  }
+});
