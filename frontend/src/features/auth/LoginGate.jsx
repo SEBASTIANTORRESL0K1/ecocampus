@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import PageLayout from "../../components/layout/PageLayout";
-import { AUTH_URL, LOGIN_REQUERIDO } from "../../config/experiment";
+import { API_URL, LOGIN_REQUERIDO } from "../../config/experiment";
 
 // Pide login institucional (UCOL) antes de mostrar a los hijos, solo cuando LOGIN_REQUERIDO.
-// children recibe el participante pseudonimo: { id, tipo } (o null si no se requiere login).
+// El backend lee la identidad de la sesion SAML; el navegador no recibe correo ni cuenta.
 const LoginGate = ({ children }) => {
   const [estado, setEstado] = useState(LOGIN_REQUERIDO ? "cargando" : "libre");
-  const [participante, setParticipante] = useState(null);
 
   useEffect(() => {
     if (!LOGIN_REQUERIDO) return;
     let cancelado = false;
-    fetch(`${AUTH_URL}/api/me`, { credentials: "include" })
+    fetch(`${API_URL}/api/me`, { credentials: "include" })
       .then((r) => r.json())
       .then((datos) => {
         if (cancelado) return;
-        setParticipante(datos.participante);
         setEstado(!datos.authenticated ? "sin-sesion" : datos.permitido ? "autenticado" : "no-permitido");
       })
       .catch(() => !cancelado && setEstado("error"));
@@ -24,7 +22,7 @@ const LoginGate = ({ children }) => {
     };
   }, []);
 
-  if (estado === "libre" || estado === "autenticado") return children(participante);
+  if (estado === "libre" || estado === "autenticado") return children;
 
   return (
     <PageLayout className="bg-[#f4f1ec]">
@@ -40,7 +38,7 @@ const LoginGate = ({ children }) => {
                 junto con tus respuestas; no se guarda tu nombre ni tu número de cuenta.
               </p>
               <a
-                href={`${AUTH_URL}/login`}
+                href={`${API_URL}/login`}
                 className="inline-block px-6 py-3 bg-lime-600 text-white text-lg rounded hover:bg-lime-800"
               >
                 Iniciar sesión con UCOL
@@ -56,7 +54,7 @@ const LoginGate = ({ children }) => {
                 no puedes participar en esta evaluación.
               </p>
               <a
-                href={`${AUTH_URL}/logout`}
+                href={`${API_URL}/logout`}
                 className="inline-block px-6 py-3 border border-lime-600 text-lime-700 text-lg rounded hover:bg-lime-50"
               >
                 Cerrar sesión

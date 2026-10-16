@@ -14,7 +14,11 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route
           path="/calculadora"
-          element={<LoginGate>{(participante) => <Calculadora participanteId={participante?.id} participanteCorreo={participante?.correo} />}</LoginGate>}
+          element={
+            <LoginGate>
+              <Calculadora />
+            </LoginGate>
+          }
         />
         <Route path="/mapa" element={<Mapa />} />
         <Route path="/comunidad" element={<Comunidad />} />

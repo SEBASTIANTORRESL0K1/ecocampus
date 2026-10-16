@@ -266,3 +266,29 @@ Claves especiales en `respuestas`:
 - El modal es un `<dialog>` nativo abierto con `showModal()` (rol `dialog` implicito, modal, fondo inerte) con `aria-labelledby` (titulo) y `aria-describedby` (descripcion). Al abrir, el foco va a "Cancelar"; Tab y Shift+Tab rotan dentro del dialogo; al cerrar, el foco vuelve al boton que lo abrio (si sigue en la pagina). El scroll del body se bloquea mientras esta abierto.
 - Transicion del modal con CSS nativo: `transition-discrete` (`transition-behavior: allow-discrete`) y la variante `starting:` (`@starting-style`) animan opacidad y escala del dialogo (`scale-95` a `scale-100`) y la opacidad del fondo (`backdrop:bg-black/50`) al abrir y al cerrar, sin temporizadores: `close()` se llama de inmediato y el foco vuelve al disparador sin esperar. En navegadores sin soporte de transiciones discretas el modal simplemente aparece y desaparece.
 - Todas las transiciones usan `motion-reduce:transition-none` (en el modal tambien `motion-reduce:backdrop:transition-none`).
+
+---
+
+## Modo Experimento
+
+Controlado por `EXPERIMENTO_ACTIVO` en `src/config/experiment.js`. Si esta activo, al pulsar "Finalizar" en la ultima pregunta se muestra el cuestionario de evaluacion (`CuestionarioExperimento`) a pantalla completa, y solo despues la pantalla de resultados.
+
+### Login federado
+
+Si ademas existe `VITE_API_URL`, `/calculadora` se envuelve en `LoginGate` (`src/features/auth/LoginGate.jsx`), que consulta `GET /api/me` y pide iniciar sesion con la cuenta institucional de la UCOL. Solo pasan estudiantes (`uTipo = Estudiante`). El navegador nunca recibe correo, nombre ni numero de cuenta.
+
+### Guardado de respuestas
+
+Al finalizar el cuestionario se envia `POST {VITE_API_URL}/api/respuestas` con `respuestas`, `tiempoMin` y `planetas`. El tiempo y los planetas se calculan solos. El backend toma el id y el correo de la sesion SAML, valida los datos y los inserta en la tabla `respuestas` de MySQL. Hay un solo registro por participante y por correo; un segundo envio devuelve `duplicado` y la pantalla de resultados muestra un aviso (`avisoEnvio`).
+
+### Estado adicional
+
+| Variable | Descripcion |
+| :--- | :--- |
+| `verCuestionario` | Muestra el cuestionario del experimento en lugar de la calculadora |
+| `avisoEnvio` | Mensaje del toast cuando el guardado falla o es un duplicado |
+| `tiempoInicio` | Marca de tiempo al montar; se usa para calcular los minutos |
+
+### Tipos de pregunta del cuestionario
+
+`opcion_unica`, `select`, `numero` (con `min` y `max`), `texto_corto`, `texto_largo` y `escala_likert` (1 a 5). Las listas de opciones deben coincidir con `backend/validacion.js`.

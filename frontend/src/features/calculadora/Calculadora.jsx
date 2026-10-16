@@ -7,7 +7,7 @@ import ToastAviso from "./ToastAviso";
 import ModalConfirmacion from "./ModalConfirmacion";
 import { pasoRespondido } from "./pasoRespondido";
 import CuestionarioExperimento from "./CuestionarioExperimento";
-import { EXPERIMENTO_ACTIVO } from "../../config/experiment";
+import { API_URL, EXPERIMENTO_ACTIVO } from "../../config/experiment";
 import {
   RESPUESTAS_INICIALES,
   borrarProgreso,
@@ -41,7 +41,7 @@ function construirPasos() {
   return pasos;
 }
 
-const Calculadora = ({ participanteId = null, participanteCorreo = null }) => {
+const Calculadora = () => {
   const pasos = useMemo(construirPasos, []);
   // El progreso guardado se lee una sola vez y de forma perezosa para que no
   // haya un parpadeo de la primera pregunta antes de restaurar.
@@ -189,39 +189,37 @@ const Calculadora = ({ participanteId = null, participanteCorreo = null }) => {
       return;
     }
 
-    // Guardar datos del cuestionario en localStorage
-    const tiempoTranscurrido = Math.round((Date.now() - tiempoInicio) / 1000 / 60); // en minutos
-    const datosCompletos = {
-      ...datosCuestionario,
-      tiempoTranscurrido,
-      participanteId,
-      correo: participanteCorreo,
-      planesNecesarios: resultado.interpretacion.planetasTexto
+    // El tiempo y los planetas se calculan solos; la identidad la toma el backend de la sesión SAML.
+    const cuerpo = {
+      respuestas: datosCuestionario.respuestasExperimento,
+      tiempoMin: Math.round((Date.now() - tiempoInicio) / 1000 / 60),
+      planetas: resultado.interpretacion.planetasTexto,
     };
 
-    console.log("Datos del experimento completos:", datosCompletos);
-    localStorage.setItem("datosExperimento", JSON.stringify(datosCompletos));
+    const MENSAJES_ENVIO = {
+      duplicado: "Ya habías registrado tu participación; no se guardó una segunda respuesta.",
+      "sin-sesion": "Tu sesión expiró y no se guardó tu respuesta. Inicia sesión de nuevo.",
+      "no-permitido": "Este estudio es solo para estudiantes; no se guardó tu respuesta.",
+      invalido: "Alguna respuesta no es válida y no se guardó. Revisa el cuestionario.",
+    };
+    const MENSAJE_GENERICO = "No se pudo guardar tu respuesta. Avisa a la persona que aplica el estudio.";
 
-    // Enviar a Google Sheets vía AppScript
     try {
-      const urlAppScript = import.meta.env.VITE_APPSCRIPT_URL;
-      if (urlAppScript) {
-        const response = await fetch(urlAppScript, {
-          method: 'POST',
-          body: JSON.stringify(datosCompletos)
+      if (API_URL) {
+        const response = await fetch(`${API_URL}/api/respuestas`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(cuerpo),
         });
-        const respuestaScript = await response.json();
-        if (!respuestaScript.success) {
-          setAvisoEnvio(
-            respuestaScript.error === "duplicado"
-              ? "Ya habías registrado tu participación; no se guardó una segunda respuesta."
-              : "No se pudo guardar tu respuesta. Avisa a la persona que aplica el estudio."
-          );
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          setAvisoEnvio(MENSAJES_ENVIO[error.error] ?? MENSAJE_GENERICO);
         }
       }
     } catch (error) {
-      console.error("Error al enviar datos a Google Sheets:", error);
-      setAvisoEnvio("No se pudo guardar tu respuesta. Avisa a la persona que aplica el estudio.");
+      console.error("Error al enviar las respuestas:", error);
+      setAvisoEnvio(MENSAJE_GENERICO);
     }
 
     // Mostrar resultado final

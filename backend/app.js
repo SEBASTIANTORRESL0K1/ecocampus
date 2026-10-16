@@ -6,12 +6,20 @@ const session = require("express-session");
 const passport = require("passport");
 const saml = require("@node-saml/passport-saml");
 const cors = require("cors");
+const MySQLStore = require("express-mysql-session")(session);
+const { crearPool, esperarBD } = require("./db");
+const { validarRespuesta, COLUMNAS } = require("./validacion");
 
 const PORT = Number(process.env.PORT) || 4006;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/ecocampus/calculadora";
 const FRONTEND_ORIGIN = new URL(FRONTEND_URL).origin;
 const SESSION_SECRET = process.env.SESSION_SECRET || "ecocampus-dev-secret-cambiar-en-produccion";
 const ID_SALT = process.env.ID_SALT || "ecocampus-dev-salt-cambiar-en-produccion";
+// REQUIERE_LOGIN=false permite guardar respuestas sin sesion (solo desarrollo).
+const REQUIERE_LOGIN = process.env.REQUIERE_LOGIN !== "false";
+// Detras de nginx/ALB con HTTPS: COOKIE_SECURE=true y TRUST_PROXY=true.
+const COOKIE_SECURE = process.env.COOKIE_SECURE === "true";
+const TRUST_PROXY = process.env.TRUST_PROXY === "true";
 
 // Logs con hora y nivel. Nunca se registran correos, nombres, cuentas ni respuestas SAML completas.
 function log(nivel, mensaje, extra) {
@@ -24,6 +32,8 @@ process.on("unhandledRejection", (motivo) => log("error", "unhandledRejection", 
 process.on("uncaughtException", (err) => log("error", "uncaughtException", err.stack || err));
 
 const app = express();
+const pool = crearPool();
+if (TRUST_PROXY) app.set("trust proxy", 1);
 
 app.use((req, res, next) => {
   const inicio = Date.now();
@@ -57,9 +67,10 @@ app.use(cors({ origin: FRONTEND_ORIGIN, credentials: true }));
 app.use(
   session({
     secret: SESSION_SECRET,
+    store: new MySQLStore({}, pool),
     saveUninitialized: false,
     resave: false,
-    cookie: { httpOnly: true, sameSite: "lax" },
+    cookie: { httpOnly: true, sameSite: "lax", secure: COOKIE_SECURE },
   })
 );
 passport.use(samlStrategy);
@@ -68,7 +79,7 @@ app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Al frontend solo se expone id pseudonimo, tipo y correo; nunca nombre ni numero de cuenta.
+// El navegador nunca recibe correo, nombre ni cuenta: se leen de la sesion SAML en el servidor.
 function participanteDe(user) {
   const cuenta = String(user.uCuenta || user.uCorreo || user.nameID || "");
   if (!cuenta) return null;
@@ -78,6 +89,8 @@ function participanteDe(user) {
     correo: user.uCorreo || null,
   };
 }
+
+const quitarCorreo = ({ id, tipo }) => ({ id, tipo });
 
 app.get("/", (_req, res) => res.redirect("/login"));
 
@@ -121,7 +134,53 @@ app.get("/api/me", (req, res) => {
   const participante = autenticado ? participanteDe(req.user) : null;
   const permitido = Boolean(participante) && participante.tipo === TIPO_PERMITIDO;
   if (autenticado && !permitido) log("warn", `Acceso denegado participante=${participante?.id} tipo=${participante?.tipo}`);
-  res.json({ authenticated: autenticado, permitido, participante: permitido ? participante : null });
+  res.json({
+    authenticated: autenticado,
+    permitido,
+    participante: permitido ? quitarCorreo(participante) : null,
+  });
+});
+
+app.get("/health", async (_req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.json({ status: "ok" });
+  } catch (err) {
+    log("error", `Health check: MySQL no responde (${err.code || err.message})`);
+    res.status(503).json({ status: "db-down" });
+  }
+});
+
+app.post("/api/respuestas", async (req, res) => {
+  let participante = null;
+  if (REQUIERE_LOGIN) {
+    participante = req.isAuthenticated() ? participanteDe(req.user) : null;
+    if (!participante) return res.status(401).json({ success: false, error: "sin-sesion" });
+    if (participante.tipo !== TIPO_PERMITIDO) {
+      log("warn", `Envio rechazado participante=${participante.id} tipo=${participante.tipo}`);
+      return res.status(403).json({ success: false, error: "no-permitido" });
+    }
+  }
+
+  const validacion = validarRespuesta(req.body, participante);
+  if (!validacion.ok) {
+    log("warn", `Respuesta invalida participante=${participante?.id ?? "-"}: ${validacion.errores.join("; ")}`);
+    return res.status(400).json({ success: false, error: "invalido", detalle: validacion.errores });
+  }
+
+  try {
+    const sql = `INSERT INTO respuestas (${COLUMNAS.join(", ")}) VALUES (${COLUMNAS.map(() => "?").join(", ")})`;
+    const [resultado] = await pool.query(sql, COLUMNAS.map((c) => validacion.datos[c]));
+    log("info", `Respuesta guardada id=${resultado.insertId} participante=${participante?.id ?? "-"}`);
+    res.status(201).json({ success: true });
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      log("warn", `Participacion duplicada participante=${participante?.id ?? "-"}`);
+      return res.status(409).json({ success: false, error: "duplicado" });
+    }
+    log("error", `No se pudo guardar la respuesta: ${err.code || err.message}`, err.stack);
+    res.status(500).json({ success: false, error: "error-interno" });
+  }
 });
 
 app.get("/logout", (req, res) => {
@@ -155,10 +214,17 @@ app.use((err, req, res, _next) => {
   if (!res.headersSent) res.status(500).send("Error interno");
 });
 
-app.listen(PORT, () => {
-  log("info", `Backend de login escuchando en http://localhost:${PORT}`);
-  log("info", `FRONTEND_URL=${FRONTEND_URL} (origen CORS: ${FRONTEND_ORIGIN})`);
-  if (!process.env.SESSION_SECRET || !process.env.ID_SALT) {
-    log("warn", "SESSION_SECRET o ID_SALT no definidos: usando valores de desarrollo");
-  }
-});
+esperarBD(pool, log)
+  .then(() => {
+    app.listen(PORT, () => {
+      log("info", `Backend escuchando en http://localhost:${PORT} (MySQL conectado)`);
+      log("info", `FRONTEND_URL=${FRONTEND_URL} (origen CORS: ${FRONTEND_ORIGIN}) REQUIERE_LOGIN=${REQUIERE_LOGIN}`);
+      if (!process.env.SESSION_SECRET || !process.env.ID_SALT) {
+        log("warn", "SESSION_SECRET o ID_SALT no definidos: usando valores de desarrollo");
+      }
+    });
+  })
+  .catch((err) => {
+    log("error", err.message);
+    process.exit(1);
+  });

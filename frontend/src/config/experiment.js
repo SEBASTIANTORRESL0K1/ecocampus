@@ -3,9 +3,10 @@
 
 export const EXPERIMENTO_ACTIVO = true;
 
-// URL del backend de login federado (UCOL). Si no esta definida, no se pide login.
-export const AUTH_URL = import.meta.env.VITE_AUTH_URL || "";
-export const LOGIN_REQUERIDO = EXPERIMENTO_ACTIVO && Boolean(AUTH_URL);
+// URL del backend (login federado UCOL y guardado de respuestas). Si no esta definida,
+// no se pide login ni se envian respuestas.
+export const API_URL = import.meta.env.VITE_API_URL || "";
+export const LOGIN_REQUERIDO = EXPERIMENTO_ACTIVO && Boolean(API_URL);
 
 export const cuestionarioExperimento = {
   titulo: "Cuestionario de evaluación: Eco-Campus",
@@ -33,7 +34,9 @@ export const cuestionarioExperimento = {
         {
           id: "1",
           texto: "¿Cuál es tu edad?",
-          tipo: "texto_corto"
+          tipo: "numero",
+          min: 15,
+          max: 99
         },
         {
           id: "S1",
@@ -47,9 +50,7 @@ export const cuestionarioExperimento = {
           tipo: "select",
           opciones: [
             "Ingeniería en Software",
-            "Ingeniería en Tecnologías de la Información",
-            "Docente",
-            "Personal Administrativo"
+            "Ingeniería en Tecnologías de la Información"
           ]
         },
         {
@@ -60,8 +61,7 @@ export const cuestionarioExperimento = {
             "1",
             "3",
             "5",
-            "7",
-            "No aplica"
+            "7"
           ]
         },
         {

@@ -42,6 +42,17 @@ const CuestionarioExperimento = ({ respuestasCalculadora, tiempoTranscurrido, on
       return;
     }
 
+    const fueraDeRango = seccionActualData.preguntas.find((p) => {
+      if (p.tipo !== "numero") return false;
+      const n = Number(respuestasExperimento[p.id]);
+      return !Number.isInteger(n) || n < p.min || n > p.max;
+    });
+    if (fueraDeRango) {
+      setToastMensaje(`Escribe un número entero entre ${fueraDeRango.min} y ${fueraDeRango.max}`);
+      setShowToast(true);
+      return;
+    }
+
     if (seccionActual < secciones.length - 1) {
       setSeccionActual(seccionActual + 1);
     } else {
@@ -128,6 +139,25 @@ const CuestionarioExperimento = ({ respuestasCalculadora, tiempoTranscurrido, on
             </label>
             <input
               type="text"
+              value={valor}
+              onChange={(e) => manejarRespuesta(pregunta.id, e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Escribe tu respuesta"
+            />
+          </div>
+        );
+
+      case "numero":
+        return (
+          <div key={pregunta.id} className="mb-4">
+            <label className="block font-semibold text-gray-800 mb-2">
+              {pregunta.texto}
+            </label>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={pregunta.min}
+              max={pregunta.max}
               value={valor}
               onChange={(e) => manejarRespuesta(pregunta.id, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
