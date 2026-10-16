@@ -15,10 +15,7 @@ const CuestionarioExperimento = ({ respuestasCalculadora, tiempoTranscurrido, on
   const seccionActualData = secciones[seccionActual];
 
   const manejarRespuesta = (idPregunta, valor) => {
-    setRespuestasExperimento({
-      ...respuestasExperimento,
-      [idPregunta]: valor
-    });
+    setRespuestasExperimento((prev) => ({ ...prev, [idPregunta]: valor }));
   };
 
   const manejarSiguiente = () => {
