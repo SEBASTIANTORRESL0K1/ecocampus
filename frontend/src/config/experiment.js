@@ -15,7 +15,7 @@ export const cuestionarioExperimento = {
       id: "consentimiento",
       titulo: "Consentimiento informado",
       instrucciones_aplicador: "Lee al participante antes de empezar.",
-      texto: "Estás invitado/a a participar en una evaluación de la calculadora de huella ecológica Eco-Campus, desarrollada como parte de un proyecto de tesis en la Universidad de Colima. Consiste en usar la calculadora durante unos minutos y responder un cuestionario breve. Tus respuestas son anónimas, no hay respuestas correctas o incorrectas, y puedes dejar de participar en cualquier momento.",
+      texto: "Estás invitado/a a participar en una evaluación de la calculadora de huella ecológica Eco-Campus, desarrollada como parte de un proyecto de tesis en la Universidad de Colima. Consiste en usar la calculadora durante unos minutos y responder un cuestionario breve. Tus respuestas son confidenciales y se usarán solo con fines académicos: se guardará tu correo institucional junto con ellas, pero no se publicará ni se compartirá. No hay respuestas correctas o incorrectas, y puedes dejar de participar en cualquier momento.",
       preguntas: [
         {
           id: "C1",
@@ -28,7 +28,7 @@ export const cuestionarioExperimento = {
     {
       id: "datos_generales",
       titulo: "Parte 1. Datos generales",
-      instrucciones: "Anónimos, solo con fines estadísticos.",
+      instrucciones: "Confidenciales, solo con fines estadísticos.",
       preguntas: [
         {
           id: "1",
