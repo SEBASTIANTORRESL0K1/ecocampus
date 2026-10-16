@@ -193,7 +193,7 @@ const Calculadora = () => {
     const datosCompletos = {
       ...datosCuestionario,
       tiempoTranscurrido,
-      planesNecesarios: resultado.interpretacion.planetas
+      planesNecesarios: resultado.interpretacion.planetasTexto
     };
 
     console.log("Datos del experimento completos:", datosCompletos);
