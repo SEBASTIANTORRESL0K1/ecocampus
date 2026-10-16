@@ -134,6 +134,27 @@ const CuestionarioExperimento = ({ respuestasCalculadora, tiempoTranscurrido, on
           </div>
         );
 
+      case "select":
+        return (
+          <div key={pregunta.id} className="mb-4">
+            <label className="block font-semibold text-gray-800 mb-2">
+              {pregunta.texto}
+            </label>
+            <select
+              value={valor}
+              onChange={(e) => manejarRespuesta(pregunta.id, e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="">Selecciona una opción</option>
+              {pregunta.opciones.map((opcion) => (
+                <option key={opcion} value={opcion}>
+                  {opcion}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+
       case "texto_largo":
         return (
           <div key={pregunta.id} className="mb-4">

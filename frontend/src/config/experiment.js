@@ -34,7 +34,13 @@ export const cuestionarioExperimento = {
         {
           id: "2",
           texto: "¿Cuál es tu carrera o área?",
-          tipo: "texto_corto"
+          tipo: "select",
+          opciones: [
+            "Ingeniería en Software",
+            "Ingeniería en Tecnologías de la Información",
+            "Docente",
+            "Personal Administrativo"
+          ]
         },
         {
           id: "3",
