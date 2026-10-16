@@ -6,6 +6,8 @@ import ImagenTema from "./ImagenTema";
 import ToastAviso from "./ToastAviso";
 import ModalConfirmacion from "./ModalConfirmacion";
 import { pasoRespondido } from "./pasoRespondido";
+import CuestionarioExperimento from "./CuestionarioExperimento";
+import { EXPERIMENTO_ACTIVO } from "../../config/experiment";
 import {
   RESPUESTAS_INICIALES,
   borrarProgreso,
@@ -57,6 +59,8 @@ const Calculadora = () => {
     () => progresoInicial !== null && tieneRespuestas(progresoInicial.respuestas)
   );
   const [modalBorrarAbierto, setModalBorrarAbierto] = useState(false);
+  const [tiempoInicio] = useState(() => Date.now());
+  const [verCuestionario, setVerCuestionario] = useState(false);
 
   const hayRespuestas = tieneRespuestas(respuestas);
 
@@ -144,8 +148,13 @@ const Calculadora = () => {
     if (pasoActual < pasos.length - 1) {
       setPasoActual(pasoActual + 1);
     } else {
-      setResultado(calcularHuellaEcologica(respuestas));
-      setVerResultado(true);
+      const resultadoCalculado = calcularHuellaEcologica(respuestas);
+      setResultado(resultadoCalculado);
+      if (EXPERIMENTO_ACTIVO) {
+        setVerCuestionario(true);
+      } else {
+        setVerResultado(true);
+      }
     }
   };
 
@@ -159,6 +168,7 @@ const Calculadora = () => {
     setPasoActual(0);
     setRespuestas({ ...RESPUESTAS_INICIALES });
     setVerResultado(false);
+    setVerCuestionario(false);
     setResultado(null);
     setAvisoRecuperado(false);
     setModalBorrarAbierto(false);
@@ -169,6 +179,29 @@ const Calculadora = () => {
     setVerResultado(false);
     setResultado(null);
     setPasoActual(pasos.length - 1);
+  };
+
+  const manejarCuestionarioCompleto = (datosCuestionario) => {
+    if (datosCuestionario === null) {
+      // Usuario rechazó participar
+      reiniciarCuestionario();
+      return;
+    }
+
+    // Guardar datos del cuestionario en localStorage
+    const tiempoTranscurrido = Math.round((Date.now() - tiempoInicio) / 1000 / 60); // en minutos
+    const datosCompletos = {
+      ...datosCuestionario,
+      tiempoTranscurrido,
+      planesNecesarios: resultado.interpretacion.planetas
+    };
+
+    console.log("Datos del experimento completos:", datosCompletos);
+    localStorage.setItem("datosExperimento", JSON.stringify(datosCompletos));
+
+    // Mostrar resultado final
+    setVerCuestionario(false);
+    setVerResultado(true);
   };
 
   return (
@@ -408,6 +441,17 @@ const Calculadora = () => {
               </button>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Cuestionario del experimento */}
+      {verCuestionario && resultado && (
+        <div className="flex-grow flex flex-col items-center justify-center p-6">
+          <CuestionarioExperimento
+            respuestasCalculadora={respuestas}
+            tiempoTranscurrido={Math.round((Date.now() - tiempoInicio) / 1000 / 60)}
+            onCompletar={manejarCuestionarioCompleto}
+          />
         </div>
       )}
 
