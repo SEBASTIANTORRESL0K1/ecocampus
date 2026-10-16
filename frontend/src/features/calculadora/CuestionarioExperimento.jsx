@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cuestionarioExperimento } from "../../config/experiment";
 import ToastAviso from "./ToastAviso";
 
@@ -8,6 +8,8 @@ const CuestionarioExperimento = ({ respuestasCalculadora, tiempoTranscurrido, on
   const [aceptoConsentimiento, setAceptoConsentimiento] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMensaje, setToastMensaje] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const envioEnCurso = useRef(false);
 
   const secciones = cuestionarioExperimento.secciones;
   const seccionActualData = secciones[seccionActual];
@@ -51,6 +53,9 @@ const CuestionarioExperimento = ({ respuestasCalculadora, tiempoTranscurrido, on
   };
 
   const finalizarCuestionario = () => {
+    if (envioEnCurso.current) return;
+    envioEnCurso.current = true;
+    setEnviando(true);
     const datosFinales = {
       respuestasCalculadora,
       respuestasExperimento,
@@ -214,9 +219,10 @@ const CuestionarioExperimento = ({ respuestasCalculadora, tiempoTranscurrido, on
 
         <button
           onClick={manejarSiguiente}
-          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+          disabled={enviando}
+          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {seccionActual === secciones.length - 1 ? "Finalizar" : "Siguiente"}
+          {enviando ? "Enviando..." : seccionActual === secciones.length - 1 ? "Finalizar" : "Siguiente"}
         </button>
       </div>
 
