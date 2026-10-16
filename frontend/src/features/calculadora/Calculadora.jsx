@@ -181,7 +181,7 @@ const Calculadora = () => {
     setPasoActual(pasos.length - 1);
   };
 
-  const manejarCuestionarioCompleto = (datosCuestionario) => {
+  const manejarCuestionarioCompleto = async (datosCuestionario) => {
     if (datosCuestionario === null) {
       // Usuario rechazó participar
       reiniciarCuestionario();
@@ -198,6 +198,20 @@ const Calculadora = () => {
 
     console.log("Datos del experimento completos:", datosCompletos);
     localStorage.setItem("datosExperimento", JSON.stringify(datosCompletos));
+
+    // Enviar a Google Sheets vía AppScript
+    try {
+      const urlAppScript = import.meta.env.VITE_APPSCRIPT_URL;
+      if (urlAppScript) {
+        const response = await fetch(urlAppScript, {
+          method: 'POST',
+          body: JSON.stringify(datosCompletos)
+        });
+        console.log("Respuesta de AppScript:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error al enviar datos a Google Sheets:", error);
+    }
 
     // Mostrar resultado final
     setVerCuestionario(false);
