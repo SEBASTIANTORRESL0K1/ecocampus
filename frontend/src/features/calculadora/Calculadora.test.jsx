@@ -71,7 +71,7 @@ describe("Calculadora", () => {
 		const imagen = screen.getByRole("img", {
 			name: "Imagen ilustrativa: ¿Cuántas raciones de fruta consumes a la semana?",
 		});
-		expect(imagen).toHaveAttribute("src", "/ecocampus/img/q1.jpg");
+		expect(imagen).toHaveAttribute("src", "/ecocampus/img/q1.webp");
 		expect(imagen).toHaveAttribute("loading", "lazy");
 	});
 
