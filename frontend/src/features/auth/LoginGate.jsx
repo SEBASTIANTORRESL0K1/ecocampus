@@ -36,8 +36,8 @@ const LoginGate = ({ children }) => {
             <>
               <h2 className="text-2xl font-semibold text-gray-800 mb-3">Inicia sesión para participar</h2>
               <p className="text-gray-600 mb-6">
-                Usa tu cuenta institucional de la Universidad de Colima. Solo se guarda un identificador
-                anónimo, no tu nombre ni tu correo.
+                Usa tu cuenta institucional de la Universidad de Colima. Tu correo institucional se guardará
+                junto con tus respuestas; no se guarda tu nombre ni tu número de cuenta.
               </p>
               <a
                 href={`${AUTH_URL}/login`}

@@ -49,13 +49,14 @@ app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Id pseudonimo estable: no se expone correo, nombre ni cuenta al frontend.
+// Al frontend solo se expone id pseudonimo, tipo y correo; nunca nombre ni numero de cuenta.
 function participanteDe(user) {
   const cuenta = String(user.uCuenta || user.uCorreo || user.nameID || "");
   if (!cuenta) return null;
   return {
     id: crypto.createHash("sha256").update(ID_SALT + cuenta).digest("hex").slice(0, 16),
     tipo: user.uTipo || null,
+    correo: user.uCorreo || null,
   };
 }
 
