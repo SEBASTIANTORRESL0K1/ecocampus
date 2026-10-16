@@ -131,7 +131,7 @@ docker compose up --build
 
 ### Despliegue en EC2
 
-1. Instancia con Docker y el plugin compose; abre en el grupo de seguridad solo los puertos 80 y 443 (el 8081 de Adminer y el 3306 quedan en 127.0.0.1; usa un tunel SSH para Adminer).
+1. Instancia con Docker y el plugin compose; abre en el grupo de seguridad solo los puertos 80 y 443 (el 8081 de Adminer y el 3307 (MySQL) quedan en 127.0.0.1; usa un tunel SSH para Adminer).
 2. En `.env` define `FRONTEND_URL` y `API_URL` con tu dominio, `COOKIE_SECURE=true` y `TRUST_PROXY=true`, y genera `SESSION_SECRET` e `ID_SALT` con `openssl rand -hex 32`.
 3. Pon un proxy con HTTPS (nginx o un balanceador) delante del frontend y del backend.
 4. El login SAML en un servidor publico requiere EntityID, certificados y URL de callback propios, que se tramitan con sistemas@ucol.mx. Las credenciales de desarrollo solo funcionan con `localhost:4006`.
