@@ -2,10 +2,10 @@ import React from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
-const PageLayout = ({ children, className = "" }) => {
+const PageLayout = ({ children, className = "", navTransparent = false }) => {
   return (
-    <div className={`min-h-screen flex flex-col ${className}`}>
-      <Navbar />
+    <div className={`min-h-screen flex flex-col ${navTransparent ? "relative" : ""} ${className}`}>
+      <Navbar transparent={navTransparent} />
       {children}
       <Footer />
     </div>

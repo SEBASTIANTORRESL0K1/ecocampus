@@ -38,7 +38,7 @@ const tools = [
 
 const LandingPage = () => {
   return (
-    <PageLayout>
+    <PageLayout navTransparent>
       <main>
         {/* ── Hero ── */}
         <PageHero
