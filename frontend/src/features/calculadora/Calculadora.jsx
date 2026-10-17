@@ -6,8 +6,6 @@ import ImagenTema from "./ImagenTema";
 import ToastAviso from "./ToastAviso";
 import ModalConfirmacion from "./ModalConfirmacion";
 import { pasoRespondido } from "./pasoRespondido";
-import CuestionarioExperimento from "./CuestionarioExperimento";
-import { API_URL, EXPERIMENTO_ACTIVO } from "../../config/experiment";
 import {
   RESPUESTAS_INICIALES,
   borrarProgreso,
@@ -59,9 +57,6 @@ const Calculadora = () => {
     () => progresoInicial !== null && tieneRespuestas(progresoInicial.respuestas)
   );
   const [modalBorrarAbierto, setModalBorrarAbierto] = useState(false);
-  const [tiempoInicio] = useState(() => Date.now());
-  const [verCuestionario, setVerCuestionario] = useState(false);
-  const [avisoEnvio, setAvisoEnvio] = useState(null);
 
   const hayRespuestas = tieneRespuestas(respuestas);
 
@@ -149,13 +144,8 @@ const Calculadora = () => {
     if (pasoActual < pasos.length - 1) {
       setPasoActual(pasoActual + 1);
     } else {
-      const resultadoCalculado = calcularHuellaEcologica(respuestas);
-      setResultado(resultadoCalculado);
-      if (EXPERIMENTO_ACTIVO) {
-        setVerCuestionario(true);
-      } else {
-        setVerResultado(true);
-      }
+      setResultado(calcularHuellaEcologica(respuestas));
+      setVerResultado(true);
     }
   };
 
@@ -169,7 +159,6 @@ const Calculadora = () => {
     setPasoActual(0);
     setRespuestas({ ...RESPUESTAS_INICIALES });
     setVerResultado(false);
-    setVerCuestionario(false);
     setResultado(null);
     setAvisoRecuperado(false);
     setModalBorrarAbierto(false);
@@ -182,55 +171,10 @@ const Calculadora = () => {
     setPasoActual(pasos.length - 1);
   };
 
-  const manejarCuestionarioCompleto = async (datosCuestionario) => {
-    if (datosCuestionario === null) {
-      // Usuario rechazó participar
-      reiniciarCuestionario();
-      return;
-    }
-
-    // El tiempo y los planetas se calculan solos; la identidad la toma el backend de la sesión SAML.
-    const cuerpo = {
-      respuestas: datosCuestionario.respuestasExperimento,
-      tiempoMin: Math.round((Date.now() - tiempoInicio) / 1000 / 60),
-      planetas: resultado.interpretacion.planetasTexto,
-    };
-
-    const MENSAJES_ENVIO = {
-      duplicado: "Ya habías registrado tu participación; no se guardó una segunda respuesta.",
-      "sin-sesion": "Tu sesión expiró y no se guardó tu respuesta. Inicia sesión de nuevo.",
-      "no-permitido": "Este estudio es solo para estudiantes; no se guardó tu respuesta.",
-      invalido: "Alguna respuesta no es válida y no se guardó. Revisa el cuestionario.",
-    };
-    const MENSAJE_GENERICO = "No se pudo guardar tu respuesta. Avisa a la persona que aplica el estudio.";
-
-    try {
-      if (API_URL) {
-        const response = await fetch(`${API_URL}/api/respuestas`, {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(cuerpo),
-        });
-        if (!response.ok) {
-          const error = await response.json().catch(() => ({}));
-          setAvisoEnvio(MENSAJES_ENVIO[error.error] ?? MENSAJE_GENERICO);
-        }
-      }
-    } catch (error) {
-      console.error("Error al enviar las respuestas:", error);
-      setAvisoEnvio(MENSAJE_GENERICO);
-    }
-
-    // Mostrar resultado final
-    setVerCuestionario(false);
-    setVerResultado(true);
-  };
-
   return (
     <PageLayout className="bg-[#f4f1ec]">
       {/* Barra de progreso */}
-      {!verResultado && !verCuestionario && (
+      {!verResultado && (
         <>
           <div className="w-full h-2 bg-gray-200">
             <div
@@ -245,7 +189,7 @@ const Calculadora = () => {
       )}
 
       {/* Contenido principal */}
-      {!verResultado && !verCuestionario && (
+      {!verResultado && (
         <div className="flex-grow flex flex-col items-center justify-center p-6">
           <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-md">
             <ImagenTema key={pasoActual} {...imagenPaso} />
@@ -466,17 +410,6 @@ const Calculadora = () => {
         </div>
       )}
 
-      {/* Cuestionario del experimento */}
-      {verCuestionario && resultado && (
-        <div className="flex-grow flex flex-col items-center justify-center p-6">
-          <CuestionarioExperimento
-            respuestasCalculadora={respuestas}
-            tiempoTranscurrido={Math.round((Date.now() - tiempoInicio) / 1000 / 60)}
-            onCompletar={manejarCuestionarioCompleto}
-          />
-        </div>
-      )}
-
       {/* Pantalla de resultado final */}
       {verResultado && resultado && (
         <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-6">
@@ -563,7 +496,7 @@ const Calculadora = () => {
         </div>
       )}
       {/* Aviso flotante cuando se restauró progreso guardado */}
-      {avisoRecuperado && !verCuestionario && (
+      {avisoRecuperado && (
         <ToastAviso
           mensaje="Recuperamos tus respuestas guardadas."
           textoAccion="Borrar respuestas y empezar de nuevo"
@@ -573,18 +506,14 @@ const Calculadora = () => {
         />
       )}
 
-      {avisoEnvio && <ToastAviso mensaje={avisoEnvio} duracion={9000} onCerrar={() => setAvisoEnvio(null)} />}
-
-      {!verCuestionario && (
-        <ModalConfirmacion
-          abierto={modalBorrarAbierto}
-          titulo="¿Borrar tus respuestas?"
-          descripcion="Se perderán todas las respuestas guardadas en este navegador y el cuestionario volverá a empezar desde la pregunta 1."
-          textoConfirmar="Sí, borrar respuestas"
-          onConfirmar={reiniciarCuestionario}
-          onCancelar={() => setModalBorrarAbierto(false)}
-        />
-      )}
+      <ModalConfirmacion
+        abierto={modalBorrarAbierto}
+        titulo="¿Borrar tus respuestas?"
+        descripcion="Se perderán todas las respuestas guardadas en este navegador y el cuestionario volverá a empezar desde la pregunta 1."
+        textoConfirmar="Sí, borrar respuestas"
+        onConfirmar={reiniciarCuestionario}
+        onCancelar={() => setModalBorrarAbierto(false)}
+      />
     </PageLayout>
   );
 };

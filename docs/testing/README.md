@@ -27,12 +27,9 @@ npm run test:watch
 
 # Ejecutar pruebas E2E (Playwright)
 npm run test:e2e
-
-# Solo compatibilidad (5 navegadores/dispositivos)
-npx playwright test e2e/compatibilidad.spec.js
 ```
 
-Los comandos anteriores se ejecutan desde el directorio `frontend/`. Las pruebas del backend (validacion de respuestas) se ejecutan con `npm test` desde `backend/`. Las pruebas de carga se describen en [rendimiento.md](./rendimiento.md).
+Todos los comandos se ejecutan desde el directorio `frontend/`.
 
 ---
 
@@ -59,18 +56,7 @@ Archivos existentes:
 
 | Archivo | Que cubre |
 |---------|-----------|
-| `frontend/e2e/calculadora.spec.js` | Navegacion, flujos completos y validaciones de la calculadora (solo en `chromium`) |
-| `frontend/e2e/compatibilidad.spec.js` | Vistas publicas en Chromium, Firefox, WebKit, Pixel 7 y iPhone 14; ver [compatibilidad.md](./compatibilidad.md) |
-
-### Pruebas del backend
-
-| Archivo | Que cubre |
-|---------|-----------|
-| `backend/validacion.test.js` | Validacion de las respuestas del cuestionario (rangos, opciones, textos, campos nulos); se ejecuta con `node --test` |
-
-### Pruebas de carga
-
-Script `loadtest/k6.js` (k6) sobre un entorno Docker aislado: `docker-compose.loadtest.yml`. Resultados y metodologia en [rendimiento.md](./rendimiento.md).
+| `frontend/e2e/calculadora.spec.js` | Navegacion, flujos completos y validaciones de la calculadora |
 
 ---
 
@@ -86,5 +72,3 @@ Script `loadtest/k6.js` (k6) sobre un entorno Docker aislado: `docker-compose.lo
 
 - [Guia de pruebas de componentes con Vitest](./vitest-guidelines.md)
 - [Guia de pruebas E2E con Playwright](./playwright-e2e.md)
-- [Pruebas de rendimiento (k6)](./rendimiento.md)
-- [Pruebas de compatibilidad (navegadores y dispositivos)](./compatibilidad.md)
