@@ -7,7 +7,7 @@ const Comunidad = () => {
     <PageLayout>
       {/* Encabezado */}
       <header className="bg-gray-800 text-white text-center p-6">
-        <h2 className="text-3xl font-bold">Comunidad EcoCampus</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold">Comunidad EcoCampus</h2>
         <p>Mantente informado sobre eventos y noticias ambientales</p>
       </header>
 
