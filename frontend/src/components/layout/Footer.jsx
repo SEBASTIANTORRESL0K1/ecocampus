@@ -7,7 +7,7 @@ const Footer = () => {
 
         {/* Logos a la izquierda */}
         <div className="flex items-center space-x-4 mb-6 md:mb-0">
-          <img src={`${import.meta.env.BASE_URL}Logos/UdC_logo.png`} alt="Universidad de Colima" className="h-14 md:h-11" />
+          <img src={`${import.meta.env.BASE_URL}Logos/UdC_logo.png`} alt="Universidad de Colima" className="h-14 md:h-12" />
         </div>
 
         {/* Redes sociales al centro */}
