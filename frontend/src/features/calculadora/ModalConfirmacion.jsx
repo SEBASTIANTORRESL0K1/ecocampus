@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef } from "react";
+import { TriangleAlert } from "lucide-react";
 
 const SELECTOR_ENFOCABLES =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -99,9 +100,12 @@ const ModalConfirmacion = ({
       motion-reduce:transition-none motion-reduce:backdrop:transition-none"
     >
       <div className="p-6">
-        <h2 id={idTitulo} className="text-xl font-bold text-gray-900">
-          {titulo}
-        </h2>
+        <div className="flex items-center gap-3 mb-1">
+          <TriangleAlert aria-hidden="true" className="shrink-0 w-6 h-6 text-red-700" />
+          <h2 id={idTitulo} className="text-xl font-bold text-gray-900">
+            {titulo}
+          </h2>
+        </div>
         <p id={idDescripcion} className="mt-3 text-base text-gray-700">
           {descripcion}
         </p>

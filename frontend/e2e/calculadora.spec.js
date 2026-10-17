@@ -289,7 +289,7 @@ test('Test 1 - Navegacion basica: primer paso visible con progreso y botones cor
   await expect(page.getByText(/Sección A: Alimentos/)).toBeVisible();
 
   // Progress bar element exists and has a width close to 3.125% (1/32)
-  const progressBar = page.locator('div.h-full.bg-lime-500');
+  const progressBar = page.locator('div.h-2 > div');
   await expect(progressBar).toBeVisible();
   const width = await progressBar.evaluate((el) => el.style.width);
   const numericWidth = parseFloat(width);
@@ -378,7 +378,7 @@ test('Test 4 - Flujo completo con respuestas maximas (resultado insostenible)', 
   expect(score).toBeGreaterThan(32000);
 
   // The interpretation message must mention "insostenible" or "Huella Ecológica"
-  const resultCard = page.locator('div.bg-white.rounded-md.shadow-md');
+  const resultCard = page.locator('div.bg-white.max-w-2xl');
   await expect(
     resultCard.getByText(/insostenible|Huella Ecológica/i).first()
   ).toBeVisible();
@@ -502,13 +502,13 @@ test('Test 8 - El progreso se conserva al recargar la pagina', async ({ page }) 
   // Same step and same selection after reload, with the restored notice
   await expect(page.getByText('Pregunta 3 de 31')).toBeVisible();
   await expect(page.getByText('Recuperamos tus respuestas guardadas.')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'No consumo pan' })).toHaveClass(/bg-lime-500/);
+  await expect(page.getByRole('button', { name: 'No consumo pan' })).toHaveClass(/bg-\[#4a7c59\]/);
   await expect(page.getByRole('button', { name: 'Siguiente' })).toBeEnabled();
 
   // Previous answers are also restored
   await page.getByRole('button', { name: 'Anterior' }).click();
   await expect(page.getByText('Pregunta 2 de 31')).toBeVisible();
-  await expect(page.getByRole('button', { name: '2 a 4 raciones a la semana' })).toHaveClass(/bg-lime-500/);
+  await expect(page.getByRole('button', { name: '2 a 4 raciones a la semana' })).toHaveClass(/bg-\[#4a7c59\]/);
 
   // The toast sits in the top-right corner, below the navbar (does not cover it)
   const toast = page.getByRole('status').filter({ hasText: 'Recuperamos tus respuestas guardadas.' });

@@ -125,13 +125,13 @@ describe("Calculadora - persistencia en localStorage", () => {
 		expect(screen.getByText(/Pregunta 2 de 31/)).toBeInTheDocument();
 		expect(
 			screen.getByRole("button", { name: "2 a 4 raciones a la semana" }),
-		).toHaveClass("bg-lime-500");
+		).toHaveClass("bg-[#4a7c59]");
 		expect(screen.getByRole("button", { name: "Siguiente" })).toBeEnabled();
 
 		fireEvent.click(screen.getByRole("button", { name: "Anterior" }));
 		expect(
 			screen.getByRole("button", { name: "1 a 2 raciones a la semana" }),
-		).toHaveClass("bg-lime-500");
+		).toHaveClass("bg-[#4a7c59]");
 	});
 
 	// Guarda progreso en la pregunta 2 y vuelve a montar la calculadora.
@@ -331,7 +331,7 @@ describe("Calculadora - persistencia en localStorage", () => {
 			expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
 			expect(
 				screen.getByRole("button", { name: "1 a 2 raciones a la semana" }),
-			).not.toHaveClass("bg-lime-500");
+			).not.toHaveClass("bg-[#4a7c59]");
 			expect(
 				screen.queryByRole("button", { name: "Borrar respuestas" }),
 			).not.toBeInTheDocument();
