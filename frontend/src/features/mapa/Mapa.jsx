@@ -11,10 +11,10 @@ const Mapa = () => {
   return (
     <PageLayout>
       <main className="flex-grow flex flex-col items-center text-center px-4 py-10">
-        <h1 className="text-3xl font-bold mt-6">Mapa de Puntos de Reciclaje</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mt-6">Mapa de Puntos de Reciclaje</h1>
         <p className="text-lg text-gray-700">Ubicación de los depósitos de reciclaje en el Campus</p>
 
-        <MapContainer center={posicionCampus} zoom={17} className="w-11/12 h-[500px] mt-6 rounded-lg shadow-lg">
+        <MapContainer center={posicionCampus} zoom={17} className="w-full sm:w-11/12 h-[300px] sm:h-[500px] mt-6 rounded-lg shadow-lg">
           {/* Capa de mapa */}
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

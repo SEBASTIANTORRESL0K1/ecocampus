@@ -19,11 +19,7 @@ const ImagenTema = ({ palabraClave, alt }) => {
 	return (
 		<div className="w-full h-40 bg-gray-100 rounded-md mb-4 overflow-hidden flex items-center justify-center">
 			{error ? (
-				<img
-					src={IMAGEN_DEFAULT}
-					alt={alt}
-					className="w-full h-40 object-contain rounded-md"
-				/>
+				<span className="text-sm text-gray-500">Imagen no disponible</span>
 			) : (
 				<img
 					src={resolverSrcImagen(palabraClave)}

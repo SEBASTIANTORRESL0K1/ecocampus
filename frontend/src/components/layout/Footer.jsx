@@ -7,15 +7,17 @@ const Footer = () => {
 
         {/* Logos a la izquierda */}
         <div className="flex items-center space-x-4 mb-6 md:mb-0">
-          <img src={`${import.meta.env.BASE_URL}Logos/UdC_logo.png`} alt="Universidad de Colima" className="h-14" />
+          <img src={`${import.meta.env.BASE_URL}Logos/UdC_logo.png`} alt="Universidad de Colima" className="h-14 md:h-11" />
         </div>
 
-        {/* Redes sociales al centro (sin correo) */}
+        {/* Redes sociales al centro */}
         <div className="flex space-x-5 text-2xl mb-6 md:mb-0">
           <a
             href="https://www.facebook.com/share/18zfi8HwvY/?mibextid=wwXIfr"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Facebook de Universidad de Colima"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <i className="fab fa-facebook hover:text-lime-400"></i>
           </a>
@@ -23,6 +25,8 @@ const Footer = () => {
             href="https://www.instagram.com/udec.oficial?igsh=MWxnc2ZvYzRsN2ZnYg=="
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Instagram de Universidad de Colima"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <i className="fab fa-instagram hover:text-lime-400"></i>
           </a>
@@ -30,17 +34,19 @@ const Footer = () => {
             href="https://youtube.com/@universidaddecolimatv?si=kqP73Ld1sn6y2DmS"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="YouTube de Universidad de Colima"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <i className="fab fa-youtube hover:text-lime-400"></i>
           </a>
         </div>
 
         {/* Imagen y dirección a la derecha */}
-        <div className="text-right">
+        <div className="text-center md:text-right">
           <img
             src={`${import.meta.env.BASE_URL}Logos/eslogan.png`}
             alt="Pertenencia que transforma"
-            className="h-10 mx-auto md:mx-0 mb-2"
+            className="h-10 md:h-11 mx-auto md:mx-0 mb-2"
           />
           <p className="text-sm">Av. Universidad No. 333, Las Víboras</p>
           <p className="text-sm">CP. 28040, Colima, Colima, México</p>

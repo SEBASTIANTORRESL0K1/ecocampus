@@ -378,7 +378,7 @@ test('Test 4 - Flujo completo con respuestas maximas (resultado insostenible)', 
   expect(score).toBeGreaterThan(32000);
 
   // The interpretation message must mention "insostenible" or "Huella Ecológica"
-  const resultCard = page.locator('div.bg-white.p-12');
+  const resultCard = page.locator('div.bg-white.rounded-md.shadow-md');
   await expect(
     resultCard.getByText(/insostenible|Huella Ecológica/i).first()
   ).toBeVisible();

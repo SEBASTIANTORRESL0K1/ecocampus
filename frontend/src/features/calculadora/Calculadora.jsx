@@ -425,15 +425,14 @@ const Calculadora = () => {
               <button
                 onClick={handleAnterior}
                 disabled={pasoActual === 0}
-                // py-1.5 + borde de 2 px iguala la altura de "Siguiente" (py-2 sin borde)
-                className="px-4 py-1.5 bg-white text-gray-900 font-semibold border-2 border-gray-900 rounded hover:bg-lime-100 hover:border-lime-700 hover:text-lime-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lime-300 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-900 disabled:hover:text-gray-900"
+                className="px-4 min-h-[44px] bg-white text-gray-900 font-semibold border-2 border-gray-900 rounded hover:bg-lime-100 hover:border-lime-700 hover:text-lime-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lime-300 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-900 disabled:hover:text-gray-900"
               >
                 Anterior
               </button>
               <button
                 onClick={handleSiguiente}
                 disabled={!respondido}
-                className="px-4 py-2 bg-lime-500 text-white rounded hover:bg-lime-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-lime-500"
+                className="px-4 min-h-[44px] bg-lime-500 text-white rounded hover:bg-lime-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-lime-500"
               >
                 {pasoActual < pasos.length - 1 ? "Siguiente" : "Finalizar"}
               </button>
@@ -480,19 +479,19 @@ const Calculadora = () => {
 
       {/* Pantalla de resultado final */}
       {verResultado && resultado && (
-        <div className="flex-grow flex flex-col items-center justify-center p-6">
-          <div className="bg-white p-12 rounded-md shadow-md max-w-2xl text-center">
-            <h2 className="text-4xl font-bold mb-6 text-gray-800">¡Tu resultado!</h2>
+        <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-6">
+          <div className="bg-white p-6 sm:p-12 rounded-md shadow-md w-full max-w-2xl text-center">
+            <h2 className="text-2xl sm:text-4xl font-bold mb-6 text-gray-800">¡Tu resultado!</h2>
 
-            <p className="text-2xl text-gray-800">
+            <p className="text-lg sm:text-2xl text-gray-800">
               Tu huella ecológica total es de{" "}
-              <span className="font-bold text-lime-700 text-3xl">
+              <span className="font-bold text-lime-700 text-xl sm:text-3xl">
                 {Math.round(resultado.totalGeneral).toLocaleString()}
               </span>{" "}
               puntos.
             </p>
 
-            <div className="mt-8 grid grid-cols-2 gap-4 text-left text-gray-700 max-w-md mx-auto">
+            <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-left text-gray-700 max-w-md mx-auto">
               <div className="flex justify-between border-b pb-1">
                 <span>Alimentos</span>
                 <span className="font-semibold">{Math.round(resultado.totalAlimentos).toLocaleString()}</span>
@@ -509,15 +508,15 @@ const Calculadora = () => {
                 <span>Forestal</span>
                 <span className="font-semibold">{Math.round(resultado.totalForestal).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between border-b pb-1 col-span-2">
+              <div className="flex justify-between border-b pb-1 sm:col-span-2">
                 <span>Infraestructura</span>
                 <span className="font-semibold">{resultado.infraestructura.toLocaleString()}</span>
               </div>
             </div>
 
-            <p className="mt-8 text-2xl text-gray-800">
+            <p className="mt-6 sm:mt-8 text-lg sm:text-2xl text-gray-800">
               Equivale a{" "}
-              <span className="font-bold text-lime-700 text-3xl">
+              <span className="font-bold text-lime-700 text-xl sm:text-3xl">
                 {resultado.interpretacion.hagMax
                   ? `${resultado.interpretacion.hagMin} - ${resultado.interpretacion.hagMax}`
                   : `más de ${resultado.interpretacion.hagMin}`}
@@ -525,29 +524,29 @@ const Calculadora = () => {
               hectáreas globales (hag)
               {" "}
               ≈{" "}
-              <span className="font-bold text-lime-700 text-3xl">
+              <span className="font-bold text-lime-700 text-xl sm:text-3xl">
                 {resultado.interpretacion.planetasTexto}
               </span>{" "}
               planetas
             </p>
 
-            <p className="mt-4 text-xl text-gray-800">{resultado.interpretacion.mensaje}</p>
+            <p className="mt-4 text-base sm:text-xl text-gray-800">{resultado.interpretacion.mensaje}</p>
 
-            <p className="mt-6 text-lg text-gray-600">
+            <p className="mt-6 text-sm sm:text-lg text-gray-600">
               (Esto es una aproximación basada en tus respuestas, según la metodología de
               Ibarra-Cisneros &amp; Monroy-Ata, 2014.)
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-8 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
               <Link
                 to="/"
-                className="px-6 py-3 bg-lime-600 text-white text-xl rounded hover:bg-lime-800"
+                className="w-full sm:w-auto px-6 py-3 min-h-[44px] bg-lime-600 text-white text-lg sm:text-xl rounded hover:bg-lime-800 flex items-center justify-center"
               >
                 Volver al Inicio
               </Link>
               <button
                 onClick={reiniciarCuestionario}
-                className="px-6 py-3 border border-lime-600 text-lime-700 text-xl rounded hover:bg-lime-50"
+                className="w-full sm:w-auto px-6 py-3 min-h-[44px] border border-lime-600 text-lime-700 text-lg sm:text-xl rounded hover:bg-lime-50"
               >
                 Contestar de nuevo
               </button>
@@ -555,7 +554,7 @@ const Calculadora = () => {
             <div className="mt-4">
               <button
                 onClick={revisarRespuestas}
-                className="text-gray-600 underline hover:text-gray-800"
+                className="text-gray-600 underline hover:text-gray-800 min-h-[44px] px-2"
               >
                 Revisar mis respuestas
               </button>
