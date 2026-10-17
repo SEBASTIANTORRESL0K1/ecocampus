@@ -7,7 +7,7 @@ const Footer = () => {
 
         {/* Logos a la izquierda */}
         <div className="flex items-center space-x-4 mb-6 md:mb-0">
-          <img src={`${import.meta.env.BASE_URL}Logos/UdC_logo.png`} alt="Universidad de Colima" className="h-14" />
+          <img src={`${import.meta.env.BASE_URL}Logos/UdC_logo.png`} alt="Universidad de Colima" className="h-14 md:h-9" />
         </div>
 
         {/* Redes sociales al centro */}
@@ -46,7 +46,7 @@ const Footer = () => {
           <img
             src={`${import.meta.env.BASE_URL}Logos/eslogan.png`}
             alt="Pertenencia que transforma"
-            className="h-10 mx-auto md:mx-0 mb-2"
+            className="h-10 md:h-7 mx-auto md:mx-0 mb-2"
           />
           <p className="text-sm">Av. Universidad No. 333, Las Víboras</p>
           <p className="text-sm">CP. 28040, Colima, Colima, México</p>
