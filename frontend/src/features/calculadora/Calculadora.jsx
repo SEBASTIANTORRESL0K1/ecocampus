@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Trash2 } from "lucide-react";
 import PageLayout from "../../components/layout/PageLayout";
 import { preguntasHuellaEcologica, calcularHuellaEcologica } from "./preguntas";
 import ImagenTema from "./ImagenTema";
@@ -172,13 +173,13 @@ const Calculadora = () => {
   };
 
   return (
-    <PageLayout className="bg-[#f4f1ec]">
+    <PageLayout className="bg-[#f7f9f4]">
       {/* Barra de progreso */}
       {!verResultado && (
         <>
           <div className="w-full h-2 bg-gray-200">
             <div
-              className="h-full bg-lime-500 transition-all duration-300"
+              className="h-full bg-[#4a7c59] transition-all duration-300"
               style={{ width: `${((pasoActual + 1) / pasos.length) * 100}%` }}
             ></div>
           </div>
@@ -191,7 +192,7 @@ const Calculadora = () => {
       {/* Contenido principal */}
       {!verResultado && (
         <div className="flex-grow flex flex-col items-center justify-center p-6">
-          <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-md">
+          <div className="bg-white p-8 rounded-[12px] shadow-[0_4px_16px_rgba(34,85,44,0.1)] w-full max-w-md">
             <ImagenTema key={pasoActual} {...imagenPaso} />
 
             {/* --- Pregunta de una sola opción --- */}
@@ -210,8 +211,8 @@ const Calculadora = () => {
                       <button
                         key={op.label}
                         onClick={() => seleccionarUnica(paso.pregunta.id, op.valor)}
-                        className={`w-full py-3 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100
-                        ${estaSeleccionado ? "bg-lime-500 border-lime-600 font-bold text-white" : ""}`}
+                        className={`w-full py-3 px-4 border-2 rounded-md text-gray-700 transition-colors
+                        ${estaSeleccionado ? "bg-[#4a7c59] border-[#4a7c59] font-bold text-white" : "border-[#d0e4d0] hover:border-[#4a7c59] hover:bg-gray-50"}`}
                       >
                         {op.label}
                       </button>
@@ -263,8 +264,8 @@ const Calculadora = () => {
                       <button
                         key={op.label}
                         onClick={() => toggleDetalle21(index)}
-                        className={`w-full py-3 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 text-left
-                        ${marcado ? "bg-lime-500 border-lime-600 font-bold text-white" : ""}`}
+                        className={`w-full py-3 px-4 border-2 rounded-md text-gray-700 text-left transition-colors
+                        ${marcado ? "bg-[#4a7c59] border-[#4a7c59] font-bold text-white" : "border-[#d0e4d0] hover:border-[#4a7c59] hover:bg-gray-50"}`}
                       >
                         {op.label}
                       </button>
@@ -274,8 +275,8 @@ const Calculadora = () => {
                 <div className="mt-3">
                   <button
                     onClick={toggleNinguno21}
-                    className={`w-full py-3 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 text-left
-                    ${respuestas.ninguno21 ? "bg-lime-500 border-lime-600 font-bold text-white" : ""}`}
+                    className={`w-full py-3 px-4 border-2 rounded-md text-gray-700 text-left transition-colors
+                    ${respuestas.ninguno21 ? "bg-[#4a7c59] border-[#4a7c59] font-bold text-white" : "border-[#d0e4d0] hover:border-[#4a7c59] hover:bg-gray-50"}`}
                   >
                     Ninguno de estos
                   </button>
@@ -369,14 +370,14 @@ const Calculadora = () => {
               <button
                 onClick={handleAnterior}
                 disabled={pasoActual === 0}
-                className="px-4 min-h-[44px] bg-white text-gray-900 font-semibold border-2 border-gray-900 rounded hover:bg-lime-100 hover:border-lime-700 hover:text-lime-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lime-300 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-900 disabled:hover:text-gray-900"
+                className="px-4 min-h-[44px] bg-white text-[#2d6a2d] font-semibold border-2 border-[#2d6a2d] rounded hover:bg-[#e8f4ec] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#4a7c59] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
               >
                 Anterior
               </button>
               <button
                 onClick={handleSiguiente}
                 disabled={!respondido}
-                className="px-4 min-h-[44px] bg-lime-500 text-white rounded hover:bg-lime-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-lime-500"
+                className="px-4 min-h-[44px] bg-[#2d6a2d] text-white rounded hover:bg-[#1e4d1e] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#2d6a2d]"
               >
                 {pasoActual < pasos.length - 1 ? "Siguiente" : "Finalizar"}
               </button>
@@ -388,21 +389,7 @@ const Calculadora = () => {
                 onClick={() => setModalBorrarAbierto(true)}
                 className="mt-6 w-full min-h-12 px-4 inline-flex items-center justify-center gap-2 text-base font-semibold text-red-700 bg-white border-2 border-red-700 rounded-md hover:bg-red-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-300 focus-visible:ring-offset-2"
               >
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-5 h-5"
-                >
-                  <path d="M3 6h18" />
-                  <path d="M8 6V4h8v2" />
-                  <path d="M19 6l-1 14H6L5 6" />
-                  <path d="M10 11v6M14 11v6" />
-                </svg>
+                <Trash2 aria-hidden="true" className="w-5 h-5" />
                 Borrar respuestas
               </button>
             )}
@@ -413,12 +400,12 @@ const Calculadora = () => {
       {/* Pantalla de resultado final */}
       {verResultado && resultado && (
         <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-6">
-          <div className="bg-white p-6 sm:p-12 rounded-md shadow-md w-full max-w-2xl text-center">
+          <div className="bg-white p-6 sm:p-12 rounded-[12px] shadow-[0_4px_16px_rgba(34,85,44,0.1)] w-full max-w-2xl text-center">
             <h2 className="text-2xl sm:text-4xl font-bold mb-6 text-gray-800">¡Tu resultado!</h2>
 
             <p className="text-lg sm:text-2xl text-gray-800">
               Tu huella ecológica total es de{" "}
-              <span className="font-bold text-lime-700 text-xl sm:text-3xl">
+              <span className="font-bold text-[#4a7c59] text-xl sm:text-3xl">
                 {Math.round(resultado.totalGeneral).toLocaleString()}
               </span>{" "}
               puntos.
@@ -449,7 +436,7 @@ const Calculadora = () => {
 
             <p className="mt-6 sm:mt-8 text-lg sm:text-2xl text-gray-800">
               Equivale a{" "}
-              <span className="font-bold text-lime-700 text-xl sm:text-3xl">
+              <span className="font-bold text-[#4a7c59] text-xl sm:text-3xl">
                 {resultado.interpretacion.hagMax
                   ? `${resultado.interpretacion.hagMin} - ${resultado.interpretacion.hagMax}`
                   : `más de ${resultado.interpretacion.hagMin}`}
@@ -457,7 +444,7 @@ const Calculadora = () => {
               hectáreas globales (hag)
               {" "}
               ≈{" "}
-              <span className="font-bold text-lime-700 text-xl sm:text-3xl">
+              <span className="font-bold text-[#4a7c59] text-xl sm:text-3xl">
                 {resultado.interpretacion.planetasTexto}
               </span>{" "}
               planetas
@@ -473,13 +460,13 @@ const Calculadora = () => {
             <div className="mt-8 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
               <Link
                 to="/"
-                className="w-full sm:w-auto px-6 py-3 min-h-[44px] bg-lime-600 text-white text-lg sm:text-xl rounded hover:bg-lime-800 flex items-center justify-center"
+                className="w-full sm:w-auto px-6 py-3 min-h-[44px] bg-[#2d6a2d] text-white text-lg sm:text-xl rounded hover:bg-[#1e4d1e] flex items-center justify-center"
               >
                 Volver al Inicio
               </Link>
               <button
                 onClick={reiniciarCuestionario}
-                className="w-full sm:w-auto px-6 py-3 min-h-[44px] border border-lime-600 text-lime-700 text-lg sm:text-xl rounded hover:bg-lime-50"
+                className="w-full sm:w-auto px-6 py-3 min-h-[44px] border border-[#2d6a2d] text-[#2d6a2d] text-lg sm:text-xl rounded hover:bg-[#e8f4ec]"
               >
                 Contestar de nuevo
               </button>
