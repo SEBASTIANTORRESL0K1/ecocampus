@@ -8,11 +8,11 @@ const LandingPage = () => {
       <main className="flex-grow flex flex-col items-center text-center px-4 py-10">
         {/* Encabezado */}
         <header className="w-full bg-lime-600 text-white py-6 text-center rounded-lg shadow-md">
-          <h1 className="text-3xl font-bold">Calcula tu huella ecológica y ayuda al planeta</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold px-4">Calcula tu huella ecológica y ayuda al planeta</h1>
           <p className="text-lg mt-2">Conoce tu impacto y ayuda al planeta</p>
           <Link to="/calculadora">
             <button
-              className="mt-4 px-6 py-2 bg-indigo-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-indigo-700">
+              className="mt-4 px-6 py-3 min-h-[44px] bg-indigo-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-indigo-700">
               Comenzar cálculo
             </button>
           </Link>
