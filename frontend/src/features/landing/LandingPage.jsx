@@ -214,6 +214,9 @@ const LandingPage = () => {
               <img
                 src="https://picsum.photos/seed/campo/800/600"
                 alt="Campo natural con vegetación"
+                loading="lazy"
+                width="800"
+                height="600"
                 style={{
                   width: "100%",
                   height: "100%",
