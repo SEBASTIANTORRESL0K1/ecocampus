@@ -15,5 +15,8 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/setupTests.js',
     exclude: ['**/node_modules/**', '**/e2e/**'],
+    env: {
+      BASE_URL: '/ecocampus/',
+    },
   },
 })
