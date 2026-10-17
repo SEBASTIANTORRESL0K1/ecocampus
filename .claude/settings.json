@@ -1,6 +1,7 @@
 {
   "enabledPlugins": {
     "voltagent-core-dev@voltagent-subagents": true,
-    "voltagent-qa-sec@voltagent-subagents": true
+    "voltagent-qa-sec@voltagent-subagents": true,
+    "taste-skill@taste-skill": true
   }
 }
