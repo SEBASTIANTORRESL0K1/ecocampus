@@ -32,6 +32,28 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+  contrast:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run contrast tests
+        run: npx vitest run src/features/landing/LandingPage.contrast.test.js
+
   e2e:
     runs-on: ubuntu-latest
     defaults:

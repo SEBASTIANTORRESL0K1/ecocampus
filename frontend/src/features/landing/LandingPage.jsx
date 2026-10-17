@@ -229,7 +229,7 @@ const LandingPage = () => {
                   <p
                     style={{
                       fontSize: "0.8rem",
-                      color: "#6a8a6a",
+                      color: "#5a7a5a",
                       margin: "0.3rem 0 0",
                       textTransform: "uppercase",
                       letterSpacing: "0.07em",
@@ -261,7 +261,7 @@ const LandingPage = () => {
                   <p
                     style={{
                       fontSize: "0.8rem",
-                      color: "#6a8a6a",
+                      color: "#5a7a5a",
                       margin: "0.3rem 0 0",
                       textTransform: "uppercase",
                       letterSpacing: "0.07em",
