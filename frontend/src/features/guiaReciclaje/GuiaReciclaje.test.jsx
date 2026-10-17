@@ -25,21 +25,21 @@ describe('GuiaReciclaje', () => {
 
   test('muestra el título principal', () => {
     renderGuiaReciclaje();
-    screen.getByRole('heading', { level: 1, name: /guía de reciclaje/i });
+    expect(screen.getByRole('heading', { level: 1, name: /guía de reciclaje/i })).toBeInTheDocument();
   });
 
   test('muestra los tres principios de las 3 R\'s', () => {
     renderGuiaReciclaje();
-    screen.getByRole('heading', { name: /reciclar/i });
-    screen.getByRole('heading', { name: /reutilizar/i });
-    screen.getByRole('heading', { name: /reducir/i });
+    expect(screen.getByRole('heading', { name: /reciclar/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /reutilizar/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /reducir/i })).toBeInTheDocument();
   });
 
   test('muestra las tres categorías de beneficios', () => {
     renderGuiaReciclaje();
-    screen.getByRole('heading', { name: /ambientales/i });
-    screen.getByRole('heading', { name: /económicos/i });
-    screen.getByRole('heading', { name: /sociales/i });
+    expect(screen.getByRole('heading', { name: /ambientales/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /económicos/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /sociales/i })).toBeInTheDocument();
   });
 
   test('el enlace "Conoce más" apunta a la URL correcta', () => {
