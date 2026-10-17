@@ -1,3 +1,26 @@
+:root {
+  --color-brand-dark: #1a2e1a;
+  --color-brand-mid: #2d6a2d;
+  --color-brand-main: #4a7c59;
+  --color-brand-hover: #1e4d1e;
+  --color-surface-light: #e8f4ec;
+  --color-section-alt: #f7f9f4;
+  --color-text-body: #3a4a3a;
+  --color-text-muted: #5a7a5a;
+  --color-hero-sub: #b8e0c8;
+  --color-hero-desc: #d4ead9;
+  --color-text-date: #6a8a6a;
+  --shadow-card: 0 2px 12px rgba(34,85,44,0.08);
+  --shadow-card-hover: 0 8px 28px rgba(34,85,44,0.18);
+  --shadow-image: 0 8px 32px rgba(34,85,44,0.15);
+  --shadow-btn: 0 4px 14px rgba(45,106,45,0.4);
+  --shadow-btn-hover: 0 8px 20px rgba(45,106,45,0.5);
+  --hero-overlay: rgba(34,85,44,0.65);
+  --section-padding: 5rem 1.5rem;
+  --section-max-width: 1100px;
+  --radius-card: 8px;
+}
+
 @import "tailwindcss";
 
 *,

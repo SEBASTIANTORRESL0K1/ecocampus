@@ -4,6 +4,7 @@ import PageLayout from "../../components/layout/PageLayout";
 import HeroSection from "./HeroSection";
 import PrinciplesSection from "./PrinciplesSection";
 import BenefitsSection from "./BenefitsSection";
+import SectionWrapper from "../../components/ui/SectionWrapper";
 
 const GuiaReciclaje = () => (
   <PageLayout>
@@ -46,35 +47,33 @@ const GuiaReciclaje = () => (
       <BenefitsSection />
 
       {/* Infografía */}
-      <section style={{ background: "#ffffff", padding: "5rem 1.5rem" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto", textAlign: "center" }}>
-          <h2
-            style={{
-              fontSize: "clamp(1.4rem, 3vw, 2rem)",
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              color: "#1a2e1a",
-              margin: "0 0 2rem",
-              textWrap: "balance",
-            }}
-          >
-            Infografía informativa
-          </h2>
-          <img
-            src={`${import.meta.env.BASE_URL}infografia_guia.jpeg`}
-            alt="Infografía Guía de Reciclaje"
-            style={{
-              width: "100%",
-              maxWidth: "896px",
-              margin: "0 auto",
-              display: "block",
-              borderRadius: "8px",
-              boxShadow: "0 8px 28px rgba(34,85,44,0.15)",
-            }}
-          />
-        </div>
-      </section>
+      <SectionWrapper innerStyle={{ textAlign: "center" }}>
+        <h2
+          style={{
+            fontSize: "clamp(1.4rem, 3vw, 2rem)",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            color: "#1a2e1a",
+            margin: "0 0 2rem",
+            textWrap: "balance",
+          }}
+        >
+          Infografía informativa
+        </h2>
+        <img
+          src={`${import.meta.env.BASE_URL}infografia_guia.jpeg`}
+          alt="Infografía Guía de Reciclaje"
+          style={{
+            width: "100%",
+            maxWidth: "896px",
+            margin: "0 auto",
+            display: "block",
+            borderRadius: "8px",
+            boxShadow: "0 8px 28px rgba(34,85,44,0.15)",
+          }}
+        />
+      </SectionWrapper>
     </main>
   </PageLayout>
 );

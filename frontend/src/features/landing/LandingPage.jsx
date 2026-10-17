@@ -2,6 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Sprout, Map, Users, Recycle, Leaf } from "lucide-react";
 import PageLayout from "../../components/layout/PageLayout";
+import PageHero from "../../components/ui/PageHero";
+import CtaButton from "../../components/ui/CtaButton";
+import SectionWrapper from "../../components/ui/SectionWrapper";
+import SectionHeading from "../../components/ui/SectionHeading";
+import FeatureCard from "../../components/ui/FeatureCard";
+import IconCircle from "../../components/ui/IconCircle";
 
 const tools = [
   {
@@ -35,94 +41,18 @@ const LandingPage = () => {
     <PageLayout>
       <main>
         {/* ── Hero ── */}
-        <section
-          style={{
-            backgroundImage:
-              "url('https://picsum.photos/seed/ecocampus/1920/600')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div
-            style={{
-              background: "rgba(34,85,44,0.65)",
-              minHeight: "100dvh",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "4rem 1.5rem",
-            }}
-          >
-            <p
-              style={{
-                fontStyle: "italic",
-                color: "#b8e0c8",
-                fontSize: "1.1rem",
-                marginBottom: "0.5rem",
-                letterSpacing: "0.05em",
-              }}
-            >
-              Plataforma ambiental universitaria
-            </p>
-            <h1
-              style={{
-                color: "#ffffff",
-                fontSize: "clamp(2.2rem, 6vw, 4.5rem)",
-                fontWeight: 700,
-                textAlign: "center",
-                letterSpacing: "0.02em",
-                textWrap: "balance",
-                margin: "0 0 1rem",
-                lineHeight: 1.1,
-              }}
-            >
-              Calcula tu huella ecológica
-            </h1>
-            <p
-              style={{
-                color: "#d4ead9",
-                fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
-                textAlign: "center",
-                maxWidth: "520px",
-                marginBottom: "2rem",
-                textWrap: "balance",
-              }}
-            >
-              Conoce tu impacto ambiental y actúa hoy
-            </p>
+        <PageHero
+          backgroundSeed="ecocampus"
+          eyebrow="Plataforma ambiental universitaria"
+          title="Calcula tu huella ecológica"
+          description="Conoce tu impacto ambiental y actúa hoy"
+          minHeight="100dvh"
+          cta={
             <Link to="/calculadora">
-              <button
-                style={{
-                  background: "#2d6a2d",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "4px",
-                  padding: "0.85rem 2.5rem",
-                  fontSize: "0.95rem",
-                  fontWeight: 600,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  cursor: "pointer",
-                  transition: "transform 200ms ease, box-shadow 200ms ease, background 200ms ease",
-                  boxShadow: "0 4px 14px rgba(45,106,45,0.4)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#1e4d1e";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 20px rgba(45,106,45,0.5)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#2d6a2d";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 14px rgba(45,106,45,0.4)";
-                }}
-              >
-                Comenzar cálculo
-              </button>
+              <CtaButton>Comenzar cálculo</CtaButton>
             </Link>
-          </div>
-        </section>
+          }
+        />
 
         {/* ── Welcome / About ── */}
         <section
@@ -296,124 +226,51 @@ const LandingPage = () => {
         </section>
 
         {/* ── Services ── */}
-        <section
-          style={{
-            background: "#f7f9f4",
-            padding: "5rem 1.5rem",
-          }}
-        >
-          <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-            {/* Heading */}
-            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-              <p
-                style={{
-                  fontStyle: "italic",
-                  color: "#4a7c59",
-                  fontSize: "1.05rem",
-                  marginBottom: "0.4rem",
-                }}
-              >
-                Todo lo que necesitas
-              </p>
-              <h2
-                style={{
-                  fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  color: "#1a2e1a",
-                  margin: "0 0 0.5rem",
-                  textWrap: "balance",
-                }}
-              >
-                Nuestras herramientas
-              </h2>
-              <div
-                style={{ marginTop: "0.5rem", display: "flex", justifyContent: "center" }}
-                aria-hidden="true"
-              >
-                <Leaf size={24} color="#4a7c59" />
-              </div>
-            </div>
+        <SectionWrapper background="var(--color-section-alt)">
+          <SectionHeading eyebrow="Todo lo que necesitas" title="Nuestras herramientas" />
 
-            {/* Cards grid */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                gap: "1.5rem",
-              }}
-            >
-              {tools.map((tool) => (
-                <Link
-                  key={tool.to}
-                  to={tool.to}
-                  style={{ textDecoration: "none" }}
-                >
-                  <article
+          {/* Cards grid */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: "1.5rem",
+            }}
+          >
+            {tools.map((tool) => (
+              <Link
+                key={tool.to}
+                to={tool.to}
+                style={{ textDecoration: "none" }}
+              >
+                <FeatureCard cursor="pointer">
+                  <IconCircle Icon={tool.Icon} />
+                  <h3
                     style={{
-                      background: "#ffffff",
-                      borderRadius: "8px",
-                      padding: "2rem 1.5rem",
-                      textAlign: "center",
-                      boxShadow: "0 2px 12px rgba(34,85,44,0.08)",
-                      transition: "transform 200ms ease, box-shadow 200ms ease",
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "scale(1.02)";
-                      e.currentTarget.style.boxShadow =
-                        "0 8px 28px rgba(34,85,44,0.18)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "scale(1)";
-                      e.currentTarget.style.boxShadow =
-                        "0 2px 12px rgba(34,85,44,0.08)";
+                      fontSize: "1.05rem",
+                      fontWeight: 600,
+                      color: "#1a2e1a",
+                      margin: "0 0 0.5rem",
+                      letterSpacing: "0.02em",
                     }}
                   >
-                    {/* Icon circle */}
-                    <div
-                      style={{
-                        width: "64px",
-                        height: "64px",
-                        borderRadius: "50%",
-                        background: "#e8f4ec",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        margin: "0 auto 1rem",
-                      }}
-                      aria-hidden="true"
-                    >
-                      <tool.Icon size={28} color="#4a7c59" strokeWidth={1.5} />
-                    </div>
-                    <h3
-                      style={{
-                        fontSize: "1.05rem",
-                        fontWeight: 600,
-                        color: "#1a2e1a",
-                        margin: "0 0 0.5rem",
-                        letterSpacing: "0.02em",
-                      }}
-                    >
-                      {tool.name}
-                    </h3>
-                    <p
-                      style={{
-                        fontSize: "0.88rem",
-                        color: "#5a7a5a",
-                        margin: 0,
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      {tool.description}
-                    </p>
-                  </article>
-                </Link>
-              ))}
-            </div>
+                    {tool.name}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: "0.88rem",
+                      color: "#5a7a5a",
+                      margin: 0,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {tool.description}
+                  </p>
+                </FeatureCard>
+              </Link>
+            ))}
           </div>
-        </section>
+        </SectionWrapper>
       </main>
 
       <style>{`
