@@ -13,3 +13,5 @@ services:
     ports: !reset []
   adminer:
     profiles: ["sin-adminer"]
+  phpmyadmin:
+    profiles: ["sin-phpmyadmin"]

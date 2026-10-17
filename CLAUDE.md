@@ -104,6 +104,7 @@ El login usa la configuracion y los certificados de desarrollo que proporciono e
 | Frontend | `http://localhost:8080/ecocampus/` |
 | Backend | `http://localhost:4006` |
 | Adminer | `http://127.0.0.1:8081` (servidor `db`) |
+| phpMyAdmin | `http://127.0.0.1:8082` (usuario `ecocampus`, contrasena `MYSQL_PASSWORD` del `.env`) |
 | MySQL en el host | `127.0.0.1:3307` (el 3306 esta reservado en la maquina del usuario) |
 
 - Pruebas del backend: `cd backend && npm test`. Pruebas del frontend: `cd frontend && npx vitest run`.

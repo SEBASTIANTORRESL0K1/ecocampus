@@ -123,6 +123,7 @@ docker compose up --build
 | Frontend | http://localhost:8080/ecocampus/ |
 | Backend | http://localhost:4006 (`/health`, `/Metadata`) |
 | Adminer (consulta y exporta a CSV) | http://localhost:8081, servidor `db`, usuario `ecocampus`, base `ecocampus` |
+| phpMyAdmin | http://localhost:8082, usuario `ecocampus` y la contrasena `MYSQL_PASSWORD` de tu `.env` (el usuario `root` usa `MYSQL_ROOT_PASSWORD`) |
 
 - `backend/cert/` debe contener `cert.pem`, `idp.crt` y `key.pem` (de desarrollo, tomados de https://github.com/Universidad-de-Colima/login-federado-node); se montan como volumen; estan versionados en el repo con autorizacion del asesor (son credenciales de desarrollo, no de produccion).
 - Los datos viven en el volumen `db_data`; `docker compose down` los conserva y `docker compose down -v` los borra.
@@ -131,7 +132,7 @@ docker compose up --build
 
 ### Despliegue en EC2
 
-1. Instancia con Docker y el plugin compose; abre en el grupo de seguridad solo los puertos 80 y 443 (el 8081 de Adminer y el 3307 (MySQL) quedan en 127.0.0.1; usa un tunel SSH para Adminer).
+1. Instancia con Docker y el plugin compose; abre en el grupo de seguridad solo los puertos 80 y 443 (el 8081 de Adminer, el 8082 de phpMyAdmin y el 3307 (MySQL) quedan en 127.0.0.1; usa un tunel SSH para entrar a ellos).
 2. En `.env` define `FRONTEND_URL` y `API_URL` con tu dominio, `COOKIE_SECURE=true` y `TRUST_PROXY=true`, y genera `SESSION_SECRET` e `ID_SALT` con `openssl rand -hex 32`.
 3. Pon un proxy con HTTPS (nginx o un balanceador) delante del frontend y del backend.
 4. El login SAML en un servidor publico requiere EntityID, certificados y URL de callback propios, que se tramitan con sistemas@ucol.mx. Las credenciales de desarrollo solo funcionan con `localhost:4006`.

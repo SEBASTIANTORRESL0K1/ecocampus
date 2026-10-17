@@ -70,5 +70,17 @@ services:
     ports:
       - "127.0.0.1:8081:8080"
 
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "127.0.0.1:8082:80"
+
 volumes:
   db_data:
