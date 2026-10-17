@@ -1,28 +1,29 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Sprout, Map, Users, Recycle, Leaf } from "lucide-react";
 import PageLayout from "../../components/layout/PageLayout";
 
 const tools = [
   {
-    icon: "🌱",
+    Icon: Sprout,
     name: "Calculadora",
     description: "Mide tu huella ecológica personal",
     to: "/calculadora",
   },
   {
-    icon: "🗺️",
+    Icon: Map,
     name: "Mapa interactivo",
     description: "Visualiza el impacto ambiental en tu zona",
     to: "/mapa",
   },
   {
-    icon: "🤝",
+    Icon: Users,
     name: "Comunidad",
     description: "Comparte y aprende con otros usuarios",
     to: "/comunidad",
   },
   {
-    icon: "♻️",
+    Icon: Recycle,
     name: "Guía de reciclaje",
     description: "Aprende a reducir y gestionar tus residuos",
     to: "/guia-reciclaje",
@@ -170,13 +171,12 @@ const LandingPage = () => {
               {/* Decorative leaf divider */}
               <div
                 style={{
-                  fontSize: "1.8rem",
                   marginBottom: "1.25rem",
                   lineHeight: 1,
                 }}
                 aria-hidden="true"
               >
-                🌿
+                <Leaf size={28} color="#4a7c59" />
               </div>
               <p
                 style={{
@@ -329,10 +329,10 @@ const LandingPage = () => {
                 Nuestras herramientas
               </h2>
               <div
-                style={{ fontSize: "1.6rem", marginTop: "0.5rem" }}
+                style={{ marginTop: "0.5rem", display: "flex", justifyContent: "center" }}
                 aria-hidden="true"
               >
-                🌿
+                <Leaf size={24} color="#4a7c59" />
               </div>
             </div>
 
@@ -381,12 +381,11 @@ const LandingPage = () => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: "1.75rem",
                         margin: "0 auto 1rem",
                       }}
                       aria-hidden="true"
                     >
-                      {tool.icon}
+                      <tool.Icon size={28} color="#4a7c59" strokeWidth={1.5} />
                     </div>
                     <h3
                       style={{
