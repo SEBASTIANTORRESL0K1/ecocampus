@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { RotateCcw } from "lucide-react";
 
 const DURACION_SALIDA = 300;
 
@@ -81,6 +82,7 @@ const ToastAviso = ({ mensaje, textoAccion, onAccion, onCerrar, duracion = 5000,
         : "opacity-0 -translate-y-4 sm:translate-y-0 sm:translate-x-8"}`}
     >
       <div className="flex items-start gap-3">
+        <RotateCcw aria-hidden="true" className="shrink-0 w-5 h-5 mt-0.5 text-[#4a7c59]" />
         <p role="status" aria-live="polite" className="flex-grow text-base text-gray-800 font-medium">
           {mensaje}
         </p>
