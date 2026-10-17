@@ -1,0 +1,50 @@
+  █ THRESHOLDS 
+    http_req_duration
+    ✓ 'p(95)<1000' p(95)=16.63ms
+      {endpoint:api_me}
+      ✓ 'p(95)<1000' p(95)=25.78ms
+      {endpoint:asset_css}
+      ✓ 'p(95)<1000' p(95)=1.25ms
+      {endpoint:asset_js}
+      ✓ 'p(95)<1000' p(95)=2.46ms
+      {endpoint:calculadora}
+      ✓ 'p(95)<1000' p(95)=1.11ms
+      {endpoint:health}
+      ✓ 'p(95)<1000' p(95)=40.05ms
+      {endpoint:home}
+      ✓ 'p(95)<1000' p(95)=1.15ms
+      {endpoint:post_respuestas}
+      ✓ 'p(95)<1000' p(95)=62.17ms
+    http_req_failed
+    ✓ 'rate<0.01' rate=0.00%
+  █ TOTAL RESULTS 
+    checks_total.......: 106415  619.262634/s
+    checks_succeeded...: 100.00% 106415 out of 106415
+    checks_failed......: 0.00%   0 out of 106415
+    ✓ home 2xx
+    ✓ calculadora 2xx
+    ✓ asset_js 2xx
+    ✓ asset_css 2xx
+    ✓ health 2xx
+    ✓ api_me 2xx
+    ✓ post_respuestas 2xx
+    HTTP
+    http_req_duration................: min=-1359019ns med=1.14ms   avg=3.82ms   p(90)=8.35ms   p(95)=16.63ms p(99)=51.22ms  max=168.13ms
+      { endpoint:api_me }............: min=91.71µs    med=2.08ms   avg=5.82ms   p(90)=14.16ms  p(95)=25.78ms p(99)=55.25ms  max=92.61ms 
+      { endpoint:asset_css }.........: min=313.41µs   med=741.42µs avg=839.67µs p(90)=1.01ms   p(95)=1.25ms  p(99)=3.76ms   max=13.49ms 
+      { endpoint:asset_js }..........: min=651.18µs   med=1.46ms   avg=1.61ms   p(90)=1.99ms   p(95)=2.46ms  p(99)=5.58ms   max=32.5ms  
+      { endpoint:calculadora }.......: min=181.03µs   med=666.9µs  avg=745.98µs p(90)=922.84µs p(95)=1.11ms  p(99)=2.8ms    max=19.63ms 
+      { endpoint:health }............: min=1.36ms     med=3.62ms   avg=9.31ms   p(90)=22.48ms  p(95)=40.05ms p(99)=78.33ms  max=159.28ms
+      { endpoint:home }..............: min=-1359019ns med=694.91µs avg=783.29µs p(90)=949.69µs p(95)=1.15ms  p(99)=3.02ms   max=19.91ms 
+      { endpoint:post_respuestas }...: min=6.75ms     med=15.19ms  avg=23.16ms  p(90)=46.98ms  p(95)=62.17ms p(99)=107.78ms max=168.13ms
+      { expected_response:true }.....: min=-1359019ns med=1.14ms   avg=3.82ms   p(90)=8.35ms   p(95)=16.63ms p(99)=51.22ms  max=168.13ms
+    http_req_failed..................: 0.00%  0 out of 106416
+    http_reqs........................: 106416 619.268454/s
+    EXECUTION
+    iteration_duration...............: min=2s         med=2.01s    avg=2.02s    p(90)=2.05s    p(95)=2.08s   p(99)=2.14s    max=2.25s   
+    iterations.......................: 17168  99.906037/s
+    vus..............................: 4      min=4           max=300
+    vus_max..........................: 300    min=300         max=300
+    NETWORK
+    data_received....................: 8.3 GB 48 MB/s
+    data_sent........................: 10 MB  59 kB/s
