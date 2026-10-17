@@ -1,0 +1,48 @@
+t+15s
+ecocampus-loadtest-frontend-1 cpu=0.48% mem=10.71MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=2.72% mem=31.7MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=1.73% mem=389.8MiB / 7.413GiB
+t+30s
+ecocampus-loadtest-frontend-1 cpu=4.83% mem=11.64MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=22.18% mem=52.24MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=5.21% mem=389.8MiB / 7.413GiB
+t+45s
+ecocampus-loadtest-frontend-1 cpu=10.79% mem=10.92MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=42.96% mem=70.82MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=9.31% mem=389.9MiB / 7.413GiB
+t+60s
+ecocampus-loadtest-frontend-1 cpu=14.67% mem=11.02MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=40.79% mem=71.1MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=12.05% mem=390.1MiB / 7.413GiB
+t+75s
+ecocampus-loadtest-frontend-1 cpu=18.83% mem=11.65MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=53.48% mem=84.81MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=16.32% mem=390.9MiB / 7.413GiB
+t+90s
+ecocampus-loadtest-frontend-1 cpu=24.39% mem=11.75MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=70.86% mem=106.7MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=21.32% mem=391.5MiB / 7.413GiB
+t+105s
+ecocampus-loadtest-frontend-1 cpu=30.01% mem=11.51MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=92.72% mem=109.2MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=20.36% mem=391.6MiB / 7.413GiB
+t+120s
+ecocampus-loadtest-frontend-1 cpu=20.49% mem=11.68MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=54.53% mem=112.1MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=21.51% mem=391.8MiB / 7.413GiB
+t+135s
+ecocampus-loadtest-frontend-1 cpu=27.56% mem=12.04MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=78.47% mem=112.6MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=20.07% mem=391.9MiB / 7.413GiB
+t+150s
+ecocampus-loadtest-frontend-1 cpu=9.22% mem=11.74MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=23.47% mem=107.4MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=12.67% mem=393.5MiB / 7.413GiB
+t+165s
+ecocampus-loadtest-frontend-1 cpu=0.00% mem=10.68MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=0.00% mem=31.24MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=1.16% mem=393.5MiB / 7.413GiB
+t+180s
+ecocampus-loadtest-frontend-1 cpu=0.00% mem=10.68MiB / 7.413GiB
+ecocampus-loadtest-backend-1 cpu=11.77% mem=31.38MiB / 7.413GiB
+ecocampus-loadtest-db-1 cpu=8.79% mem=393.6MiB / 7.413GiB

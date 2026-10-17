@@ -1,0 +1,200 @@
+{
+    "metrics": {
+        "checks": {
+            "passes": 33387,
+            "fails": 0,
+            "value": 1
+        },
+        "http_req_duration{expected_response:true}": {
+            "max": 464.61876,
+            "min": -0.746,
+            "med": 1.0842049999999999,
+            "avg": 1.9867390608601931,
+            "p(90)": 3.2358731999999994,
+            "p(95)": 5.693121099999994,
+            "p(99)": 14.839181029999972
+        },
+        "http_req_sending": {
+            "med": 0.023215,
+            "avg": 0.032778096292080804,
+            "p(90)": 0.071069,
+            "p(95)": 0.09078484999999997,
+            "p(99)": 0.1364983999999998,
+            "max": 1.683975,
+            "min": 0.004469
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 33388,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        },
+        "http_req_waiting": {
+            "max": 464.461391,
+            "min": 0.140071,
+            "med": 0.676994,
+            "avg": 1.6388415380376349,
+            "p(90)": 2.9264014,
+            "p(95)": 5.217356049999969,
+            "p(99)": 14.537209559999946
+        },
+        "data_sent": {
+            "count": 3190586,
+            "rate": 15832.035842785275
+        },
+        "http_req_receiving": {
+            "med": 0.164413,
+            "avg": 0.3151194265304904,
+            "p(90)": 0.7988103999999999,
+            "p(95)": 1.19127985,
+            "p(99)": 1.8490429999999907,
+            "max": 16.585465,
+            "min": -1.157163
+        },
+        "http_req_duration": {
+            "max": 464.61876,
+            "min": -0.746,
+            "med": 1.0842049999999999,
+            "avg": 1.9867390608601931,
+            "p(90)": 3.2358731999999994,
+            "p(95)": 5.693121099999994,
+            "p(99)": 14.839181029999972,
+            "thresholds": {
+                "p(95)<1000": false
+            }
+        },
+        "http_req_duration{endpoint:post_respuestas}": {
+            "med": 12.117994,
+            "avg": 14.923958310344842,
+            "p(90)": 19.246361,
+            "p(95)": 25.972267000000002,
+            "p(99)": 72.10625790000013,
+            "max": 464.61876,
+            "min": 7.459595,
+            "thresholds": {
+                "p(95)<1000": false
+            }
+        },
+        "iteration_duration": {
+            "p(90)": 2025.7919375,
+            "p(95)": 2030.41383275,
+            "p(99)": 2048.794386,
+            "max": 2476.679445,
+            "min": 2006.05292,
+            "med": 2012.092717,
+            "avg": 2015.180369578321
+        },
+        "http_reqs": {
+            "rate": 165.67489881761995,
+            "count": 33388
+        },
+        "vus": {
+            "value": 2,
+            "min": 1,
+            "max": 100
+        },
+        "http_req_connecting": {
+            "p(95)": 0,
+            "p(99)": 0,
+            "max": 23.462121,
+            "min": 0,
+            "med": 0,
+            "avg": 0.0040355524739427336,
+            "p(90)": 0
+        },
+        "vus_max": {
+            "value": 100,
+            "min": 100,
+            "max": 100
+        },
+        "iterations": {
+            "rate": 26.67629855168099,
+            "count": 5376
+        },
+        "http_req_blocked": {
+            "p(95)": 0.012755,
+            "p(99)": 0.06292439999999978,
+            "max": 23.594772,
+            "min": 0.001222,
+            "med": 0.0070834999999999995,
+            "avg": 0.013191756978555107,
+            "p(90)": 0.011282
+        },
+        "http_req_tls_handshaking": {
+            "min": 0,
+            "med": 0,
+            "avg": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 0,
+            "max": 0
+        },
+        "data_received": {
+            "count": 2590433603,
+            "rate": 12854014.168886656
+        }
+    },
+    "setup_data": {
+        "css": "/ecocampus/assets/index-g_9cpzCl.css",
+        "js": "/ecocampus/assets/index-BORE9eIi.js"
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "home 2xx": {
+                    "name": "home 2xx",
+                    "path": "::home 2xx",
+                    "id": "0232ca12e6ca5738430b9ce3039d025a",
+                    "passes": 5376,
+                    "fails": 0
+                },
+                "calculadora 2xx": {
+                    "id": "ba207e7df27b705df211605a9e363d91",
+                    "passes": 5376,
+                    "fails": 0,
+                    "name": "calculadora 2xx",
+                    "path": "::calculadora 2xx"
+                },
+                "asset_js 2xx": {
+                    "fails": 0,
+                    "name": "asset_js 2xx",
+                    "path": "::asset_js 2xx",
+                    "id": "b037f358fb3004e2b65238554249f4b9",
+                    "passes": 5376
+                },
+                "asset_css 2xx": {
+                    "name": "asset_css 2xx",
+                    "path": "::asset_css 2xx",
+                    "id": "26274df03050d9117c85a74e92b39788",
+                    "passes": 5376,
+                    "fails": 0
+                },
+                "health 2xx": {
+                    "passes": 5376,
+                    "fails": 0,
+                    "name": "health 2xx",
+                    "path": "::health 2xx",
+                    "id": "56c2802d1ddee6232b6f3c039ad99cc6"
+                },
+                "api_me 2xx": {
+                    "id": "9337715598cf1888eceb484742d7da76",
+                    "passes": 5376,
+                    "fails": 0,
+                    "name": "api_me 2xx",
+                    "path": "::api_me 2xx"
+                },
+                "post_respuestas 2xx": {
+                    "name": "post_respuestas 2xx",
+                    "path": "::post_respuestas 2xx",
+                    "id": "a0db5394e1739fd725ad86d6bba4e5fb",
+                    "passes": 1131,
+                    "fails": 0
+                }
+            }
+    }
+}
