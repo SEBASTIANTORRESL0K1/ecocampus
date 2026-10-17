@@ -1,80 +1,82 @@
 import React from "react";
+import { Leaf } from "lucide-react";
 import PageLayout from "../../components/layout/PageLayout";
+import HeroSection from "./HeroSection";
+import PrinciplesSection from "./PrinciplesSection";
+import BenefitsSection from "./BenefitsSection";
 
-const GuiaReciclaje = () => {
-  return (
-    <PageLayout>
-      {/* Encabezado */}
-      <header className="bg-gray-800 text-white text-center p-6">
-        <h2 className="text-2xl sm:text-3xl font-bold">Guía de Reciclaje</h2>
-        <p className="text-lg mt-1">Conoce la importancia del reciclaje y cómo ayudar al planeta</p>
-        <a
-          href="https://portal.ucol.mx/siga/reforestaccion/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 px-6 py-3 min-h-[44px] bg-indigo-500 text-white text-lg font-semibold rounded-lg hover:bg-indigo-700 inline-flex items-center justify-center">
-          Conoce más
-        </a>
-      </header>
+const GuiaReciclaje = () => (
+  <PageLayout>
+    <main>
+      <HeroSection />
 
-      {/* Sección informativa */}
-      <section className="bg-emerald-100 p-6 text-center">
-        <p className="text-base sm:text-lg text-gray-800">
-          El reciclaje es una de las acciones más efectivas para reducir el impacto ambiental y promover un uso más sostenible de los recursos.
-        </p>
-      </section>
-
-      {/* Principios del reciclaje */}
-      <div className="flex flex-col md:flex-row justify-center items-stretch gap-6 p-6">
-        <div className="bg-emerald-50 p-6 text-center rounded-lg shadow-md w-full md:w-64">
-          <h3 className="text-2xl font-bold text-green-800">1</h3>
-          <h4 className="text-xl font-semibold mt-2">Reciclar</h4>
-          <p>Convertir materiales usados en nuevos productos.</p>
-        </div>
-        <div className="bg-emerald-50 p-6 text-center rounded-lg shadow-md w-full md:w-64">
-          <h3 className="text-2xl font-bold text-green-800">2</h3>
-          <h4 className="text-xl font-semibold mt-2">Reutilizar</h4>
-          <p>Dar nueva vida a productos existentes sin modificarlos.</p>
-        </div>
-        <div className="bg-emerald-50 p-6 text-center rounded-lg shadow-md w-full md:w-64">
-          <h3 className="text-2xl font-bold text-green-800">3</h3>
-          <h4 className="text-xl font-semibold mt-2">Reducir</h4>
-          <p>Disminuir el consumo y generación de residuos.</p>
-        </div>
-      </div>
-
-      {/* Beneficios del reciclaje */}
-      <section className="p-6 text-center">
-        <h3 className="text-2xl font-bold text-green-800">Beneficios del Reciclaje</h3>
-        <div className="flex flex-col md:flex-row justify-center items-stretch gap-6 mt-4">
-          <div className="bg-white p-4 rounded-lg shadow-md w-full md:w-64">
-            <h4 className="text-lg font-bold text-green-700">Ambientales</h4>
-            <p>Menos contaminación, ahorro de agua y energía, y conservación de recursos naturales.</p>
+      {/* Banner intro */}
+      <section style={{ background: "#f7f9f4", padding: "3.5rem 1.5rem" }}>
+        <div
+          style={{
+            maxWidth: "800px",
+            margin: "0 auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+            gap: "1rem",
+          }}
+        >
+          <div aria-hidden="true">
+            <Leaf size={32} color="#4a7c59" />
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-md w-full md:w-64">
-            <h4 className="text-lg font-bold text-green-700">Económicos</h4>
-            <p>Generación de empleo en la industria del reciclaje y reducción de costos de producción.</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-md w-full md:w-64">
-            <h4 className="text-lg font-bold text-green-700">Sociales</h4>
-            <p>Un entorno más limpio y saludable para todos, así como comunidades con educación ambiental.</p>
-          </div>
+          <p
+            style={{
+              color: "#3a4a3a",
+              lineHeight: 1.75,
+              fontSize: "clamp(1rem, 2vw, 1.15rem)",
+              textWrap: "balance",
+            }}
+          >
+            El reciclaje es una de las acciones más efectivas para reducir el
+            impacto ambiental y promover un uso más sostenible de los recursos.
+            Cada residuo correctamente gestionado es un paso hacia un campus
+            más limpio y un planeta más saludable.
+          </p>
         </div>
       </section>
 
-      {/* Infografía al final */}
-      <section className="p-6 text-center bg-white">
-        <h3 className="text-2xl font-bold text-lime-800 mb-4">Infografía informativa</h3>
-        <div className="flex justify-center">
+      <PrinciplesSection />
+      <BenefitsSection />
+
+      {/* Infografía */}
+      <section style={{ background: "#ffffff", padding: "5rem 1.5rem" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", textAlign: "center" }}>
+          <h2
+            style={{
+              fontSize: "clamp(1.4rem, 3vw, 2rem)",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              color: "#1a2e1a",
+              margin: "0 0 2rem",
+              textWrap: "balance",
+            }}
+          >
+            Infografía informativa
+          </h2>
           <img
             src={`${import.meta.env.BASE_URL}infografia_guia.jpeg`}
             alt="Infografía Guía de Reciclaje"
-            className="w-full max-w-4xl rounded-lg shadow-lg"
+            style={{
+              width: "100%",
+              maxWidth: "896px",
+              margin: "0 auto",
+              display: "block",
+              borderRadius: "8px",
+              boxShadow: "0 8px 28px rgba(34,85,44,0.15)",
+            }}
           />
         </div>
       </section>
-    </PageLayout>
-  );
-};
+    </main>
+  </PageLayout>
+);
 
 export default GuiaReciclaje;
