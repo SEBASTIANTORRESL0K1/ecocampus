@@ -1,6 +1,5 @@
 import http from 'k6/http';
 import { sleep, check } from 'k6';
-import { Trend, Rate, Counter } from 'k6/metrics';
 
 const routes = [
   { name: 'inicio',          url: 'http://localhost:4173/ecocampus/' },
@@ -22,8 +21,9 @@ export const options = {
   },
 };
 
-export default function () {
-  const route = routes[Math.floor(Math.random() * routes.length)];
+export default function loadTest() {
+  // eslint-disable-next-line no-undef
+  const route = routes[(__VU + __ITER) % routes.length];
 
   const res = http.get(route.url, {
     tags: { route: route.name },
