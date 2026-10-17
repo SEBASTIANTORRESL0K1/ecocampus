@@ -5,7 +5,9 @@ RUN npm ci
 COPY . .
 # La URL del backend (visible para el navegador) se fija al construir.
 ARG VITE_API_URL
+ARG VITE_EXPERIMENTO_ACTIVO
 ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_EXPERIMENTO_ACTIVO=$VITE_EXPERIMENTO_ACTIVO
 RUN npm run build
 
 FROM nginx:alpine

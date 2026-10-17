@@ -1,8 +1,8 @@
-// Configuración del experimento
-// Cambia EXPERIMENTO_ACTIVO a true para habilitar el cuestionario extendido
+// Configuracion del experimento (login UCOL, cuestionario y guardado en MySQL).
 
-// VITE_EXPERIMENTO_ACTIVO=false lo desactiva sin tocar el codigo (por ejemplo, en las pruebas E2E).
-export const EXPERIMENTO_ACTIVO = import.meta.env.VITE_EXPERIMENTO_ACTIVO !== "false";
+// El experimento es opt-in: solo se activa con VITE_EXPERIMENTO_ACTIVO=true. Sin la variable (por ejemplo,
+// en el despliegue publico de GitHub Pages) la calculadora funciona normal, sin login ni cuestionario.
+export const EXPERIMENTO_ACTIVO = import.meta.env.VITE_EXPERIMENTO_ACTIVO === "true";
 
 // URL del backend (login federado UCOL y guardado de respuestas). Si no esta definida,
 // no se pide login ni se envian respuestas.

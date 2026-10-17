@@ -271,7 +271,7 @@ Claves especiales en `respuestas`:
 
 ## Modo Experimento
 
-Controlado por `EXPERIMENTO_ACTIVO` en `src/config/experiment.js`. Si esta activo, al pulsar "Finalizar" en la ultima pregunta se muestra el cuestionario de evaluacion (`CuestionarioExperimento`) a pantalla completa, y solo despues la pantalla de resultados.
+Es opt-in: se activa solo con `VITE_EXPERIMENTO_ACTIVO=true` (`EXPERIMENTO_ACTIVO` en `src/config/experiment.js`). Sin esa variable, por ejemplo en el despliegue publico de GitHub Pages, la calculadora funciona normal sin login ni cuestionario. Si esta activo, al pulsar "Finalizar" en la ultima pregunta se muestra el cuestionario de evaluacion (`CuestionarioExperimento`) a pantalla completa, y solo despues la pantalla de resultados.
 
 ### Login federado
 

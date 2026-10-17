@@ -88,7 +88,7 @@ El login usa la configuracion y los certificados de desarrollo que proporciono e
 
 ### Reglas del experimento
 
-- El modo experimento se activa con `EXPERIMENTO_ACTIVO` en `frontend/src/config/experiment.js`; el login y el guardado requieren ademas `VITE_API_URL`.
+- El modo experimento es opt-in: solo se activa con `VITE_EXPERIMENTO_ACTIVO=true` (leida en `frontend/src/config/experiment.js`); el login y el guardado requieren ademas `VITE_API_URL`. Sin la variable, como en el despliegue publico de GitHub Pages (`deploy.yml` compila sin variables de entorno), la calculadora funciona normal.
 - Solo participan estudiantes: el backend exige `uTipo = Estudiante`.
 - El navegador nunca recibe correo, nombre ni numero de cuenta. El backend lee la identidad de la sesion SAML y guarda un id pseudonimo (hash con `ID_SALT`) y el correo en MySQL.
 - Una respuesta por participante y por correo (indices `UNIQUE` en `db/schema.sql`).
@@ -110,4 +110,3 @@ El login usa la configuracion y los certificados de desarrollo que proporciono e
 - Dos pruebas de imagen de `Calculadora.test.jsx` fallan tambien en `main`; no son regresiones.
 - E2E y compatibilidad (Playwright): `cd frontend && npx playwright test`. Usa su propio servidor en el puerto 5174 con `VITE_API_URL` vacia y `VITE_EXPERIMENTO_ACTIVO=false`.
 - Carga (k6): `loadtest/k6.js` con `docker-compose.loadtest.yml`; el procedimiento esta en `docs/testing/rendimiento.md`. El equipo del usuario tiene poca RAM libre: detener el stack principal antes y no ejecutar a la vez pruebas pesadas.
-- `VITE_EXPERIMENTO_ACTIVO=false` desactiva el modo experimento sin tocar el codigo.
