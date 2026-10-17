@@ -10,15 +10,26 @@ const PageHero = ({
   overlayOpacity = "0.65",
   textAlign = "center",
 }) => (
-  <section
-    style={{
-      backgroundImage: `url('https://picsum.photos/seed/${backgroundSeed}/1920/600')`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }}
-  >
+  <section style={{ position: "relative", overflow: "hidden" }}>
+    {/* img instead of CSS background-image so browsers discover and preload it early */}
+    <img
+      src={`https://picsum.photos/seed/${backgroundSeed}/1920/600`}
+      alt=""
+      aria-hidden="true"
+      fetchpriority="high"
+      width="1920"
+      height="600"
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+      }}
+    />
     <div
       style={{
+        position: "relative",
         background: `rgba(34,85,44,${overlayOpacity})`,
         minHeight,
         display: "flex",
