@@ -1,7 +1,8 @@
 // Configuración del experimento
 // Cambia EXPERIMENTO_ACTIVO a true para habilitar el cuestionario extendido
 
-export const EXPERIMENTO_ACTIVO = true;
+// VITE_EXPERIMENTO_ACTIVO=false lo desactiva sin tocar el codigo (por ejemplo, en las pruebas E2E).
+export const EXPERIMENTO_ACTIVO = import.meta.env.VITE_EXPERIMENTO_ACTIVO !== "false";
 
 // URL del backend (login federado UCOL y guardado de respuestas). Si no esta definida,
 // no se pide login ni se envian respuestas.

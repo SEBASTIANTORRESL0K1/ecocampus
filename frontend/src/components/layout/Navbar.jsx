@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <nav className="bg-lime-600 text-white p-4 flex justify-between items-center">
+    <nav className="bg-lime-600 text-white p-4 flex flex-wrap justify-between items-center gap-x-4 gap-y-2">
       <div className="flex items-center gap-2">
         <span className="bg-white rounded-full h-9 w-9 flex items-center justify-center">
           <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="Logo EcoCampus" className="h-7 w-7" />
         </span>
         <h1 className="text-2xl font-bold">EcoCampus</h1>
       </div>
-      <ul className="flex space-x-6">
+      <ul className="flex flex-wrap gap-x-6 gap-y-1">
         <li><Link to="/" className="hover:underline">Inicio</Link></li>
         <li><Link to="/calculadora" className="hover:underline">Calculadora</Link></li>
         <li><Link to="/mapa" className="hover:underline">Mapa</Link></li>
