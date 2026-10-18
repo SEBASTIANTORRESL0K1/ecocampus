@@ -5,9 +5,15 @@ import { MapPin } from "lucide-react";
 import PageLayout from "../../components/layout/PageLayout";
 import { puntosReciclaje } from "./puntosReciclaje";
 import { customIcon } from "./customIcon";
+import useScrollReveal from "../../hooks/useScrollReveal";
+import "../../styles/scroll-animations.css";
 
 const Mapa = () => {
   const posicionCampus = [19.249437, -103.698893];
+
+  const { ref: heroRef, isVisible: heroVisible } = useScrollReveal();
+  const { ref: counterRef, isVisible: counterVisible } = useScrollReveal();
+  const { ref: mapRef, isVisible: mapVisible } = useScrollReveal();
 
   return (
     <PageLayout>
@@ -26,6 +32,8 @@ const Mapa = () => {
           }}
         >
           <div
+            ref={heroRef}
+            className={`reveal${heroVisible ? " is-visible" : ""}`}
             style={{
               background: "rgba(34,85,44,0.7)",
               width: "100%",
@@ -67,6 +75,8 @@ const Mapa = () => {
 
         {/* ── Contador de puntos ── */}
         <section
+          ref={counterRef}
+          className={`reveal${counterVisible ? " is-visible" : ""}`}
           style={{
             background: "#f7f9f4",
             padding: "1.25rem 1.5rem",
@@ -99,6 +109,8 @@ const Mapa = () => {
           }}
         >
           <div
+            ref={mapRef}
+            className={`reveal${mapVisible ? " is-visible" : ""}`}
             style={{
               width: "100%",
               maxWidth: "1100px",

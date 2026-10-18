@@ -1,6 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
+vi.mock("../../hooks/useScrollReveal", () => ({
+  default: () => ({ ref: { current: null }, isVisible: true }),
+}));
+
+vi.mock("../../styles/scroll-animations.css", () => ({}));
+
 vi.mock("react-leaflet", () => ({
   MapContainer: () => null,
   TileLayer: () => null,
