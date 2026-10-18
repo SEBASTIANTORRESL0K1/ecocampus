@@ -36,7 +36,7 @@ test('calculadora: muestra la pregunta 1 y avanza al responder', async ({ page }
 
 test('mapa: renderiza el mapa, los 21 marcadores y abre un popup tocable', async ({ page }) => {
   await page.goto('/ecocampus/mapa');
-  await expect(page.getByRole('heading', { name: 'Mapa de Puntos de Reciclaje' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Mapa de Reciclaje' })).toBeVisible();
   const marcadores = page.locator('.leaflet-marker-icon');
   await expect(marcadores).toHaveCount(21);
   await expect(page.locator('.leaflet-tile-loaded').first()).toBeVisible({ timeout: 15000 });

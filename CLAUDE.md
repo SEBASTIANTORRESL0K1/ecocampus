@@ -40,6 +40,8 @@ Antes de realizar cualquier cambio en pruebas (componentes o E2E), leer el archi
 | Pruebas E2E con Playwright | `docs/testing/playwright-e2e.md` |
 | Pruebas de rendimiento (k6) | `docs/testing/rendimiento.md` |
 | Pruebas de compatibilidad (navegadores y dispositivos) | `docs/testing/compatibilidad.md` |
+| Indice de pruebas y respuesta a la revision | `docs/testing/index.md` |
+| Pruebas sobre el servidor de produccion (Lightsail) | `docs/testing/produccion/README.md` |
 
 Esta regla aplica a nuevas pruebas, modificacion de tests existentes y cambios en la configuracion de Vitest o Playwright.
 

@@ -119,12 +119,30 @@ Si en una repeticion aparecen fallos, el script cuenta cada error por endpoint y
 - El cuello de botella es el proceso Node.js del backend: llego a 92.7 % de CPU, es decir, casi un nucleo completo (Node ejecuta JavaScript en un solo hilo). Por eso `health` (p95 40 ms) y `api_me` (p95 26 ms), que hacen casi nada, son mas lentos que los estaticos: esperan turno en el ciclo de eventos.
 - Escribir una respuesta tarda 15 ms de mediana y 62 ms en p95 con 300 usuarios simultaneos. El estudio no espera esa concurrencia: aun asi, el sistema la absorbio sin errores.
 
+## Resultados en el servidor de produccion (Lightsail)
+
+Ademas del entorno aislado, la carga se midio sobre el servidor real (2 vCPU, 1.9 GB de RAM, `us-east-2`), con el acceso por correo activo. Reporte completo, metodo y datos crudos en [produccion/README.md](./produccion/README.md).
+
+| Prueba | Perfil | Usuarios (max) | Peticiones | Por segundo | Fallos | p95 (ms) | Maximo (ms) |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Lectura (inicio, calculadora, mapa, JS, CSS, `/api/me`) | ligero | 10 | 1741 | 21.5 | 0.00 % | 205 | 334 |
+| Lectura | medio | 30 | 7363 | 66.7 | 0.00 % | 197 | 845 |
+| Escritura (acceso por correo y `POST /api/respuestas`) | ligero | 10 | 732 (366 respuestas) | 9.1 | 0.00 % | 153 / 117 | 201 / 140 |
+| Escritura | medio | 30 | 3222 (1611 respuestas) | 29.2 | 0.00 % | 125 / 102 | 230 / 183 |
+| Lectura | cien | 100 | 51 499 | 300.6 | 0.00 % | 195 | 638 |
+| Escritura | cien | 100 | 21 978 (10 989 respuestas) | 128.8 | 0.00 % | 212 / 193 | 479 / 236 |
+
+- En escritura el p95 se da como acceso / envio. Todas las respuestas se guardaron (201) y el backend no registro errores 5xx.
+- Con 100 usuarios la CPU del servidor (2 vCPU) llego como maximo a 48.1 %, la CPU robada fue de 0.8 % o menos y la memoria usada subio unos 46 MB (maximo de 1150 MB, siempre con al menos 756 MB disponibles); graficas en [produccion/README.md](./produccion/README.md#cpu-y-memoria-durante-100-usuarios-simultaneos).
+- Desde un cliente remoto la latencia minima de cualquier peticion es de unos 60 ms (red hasta Ohio); el backend atiende las lecturas en 1 a 2 ms.
+- Las cifras del entorno aislado de arriba (mediciones anteriores al acceso por correo) siguen siendo una referencia de capacidad maxima; las de produccion reflejan el sistema actual con red real.
+
 ## Limitaciones
 
 - Servidor y generador de carga comparten maquina, por lo que los resultados son conservadores en CPU y optimistas en red.
 - La red es el bridge de Docker (sin latencia ni limite de ancho de banda). En un servidor real el ancho de banda pesara mas: cada visita descarga unos 435 KB de JavaScript.
 - `/api/me` se midio sin sesion; con sesion consulta MySQL y seria algo mas lento.
-- Las mediciones de este informe son anteriores al acceso por correo: el `POST` se midio sin sesion. Desde entonces `loadtest/k6.js` abre una sesion con `POST /api/acceso/correo` (endpoint `acceso_correo`, un correo unico por envio) antes de cada `POST /api/respuestas`, y el backend lee la sesion en MySQL; repite la prueba para actualizar las cifras.
+- Las mediciones del entorno aislado son anteriores al acceso por correo: el `POST` se midio sin sesion. Desde entonces `loadtest/k6.js` abre una sesion con `POST /api/acceso/correo` (endpoint `acceso_correo`, un correo unico por envio) antes de cada `POST /api/respuestas`; repite esa prueba para actualizar las cifras locales. Las cifras con sesion ya estan en la seccion de produccion.
 - Pruebas de pocos minutos: no miden degradacion a largo plazo.
 
 ## Como reproducir

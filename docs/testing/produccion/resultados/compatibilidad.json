@@ -1,0 +1,1979 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\sseba\\OneDrive\\Escritorio\\TESIS 2\\ecocampus\\frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "-c",
+      "playwright.produccion.config.js"
+    ],
+    "configFile": "C:\\Users\\sseba\\OneDrive\\Escritorio\\TESIS 2\\ecocampus\\frontend\\playwright.produccion.config.js",
+    "rootDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/e2e-produccion",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/e2e-produccion",
+        "testIgnore": [
+          "/red\\.spec\\.js/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/e2e-produccion",
+        "testIgnore": [
+          "/red\\.spec\\.js/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/e2e-produccion",
+        "testIgnore": [
+          "/red\\.spec\\.js/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "movil-android-chrome",
+        "name": "movil-android-chrome",
+        "testDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/e2e-produccion",
+        "testIgnore": [
+          "/red\\.spec\\.js/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "movil-ios-safari",
+        "name": "movil-ios-safari",
+        "testDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/e2e-produccion",
+        "testIgnore": [
+          "/red\\.spec\\.js/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "red",
+        "name": "red",
+        "testDir": "C:/Users/sseba/OneDrive/Escritorio/TESIS 2/ecocampus/frontend/e2e-produccion",
+        "testIgnore": [],
+        "testMatch": [
+          "/red\\.spec\\.js/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../docs/testing/produccion/resultados/compatibilidad.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "compatibilidad.spec.js",
+      "file": "compatibilidad.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "inicio: carga el titulo y el boton de la calculadora",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1634,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:34.278Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-90b563412cdeb3a60920",
+          "file": "compatibilidad.spec.js",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "acceso: la calculadora pide el correo y rechaza dominios ajenos",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1320,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:36.177Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-f95a7aa52b674393d34b",
+          "file": "compatibilidad.spec.js",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "calculadora: con correo permitido muestra la pregunta 1 y avanza",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2453,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:37.533Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-47d6b8737e0fdbd05d39",
+          "file": "compatibilidad.spec.js",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "mapa: renderiza el mapa, los 21 marcadores y abre un popup tocable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2906,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:40.014Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-2cc3b9f456b9a38a3477",
+          "file": "compatibilidad.spec.js",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "comunidad: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1388,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:42.941Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-171be394292c26a064a4",
+          "file": "compatibilidad.spec.js",
+          "line": 71,
+          "column": 1
+        },
+        {
+          "title": "guia de reciclaje: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1693,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:44.347Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-00c4adc87c162a74ef27",
+          "file": "compatibilidad.spec.js",
+          "line": 76,
+          "column": 1
+        },
+        {
+          "title": "sin desbordamiento horizontal en las vistas principales",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4706,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:46.064Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-0dc8d9d64937beb20d40",
+          "file": "compatibilidad.spec.js",
+          "line": 81,
+          "column": 1
+        },
+        {
+          "title": "API: /api/me responde con el modo de acceso y sin sesion no se puede guardar",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1014,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:50.800Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"chromium\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-8de52aef0602baf4f84a",
+          "file": "compatibilidad.spec.js",
+          "line": 91,
+          "column": 1
+        },
+        {
+          "title": "inicio: carga el titulo y el boton de la calculadora",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4294,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:53.128Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-5e9333eae20b821e3513",
+          "file": "compatibilidad.spec.js",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "acceso: la calculadora pide el correo y rechaza dominios ajenos",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2035,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:58:58.360Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-1a46e044d979a10370de",
+          "file": "compatibilidad.spec.js",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "calculadora: con correo permitido muestra la pregunta 1 y avanza",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3203,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:00.429Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-db3c3c99b13b3f30e0cf",
+          "file": "compatibilidad.spec.js",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "mapa: renderiza el mapa, los 21 marcadores y abre un popup tocable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2960,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:03.657Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-2b83bd02d0cfb8479d3d",
+          "file": "compatibilidad.spec.js",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "comunidad: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1961,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:06.654Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-6e7e4f01552b0cdd5194",
+          "file": "compatibilidad.spec.js",
+          "line": 71,
+          "column": 1
+        },
+        {
+          "title": "guia de reciclaje: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1865,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:08.648Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-8c38be65a741dc1fb756",
+          "file": "compatibilidad.spec.js",
+          "line": 76,
+          "column": 1
+        },
+        {
+          "title": "sin desbordamiento horizontal en las vistas principales",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5462,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:10.530Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-27b44a65c3784ed5654a",
+          "file": "compatibilidad.spec.js",
+          "line": 81,
+          "column": 1
+        },
+        {
+          "title": "API: /api/me responde con el modo de acceso y sin sesion no se puede guardar",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1580,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:16.023Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"firefox\",\"navegador\":\"firefox 155.0\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-70cd9c5fd34f8bf8d34a",
+          "file": "compatibilidad.spec.js",
+          "line": 91,
+          "column": 1
+        },
+        {
+          "title": "inicio: carga el titulo y el boton de la calculadora",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1805,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:19.262Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-60b9633a8cbbae16e18a",
+          "file": "compatibilidad.spec.js",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "acceso: la calculadora pide el correo y rechaza dominios ajenos",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2227,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:21.235Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-f43bb682ae55592b7537",
+          "file": "compatibilidad.spec.js",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "calculadora: con correo permitido muestra la pregunta 1 y avanza",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4126,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:23.491Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-e628eeb2ad5d16793c19",
+          "file": "compatibilidad.spec.js",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "mapa: renderiza el mapa, los 21 marcadores y abre un popup tocable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3524,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:27.649Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-e09d9b09c75f50a46836",
+          "file": "compatibilidad.spec.js",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "comunidad: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1752,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:31.200Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-81a058c9c1360f5e709f",
+          "file": "compatibilidad.spec.js",
+          "line": 71,
+          "column": 1
+        },
+        {
+          "title": "guia de reciclaje: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2455,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:32.971Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-031bed0c9f89facc3dd3",
+          "file": "compatibilidad.spec.js",
+          "line": 76,
+          "column": 1
+        },
+        {
+          "title": "sin desbordamiento horizontal en las vistas principales",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6787,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:35.446Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-9c3f7ffdc05ae30241df",
+          "file": "compatibilidad.spec.js",
+          "line": 81,
+          "column": 1
+        },
+        {
+          "title": "API: /api/me responde con el modo de acceso y sin sesion no se puede guardar",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1343,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:42.256Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"webkit\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"1280x720\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-0a09a8a75bbb83e321d9",
+          "file": "compatibilidad.spec.js",
+          "line": 91,
+          "column": 1
+        },
+        {
+          "title": "inicio: carga el titulo y el boton de la calculadora",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-android-chrome",
+              "projectName": "movil-android-chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1311,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:44.583Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-5fbf3a60d7b87d014f74",
+          "file": "compatibilidad.spec.js",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "acceso: la calculadora pide el correo y rechaza dominios ajenos",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-android-chrome",
+              "projectName": "movil-android-chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1218,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:46.096Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-c49cb4b2885ae468db71",
+          "file": "compatibilidad.spec.js",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "calculadora: con correo permitido muestra la pregunta 1 y avanza",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-android-chrome",
+              "projectName": "movil-android-chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2489,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:47.338Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-73572dff856ffbbc68e3",
+          "file": "compatibilidad.spec.js",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "mapa: renderiza el mapa, los 21 marcadores y abre un popup tocable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-android-chrome",
+              "projectName": "movil-android-chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2977,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:49.854Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-7145f54ff8288d04f4f2",
+          "file": "compatibilidad.spec.js",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "comunidad: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-android-chrome",
+              "projectName": "movil-android-chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1626,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:52.856Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-1fdabc65689a6be5cc11",
+          "file": "compatibilidad.spec.js",
+          "line": 71,
+          "column": 1
+        },
+        {
+          "title": "guia de reciclaje: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-android-chrome",
+              "projectName": "movil-android-chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2335,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:54.503Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-cec42f221ab36c78d735",
+          "file": "compatibilidad.spec.js",
+          "line": 76,
+          "column": 1
+        },
+        {
+          "title": "sin desbordamiento horizontal en las vistas principales",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-android-chrome",
+              "projectName": "movil-android-chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5210,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T06:59:56.879Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-c867169a6a6eb7c5db78",
+          "file": "compatibilidad.spec.js",
+          "line": 81,
+          "column": 1
+        },
+        {
+          "title": "API: /api/me responde con el modo de acceso y sin sesion no se puede guardar",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-android-chrome",
+              "projectName": "movil-android-chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1002,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:02.126Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-android-chrome\",\"navegador\":\"chromium 153.0.8010.12\",\"userAgent\":\"Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Mobile Safari/537.36\",\"plataforma\":\"Win32\",\"tactil\":true,\"ventana\":\"412x839\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-00240f02b26d3a6d2c73",
+          "file": "compatibilidad.spec.js",
+          "line": 91,
+          "column": 1
+        },
+        {
+          "title": "inicio: carga el titulo y el boton de la calculadora",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-ios-safari",
+              "projectName": "movil-ios-safari",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1945,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:04.550Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-2c6dc085151c8f358185",
+          "file": "compatibilidad.spec.js",
+          "line": 38,
+          "column": 1
+        },
+        {
+          "title": "acceso: la calculadora pide el correo y rechaza dominios ajenos",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-ios-safari",
+              "projectName": "movil-ios-safari",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2188,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:06.673Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-b556e3eb001becd08914",
+          "file": "compatibilidad.spec.js",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "calculadora: con correo permitido muestra la pregunta 1 y avanza",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-ios-safari",
+              "projectName": "movil-ios-safari",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3783,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:08.918Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-aa52bae7eff5b8aef26e",
+          "file": "compatibilidad.spec.js",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "mapa: renderiza el mapa, los 21 marcadores y abre un popup tocable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-ios-safari",
+              "projectName": "movil-ios-safari",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3125,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:12.728Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-91b855a42596671187fb",
+          "file": "compatibilidad.spec.js",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "comunidad: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-ios-safari",
+              "projectName": "movil-ios-safari",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2251,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:15.891Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-cc591c6e2d95e3b71ff8",
+          "file": "compatibilidad.spec.js",
+          "line": 71,
+          "column": 1
+        },
+        {
+          "title": "guia de reciclaje: carga el encabezado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-ios-safari",
+              "projectName": "movil-ios-safari",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1846,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:18.182Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-bbf7376351600fdc8e60",
+          "file": "compatibilidad.spec.js",
+          "line": 76,
+          "column": 1
+        },
+        {
+          "title": "sin desbordamiento horizontal en las vistas principales",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-ios-safari",
+              "projectName": "movil-ios-safari",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5727,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:20.051Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-a8d0c61013e27b21e4e7",
+          "file": "compatibilidad.spec.js",
+          "line": 81,
+          "column": 1
+        },
+        {
+          "title": "API: /api/me responde con el modo de acceso y sin sesion no se puede guardar",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "entorno",
+                  "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil-ios-safari",
+              "projectName": "movil-ios-safari",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1426,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:25.810Z",
+                  "annotations": [
+                    {
+                      "type": "entorno",
+                      "description": "{\"proyecto\":\"movil-ios-safari\",\"navegador\":\"webkit 26.6\",\"userAgent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1\",\"plataforma\":\"Win32\",\"tactil\":false,\"ventana\":\"390x664\"}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "016b657ed6b766871ac9-f21930ed1a840647d2e7",
+          "file": "compatibilidad.spec.js",
+          "line": 91,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "red.spec.js",
+      "file": "red.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "registro de peticiones de red",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 600000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "red",
+              "projectName": "red",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 57110,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T07:00:28.347Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "23b0d886691f05433da8-dfd351e7fc4da5d6b9c9",
+          "file": "red.spec.js",
+          "line": 12,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T06:58:32.606Z",
+    "duration": 173441.182,
+    "expected": 41,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

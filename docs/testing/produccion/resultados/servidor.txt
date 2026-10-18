@@ -1,0 +1,74 @@
+## Fecha
+2026-10-18 07:21:11 UTC
+
+## Sistema operativo
+Ubuntu 24.04.4 LTS
+7.0.0-1012-aws
+
+## CPU
+vCPU: 2
+Modelo: Intel(R) Xeon(R) Platinum 8259CL CPU @ 2.50GHz
+
+## Memoria (MB)
+               total        used        free      shared  buff/cache   available
+Mem:            1906        1060         253           3         800         845
+Swap:              0           0           0
+
+## Disco
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root        58G  6.2G   51G  11% /
+
+## Contenedores
+NAME                   STATUS                       IMAGE
+ecocampus-backend-1    Up About an hour (healthy)   (imagen local)
+ecocampus-db-1         Up 2 hours (healthy)         mysql:8.0
+ecocampus-frontend-1   Up 50 minutes                ecocampus-frontend
+ecocampus-proxy-1      Up 2 hours                   caddy:2-alpine
+
+## Uso de recursos de los contenedores (instantaneo)
+NAME                   CPU %     MEM USAGE / LIMIT   MEM %
+ecocampus-frontend-1   0.00%     4.02MiB / 128MiB    3.14%
+ecocampus-backend-1    0.01%     42.84MiB / 512MiB   8.37%
+ecocampus-proxy-1      0.00%     20.35MiB / 128MiB   15.90%
+ecocampus-db-1         0.61%     375MiB / 1GiB       36.62%
+
+## Versiones
+Docker version 29.9.1, build dfc520d
+Docker Compose version v5.6.0
+
+## Carga del sistema
+ 07:21:13 up  3:07,  3 users,  load average: 0.04, 0.05, 0.01
+
+## Backend: peticiones atendidas en los ultimos 24h (log del backend)
+Peticiones registradas: 2103
+
+metodo ruta | peticiones | 2xx/3xx | 4xx | 5xx | media ms | p50 | p95 | p99 | max
+GET /api/me | 1597 | 1597 | 0 | 0 | 1 | 1 | 1 | 2 | 24
+GET /health | 467 | 467 | 0 | 0 | 2 | 2 | 4 | 7 | 49
+POST /api/acceso/correo | 27 | 16 | 11 | 0 | 9 | 9 | 29 | 48 | 48
+POST /api/respuestas | 12 | 1 | 11 | 0 | 3 | 1 | 28 | 28 | 28
+
+## Backend: errores y advertencias distintos (ultimos 24h)
+     11 [WARN] Acceso por correo rechazado: dominio no permitido
+      9 [WARN] POST /api/respuestas 401 1ms
+      5 [WARN] POST /api/acceso/correo 403 2ms
+      5 [WARN] POST /api/acceso/correo 403 1ms
+      2 [WARN] POST /api/respuestas 401 2ms
+      1 [WARN] POST /api/acceso/correo 403 29ms
+
+## Proxy (Caddy): lineas de log (ultimos 24h)
+Lineas de log: 48
+
+## Reinicios de contenedores
+/ecocampus-backend-1 reinicios=0 inicio=2026-10-18T06:03:31.009290997Z
+/ecocampus-db-1 reinicios=0 inicio=2026-10-18T05:26:24.642464373Z
+/ecocampus-frontend-1 reinicios=0 inicio=2026-10-18T06:30:22.227926004Z
+/ecocampus-proxy-1 reinicios=0 inicio=2026-10-18T05:26:36.041368246Z
+
+## Base de datos (sin datos personales)
+respuestas      primera ultima
+1       2026-10-18 06:04:36     2026-10-18 06:04:36
+metodo_acceso   n
+correo  1
+sesiones_activas
+16
