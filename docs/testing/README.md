@@ -1,5 +1,7 @@
 # Guia de pruebas — EcoCampus
 
+Indice de toda la documentacion de pruebas y respuesta a la revision (rendimiento, red, compatibilidad, georreferenciacion): [index.md](./index.md).
+
 ## Filosofia
 
 Las pruebas del proyecto se organizan en dos niveles:
