@@ -198,7 +198,7 @@ Validacion automatica (`validar-georreferencia.mjs`, tabla completa en `resultad
 - Distancia minima entre dos puntos: 13.9 m; ningun punto duplicado (menos de 1 m de otro).
 - La precision de los decimales (hasta 15) excede la del GPS de un telefono (unos 3 a 5 m); no implica esa exactitud en campo.
 
-**Pendiente de confirmar por quien capturo los datos:** el procedimiento con que se obtuvieron las coordenadas (por ejemplo, tomarlas en sitio con un telefono o desde el mapa en linea), la fecha de captura y el margen de error. Los decimales largos de la mayoria de los puntos sugieren que se copiaron de un visor de mapas, pero no hay un registro en el repositorio; no se documenta como hecho. Con esa informacion se completa el procedimiento que pide la revision. Tambien conviene una verificacion visual en campo de una muestra de puntos.
+**Origen de los datos:** las coordenadas las tomo el primer equipo que desarrollo este proyecto (informacion de la tesista, 18 de octubre de 2026). Ese equipo no dejo registrado en el repositorio como las obtuvo (en sitio con un telefono o desde un mapa en linea), ni la fecha ni el margen de error; por eso no se afirma un metodo. Los decimales largos de la mayoria de los puntos sugieren que se copiaron de un visor de mapas, pero es una inferencia. Para cerrar el procedimiento que pide la revision hay dos caminos: preguntar al primer equipo como las tomaron, o repetir la captura (en sitio, con el GPS de un telefono, anotando fecha, dispositivo y precision que reporta) en una muestra de puntos y comparar contra las coordenadas actuales con `validar-georreferencia.mjs`.
 
 ## Hallazgos y acciones recomendadas
 

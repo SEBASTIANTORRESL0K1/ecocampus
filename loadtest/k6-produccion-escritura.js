@@ -10,7 +10,7 @@ import { Counter } from "k6/metrics";
 
 const BASE = __ENV.BASE || "http://3.143.203.113";
 
-// ligero: hasta 10 usuarios virtuales; medio: hasta 30. Cada usuario escribe una respuesta por iteracion (~1.5 s).
+// ligero: hasta 10 usuarios virtuales; medio: hasta 30; cien: hasta 100. Cada usuario escribe una respuesta por iteracion (~1.5 s).
 const PERFILES = {
   ligero: [
     { duration: "20s", target: 5 },
@@ -20,6 +20,13 @@ const PERFILES = {
   medio: [
     { duration: "30s", target: 15 },
     { duration: "60s", target: 30 },
+    { duration: "20s", target: 0 },
+  ],
+  // cien: hasta 100 usuarios virtuales (30 s de subida, 90 s sostenidos). Correrlo con muestrear-recursos.sh en el servidor.
+  cien: [
+    { duration: "30s", target: 50 },
+    { duration: "30s", target: 100 },
+    { duration: "90s", target: 100 },
     { duration: "20s", target: 0 },
   ],
 };

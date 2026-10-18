@@ -9,7 +9,7 @@ import { Counter } from "k6/metrics";
 
 const BASE = __ENV.BASE || "http://3.143.203.113";
 
-// PERFIL=ligero (hasta 10 usuarios virtuales), medio (hasta 30) o alto (hasta 60). Se sube de nivel solo si el anterior sale limpio.
+// PERFIL=ligero (hasta 10 usuarios virtuales), medio (30), alto (60) o cien (100). Se sube de nivel solo si el anterior sale limpio.
 const PERFILES = {
   ligero: [
     { duration: "20s", target: 5 },
@@ -24,6 +24,13 @@ const PERFILES = {
   alto: [
     { duration: "30s", target: 30 },
     { duration: "60s", target: 60 },
+    { duration: "20s", target: 0 },
+  ],
+  // cien: hasta 100 usuarios virtuales (30 s de subida, 90 s sostenidos). Correrlo con muestrear-recursos.sh en el servidor.
+  cien: [
+    { duration: "30s", target: 50 },
+    { duration: "30s", target: 100 },
+    { duration: "90s", target: 100 },
     { duration: "20s", target: 0 },
   ],
 };
