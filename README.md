@@ -270,6 +270,8 @@ Haz un respaldo antes de iniciar el estudio y de forma periódica durante él. S
 
 ## Pruebas de carga
 
+Las pruebas sobre el servidor desplegado (Lighthouse, red del navegador, compatibilidad, carga de lectura y escritura, recursos del servidor y georreferenciación) están en [`docs/testing/produccion/`](docs/testing/produccion/README.md), con sus reportes. Lo que sigue describe el entorno aislado.
+
 Se miden en un entorno aislado: un proyecto de compose aparte (`ecocampus-loadtest`) con su propio volumen de MySQL y sin puertos publicados, así que no toca los datos del estudio. El backend corre con `REQUIERE_LOGIN=false`: como no hay envíos anónimos, k6 abre una sesión con un correo único (`POST /api/acceso/correo`) antes de cada envío, sin necesitar SAML.
 
 ```bash
