@@ -59,23 +59,13 @@ const Navbar = ({ transparent = false }) => {
         </button>
 
         {/* Menú escritorio */}
-        <div className="hidden sm:flex items-center space-x-6">
-          <ul className="flex items-center space-x-6">
-            <li><Link to="/" className={linkClass("/")}>Inicio</Link></li>
-            <li><Link to="/calculadora" className={linkClass("/calculadora")}>Calculadora</Link></li>
-            <li><Link to="/mapa" className={linkClass("/mapa")}>Mapa</Link></li>
-            <li><Link to="/comunidad" className={linkClass("/comunidad")}>Comunidad</Link></li>
-            <li><Link to="/guia-reciclaje" className={linkClass("/guia-reciclaje")}>Guía de Reciclaje</Link></li>
-          </ul>
-
-          {/* Botón CTA */}
-          <Link
-            to="/calculadora"
-            className="bg-green-500 hover:bg-green-600 text-white font-semibold text-sm px-5 py-2 rounded transition-colors duration-200 ml-4 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          >
-            Comenzar
-          </Link>
-        </div>
+        <ul className="hidden sm:flex items-center space-x-6">
+          <li><Link to="/" className={linkClass("/")}>Inicio</Link></li>
+          <li><Link to="/calculadora" className={linkClass("/calculadora")}>Calculadora</Link></li>
+          <li><Link to="/mapa" className={linkClass("/mapa")}>Mapa</Link></li>
+          <li><Link to="/comunidad" className={linkClass("/comunidad")}>Comunidad</Link></li>
+          <li><Link to="/guia-reciclaje" className={linkClass("/guia-reciclaje")}>Guía de Reciclaje</Link></li>
+        </ul>
       </div>
 
       {/* Menú móvil desplegable */}
