@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import LoginGate from "./features/auth/LoginGate";
 
 const LandingPage = lazy(() => import("./features/landing/LandingPage"));
 const Calculadora = lazy(() => import("./features/calculadora/Calculadora"));
@@ -22,7 +23,14 @@ function App() {
       <Suspense fallback={null}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/calculadora" element={<Calculadora />} />
+          <Route
+            path="/calculadora"
+            element={
+              <LoginGate>
+                <Calculadora />
+              </LoginGate>
+            }
+          />
           <Route path="/mapa" element={<Mapa />} />
           <Route path="/comunidad" element={<Comunidad />} />
           <Route path="/guia-reciclaje" element={<GuiaReciclaje />} />
