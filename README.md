@@ -57,7 +57,7 @@ ecocampus/
 ├── docker-compose.loadtest.yml  # pruebas de carga
 ├── .env.dev.example, .env.prod.example, .env.loadtest.example   # plantillas con TODAS las variables
 ├── .github/workflows/
-│   ├── test.yml                 # CI: jobs unit, backend, contrast y e2e
+│   ├── test.yml                 # CI: jobs unit, backend, contrast, e2e y compatibilidad
 │   └── deploy.yml               # despliegue a GitHub Pages
 ├── backend/                     # API en TypeScript (ver "Backend (TypeScript)")
 │   ├── src/                     # server.ts, app.ts, config/, auth/, routes/, validacion/, db.ts, logger.ts
@@ -260,7 +260,7 @@ La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `b
 - Antes de la primera ejecución de Playwright hay que instalar los navegadores: `npx playwright install chromium firefox webkit`.
 - Playwright levanta su propio servidor de desarrollo en el puerto 5174 con el modo experimento apagado, para que la calculadora muestre su resultado al finalizar.
 - `react-leaflet` es ESM puro, por lo que las pruebas que renderizan `App` mockean el mapa con `vi.mock('./features/mapa/Mapa', () => ({ default: () => null }))`.
-- El workflow `.github/workflows/test.yml` corre en cada push o pull request a `main` y `dev`, con cuatro jobs: `unit` (frontend), `backend` (typecheck, pruebas y build), `contrast` (contraste WCAG de la landing) y `e2e` (Playwright; sube el reporte y los traces si falla).
+- El workflow `.github/workflows/test.yml` corre en cada push o pull request a `main` y `dev`, con cinco jobs: `unit` (frontend), `backend` (typecheck, pruebas y build), `contrast` (contraste WCAG de la landing), `e2e` (la calculadora en Chromium; sube el reporte y los traces si falla) y `compatibilidad` (los 5 perfiles de navegador y dispositivo; instala Chromium, Firefox y WebKit y sube `compatibilidad.json` con las versiones probadas).
 
 ## Documentación
 

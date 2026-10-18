@@ -41,6 +41,10 @@ La prueba 6 detecto un defecto real en el perfil iPhone 14: el menu de `Navbar` 
 | :--- | :--- | :--- | :--- |
 | Pendiente | Pendiente | Pendiente | Pendiente |
 
+## En el CI
+
+El job `compatibilidad` de `.github/workflows/test.yml` corre estas pruebas en cada push o pull request a `main` y `dev`, con Chromium, Firefox y WebKit instalados, y sube `compatibilidad.json` como artefacto (30 dias) con el navegador, la version y el agente de usuario de cada prueba. El job `e2e` corre solo la calculadora en Chromium.
+
 ## Como ejecutar
 
 Desde `frontend/`:
