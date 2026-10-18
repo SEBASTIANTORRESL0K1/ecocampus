@@ -2,6 +2,10 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Comunidad from "./Comunidad";
 
+vi.mock("../../hooks/useScrollReveal", () => ({
+  default: () => ({ ref: { current: null }, isVisible: true }),
+}));
+
 vi.mock("lucide-react", () => ({
   Calendar: () => null,
   Newspaper: () => null,

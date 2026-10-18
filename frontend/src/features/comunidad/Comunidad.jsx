@@ -5,6 +5,8 @@ import { noticiasEventos } from "./noticiasEventos";
 import PageHero from "../../components/ui/PageHero";
 import SectionWrapper from "../../components/ui/SectionWrapper";
 import FeatureCard from "../../components/ui/FeatureCard";
+import useScrollReveal from "../../hooks/useScrollReveal";
+import "../../styles/scroll-animations.css";
 
 const badgeIcon = (tipo) => {
   if (tipo === "Noticia") return <Newspaper size={14} color="#2d6a2d" strokeWidth={1.5} aria-hidden="true" />;
@@ -12,21 +14,31 @@ const badgeIcon = (tipo) => {
 };
 
 const Comunidad = () => {
+  const { ref: heroRef, isVisible: heroVisible } = useScrollReveal();
+  const { ref: gridRef, isVisible: gridVisible } = useScrollReveal();
+
   return (
     <PageLayout>
       <main>
         {/* ── Hero ── */}
-        <PageHero
-          backgroundSeed="comunidad"
-          eyebrow="Noticias y eventos ambientales"
-          title="Comunidad EcoCampus"
-          description="Mantente informado sobre eventos y noticias ambientales"
-          minHeight="42vh"
-        />
+        <div
+          ref={heroRef}
+          className={`reveal${heroVisible ? " is-visible" : ""}`}
+          style={{ "--reveal-delay": "0ms" }}
+        >
+          <PageHero
+            backgroundSeed="comunidad"
+            eyebrow="Noticias y eventos ambientales"
+            title="Comunidad EcoCampus"
+            description="Mantente informado sobre eventos y noticias ambientales"
+            minHeight="42vh"
+          />
+        </div>
 
         {/* ── Cards grid ── */}
         <SectionWrapper background="var(--color-section-alt)" padding="4rem 1.5rem">
           <div
+            ref={gridRef}
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
@@ -34,8 +46,13 @@ const Comunidad = () => {
             }}
             className="comunidad-cards-grid"
           >
-            {noticiasEventos.map((item) => (
-              <FeatureCard key={item.id} padding="1.75rem">
+            {noticiasEventos.map((item, index) => (
+              <div
+                key={item.id}
+                className={`reveal-card${gridVisible ? " is-visible" : ""}`}
+                style={{ "--reveal-delay": `${index * 80}ms` }}
+              >
+              <FeatureCard padding="1.75rem">
                 {/* Badge */}
                 <div
                   style={{
@@ -98,6 +115,7 @@ const Comunidad = () => {
                   {item.descripcion}
                 </p>
               </FeatureCard>
+              </div>
             ))}
           </div>
         </SectionWrapper>
