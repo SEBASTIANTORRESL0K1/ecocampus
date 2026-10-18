@@ -14,6 +14,22 @@ const entero = (defecto: number, min: number, max: number) =>
 const booleano = (defecto: boolean) =>
   z.preprocess(sinVacios, z.enum(["true", "false"]).optional()).transform((v) => (v === undefined ? defecto : v === "true"));
 
+const DOMINIO = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/;
+// Lista separada por comas ("ucol.mx,alumnos.ucol.mx"): se normaliza a minusculas y se valida cada dominio.
+const dominios = (defecto: string) =>
+  z.preprocess(sinVacios, z.string().default(defecto)).transform((lista, ctx) => {
+    const encontrados = lista.split(",").map((d) => d.trim().toLowerCase()).filter((d) => d !== "");
+    const invalidos = encontrados.filter((d) => !DOMINIO.test(d));
+    if (encontrados.length === 0 || invalidos.length > 0) {
+      ctx.addIssue({
+        code: "custom",
+        message: `lista de dominios invalida (ejemplo: ucol.mx,alumnos.ucol.mx)${invalidos.length ? `; invalidos: ${invalidos.join(", ")}` : ""}`,
+      });
+      return z.NEVER;
+    }
+    return encontrados;
+  });
+
 const esquemaEntorno = z
   .object({
     NODE_ENV: z.preprocess(sinVacios, z.enum(["development", "production", "test"]).default("development")),
@@ -21,7 +37,10 @@ const esquemaEntorno = z
     FRONTEND_URL: url("http://localhost:5173/ecocampus/calculadora"),
     SESSION_SECRET: z.preprocess(sinVacios, z.string().min(16).optional()),
     ID_SALT: z.preprocess(sinVacios, z.string().min(8).optional()),
+    // true = login federado SAML de la UCOL; false = acceso con solo el correo institucional
     REQUIERE_LOGIN: booleano(true),
+    // Dominios que acepta el acceso por correo (el dominio exacto o cualquier subdominio)
+    CORREO_DOMINIOS_PERMITIDOS: dominios("ucol.mx"),
     COOKIE_SECURE: booleano(false),
     TRUST_PROXY: booleano(false),
     DB_HOST: texto("localhost"),
@@ -54,7 +73,9 @@ export interface Config {
   sessionSecret: string;
   idSalt: string;
   secretosDeDesarrollo: boolean;
-  requiereLogin: boolean;
+  /** "saml": login federado de la UCOL. "correo": acceso con solo el correo (sin verificar la identidad). */
+  modoAcceso: "saml" | "correo";
+  correoDominios: string[];
   cookieSegura: boolean;
   confiarEnProxy: boolean;
   db: { host: string; port: number; user: string; password: string; database: string };
@@ -88,7 +109,8 @@ export function cargarConfig(env: NodeJS.ProcessEnv = process.env): Config {
     sessionSecret: e.SESSION_SECRET ?? "ecocampus-dev-secret-cambiar-en-produccion",
     idSalt: e.ID_SALT ?? "ecocampus-dev-salt-cambiar-en-produccion",
     secretosDeDesarrollo: !e.SESSION_SECRET || !e.ID_SALT,
-    requiereLogin: e.REQUIERE_LOGIN,
+    modoAcceso: e.REQUIERE_LOGIN ? "saml" : "correo",
+    correoDominios: e.CORREO_DOMINIOS_PERMITIDOS,
     cookieSegura: e.COOKIE_SECURE,
     confiarEnProxy: e.TRUST_PROXY,
     db: { host: e.DB_HOST, port: e.DB_PORT, user: e.DB_USER, password: e.DB_PASSWORD, database: e.DB_NAME },

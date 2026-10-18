@@ -17,8 +17,8 @@ esperarBD(pool)
   .then(() => {
     app.listen(config.puerto, () => {
       log("info", `Backend escuchando en http://localhost:${config.puerto} (MySQL conectado)`);
-      log("info", `FRONTEND_URL=${config.frontendUrl} (origen CORS: ${config.frontendOrigen}) REQUIERE_LOGIN=${config.requiereLogin}`);
-      if (config.entorno === "production" && config.saml.issuerEsDeDesarrollo) {
+      log("info", `FRONTEND_URL=${config.frontendUrl} (origen CORS: ${config.frontendOrigen}) acceso=${config.modoAcceso}${config.modoAcceso === "correo" ? ` dominios=${config.correoDominios.join(",")}` : ""}`);
+      if (config.entorno === "production" && config.modoAcceso === "saml" && config.saml.issuerEsDeDesarrollo) {
         log("warn", "Produccion con el EntityID de desarrollo: el login solo funciona con callback en localhost:4006");
       }
       if (config.secretosDeDesarrollo) {

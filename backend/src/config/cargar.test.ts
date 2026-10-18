@@ -13,7 +13,8 @@ test("sin variables usa los valores de desarrollo", () => {
   const c = cargarConfig({});
   assert.strictEqual(c.entorno, "development");
   assert.strictEqual(c.puerto, 4006);
-  assert.strictEqual(c.requiereLogin, true);
+  assert.strictEqual(c.modoAcceso, "saml");
+  assert.deepStrictEqual(c.correoDominios, ["ucol.mx"]);
   assert.strictEqual(c.cookieSegura, false);
   assert.strictEqual(c.secretosDeDesarrollo, true);
   assert.strictEqual(c.saml.issuer, "http://localhost/20166932");
@@ -26,7 +27,7 @@ test("convierte numeros y booleanos desde texto", () => {
   const c = cargarConfig({ PORT: "5000", DB_PORT: "3307", REQUIERE_LOGIN: "false", COOKIE_SECURE: "true", TRUST_PROXY: "true", SAML_CLOCK_SKEW_MS: "120000" });
   assert.strictEqual(c.puerto, 5000);
   assert.strictEqual(c.db.port, 3307);
-  assert.strictEqual(c.requiereLogin, false);
+  assert.strictEqual(c.modoAcceso, "correo");
   assert.strictEqual(c.cookieSegura, true);
   assert.strictEqual(c.confiarEnProxy, true);
   assert.strictEqual(c.saml.clockSkewMs, 120000);
@@ -35,8 +36,13 @@ test("convierte numeros y booleanos desde texto", () => {
 test("trata las variables vacias como no definidas", () => {
   const c = cargarConfig({ PORT: "", REQUIERE_LOGIN: "", FRONTEND_URL: "", SAML_ISSUER: "", SESSION_SECRET: "" });
   assert.strictEqual(c.puerto, 4006);
-  assert.strictEqual(c.requiereLogin, true);
+  assert.strictEqual(c.modoAcceso, "saml");
   assert.strictEqual(c.saml.issuerEsDeDesarrollo, true);
+});
+
+test("CORREO_DOMINIOS_PERMITIDOS acepta una lista en minusculas y sin espacios", () => {
+  const c = cargarConfig({ CORREO_DOMINIOS_PERMITIDOS: " UCOL.mx , alumnos.ucol.mx,," });
+  assert.deepStrictEqual(c.correoDominios, ["ucol.mx", "alumnos.ucol.mx"]);
 });
 
 test("deriva el origen CORS de FRONTEND_URL y la carpeta de certificados", () => {
@@ -49,6 +55,9 @@ test("deriva el origen CORS de FRONTEND_URL y la carpeta de certificados", () =>
 test("rechaza valores invalidos con un mensaje que nombra la variable", () => {
   const casos: Array<[Record<string, string>, string]> = [
     [{ REQUIERE_LOGIN: "si" }, "REQUIERE_LOGIN"],
+    [{ CORREO_DOMINIOS_PERMITIDOS: "ucol.mx,no es dominio" }, "CORREO_DOMINIOS_PERMITIDOS"],
+    [{ CORREO_DOMINIOS_PERMITIDOS: "localhost" }, "CORREO_DOMINIOS_PERMITIDOS"],
+    [{ CORREO_DOMINIOS_PERMITIDOS: " , " }, "CORREO_DOMINIOS_PERMITIDOS"],
     [{ PORT: "abc" }, "PORT"],
     [{ PORT: "70000" }, "PORT"],
     [{ DB_PORT: "0" }, "DB_PORT"],

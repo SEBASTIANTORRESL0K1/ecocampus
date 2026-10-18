@@ -7,10 +7,12 @@ import type { Config } from "./config/cargar";
 import { crearEstrategiaSaml } from "./auth/saml";
 import type { PerfilSaml } from "./auth/tipos";
 import { log } from "./logger";
-import { rutasAuth } from "./routes/auth";
+import { rutasAccesoCorreo } from "./routes/acceso";
 import { rutasDocs } from "./routes/docs";
 import { rutasRespuestas } from "./routes/respuestas";
+import { rutasSaml } from "./routes/saml";
 import { rutasSalud } from "./routes/salud";
+import { rutasSesion } from "./routes/sesion";
 
 export interface DependenciasApp {
   config: Config;
@@ -34,8 +36,9 @@ export function crearApp({ config, pool, almacenSesiones }: DependenciasApp): Ex
 
   passport.serializeUser<PerfilSaml>((usuario, done) => done(null, usuario));
   passport.deserializeUser<PerfilSaml>((usuario, done) => done(null, usuario));
-  const estrategia = crearEstrategiaSaml(config.saml);
-  passport.use(estrategia);
+  // La estrategia SAML (y sus certificados) solo se carga en modo saml
+  const estrategia = config.modoAcceso === "saml" ? crearEstrategiaSaml(config.saml) : null;
+  if (estrategia) passport.use(estrategia);
 
   app.use(cors({ origin: config.frontendOrigen, credentials: true }));
   app.use(
@@ -52,7 +55,9 @@ export function crearApp({ config, pool, almacenSesiones }: DependenciasApp): Ex
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  app.use(rutasAuth(config, estrategia));
+  if (estrategia) app.use(rutasSaml(config, estrategia));
+  else app.use(rutasAccesoCorreo(config));
+  app.use(rutasSesion(config));
   app.use(rutasSalud(pool));
   app.use(rutasDocs(config));
   app.use(rutasRespuestas(config, pool));

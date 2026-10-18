@@ -124,7 +124,7 @@ Si en una repeticion aparecen fallos, el script cuenta cada error por endpoint y
 - Servidor y generador de carga comparten maquina, por lo que los resultados son conservadores en CPU y optimistas en red.
 - La red es el bridge de Docker (sin latencia ni limite de ancho de banda). En un servidor real el ancho de banda pesara mas: cada visita descarga unos 435 KB de JavaScript.
 - `/api/me` se midio sin sesion; con sesion consulta MySQL y seria algo mas lento.
-- El `POST` se midio con `REQUIERE_LOGIN=false`; el costo extra de autenticar es una lectura de sesion en MySQL.
+- Las mediciones de este informe son anteriores al acceso por correo: el `POST` se midio sin sesion. Desde entonces `loadtest/k6.js` abre una sesion con `POST /api/acceso/correo` (endpoint `acceso_correo`, un correo unico por envio) antes de cada `POST /api/respuestas`, y el backend lee la sesion en MySQL; repite la prueba para actualizar las cifras.
 - Pruebas de pocos minutos: no miden degradacion a largo plazo.
 
 ## Como reproducir

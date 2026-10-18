@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS respuestas (
   creado_en              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   participante_id        CHAR(16) NULL,
   correo                 VARCHAR(255) NULL,
+  -- Como entro el participante: 'saml' (login federado UCOL) o 'correo' (solo el correo, sin verificar)
+  metodo_acceso          VARCHAR(10) NOT NULL DEFAULT 'saml',
 
   edad                   TINYINT UNSIGNED NOT NULL,
   sexo                   VARCHAR(30) NOT NULL,
@@ -31,10 +33,11 @@ CREATE TABLE IF NOT EXISTS respuestas (
   comentarios            TEXT NULL,
 
   PRIMARY KEY (id),
-  -- MySQL permite varios NULL en un indice UNIQUE (modo sin login).
+  -- Siempre se guardan (no hay envios anonimos); MySQL permite varios NULL en un UNIQUE solo en filas antiguas.
   UNIQUE KEY uq_participante (participante_id),
   UNIQUE KEY uq_correo (correo),
 
+  CONSTRAINT ck_metodo_acceso CHECK (metodo_acceso IN ('saml', 'correo')),
   CONSTRAINT ck_edad CHECK (edad BETWEEN 15 AND 99),
   CONSTRAINT ck_likert CHECK (
     u9  BETWEEN 1 AND 5 AND u10 BETWEEN 1 AND 5 AND u11 BETWEEN 1 AND 5 AND u12 BETWEEN 1 AND 5 AND

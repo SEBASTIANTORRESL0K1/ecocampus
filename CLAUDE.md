@@ -89,8 +89,8 @@ El login usa la configuracion y los certificados de desarrollo que proporciono e
 ### Reglas del experimento
 
 - El modo experimento es opt-in: solo se activa con `VITE_EXPERIMENTO_ACTIVO=true` (leida en `frontend/src/config/experiment.js`); el login y el guardado requieren ademas `VITE_API_URL`. Sin la variable, como en el despliegue publico de GitHub Pages (`deploy.yml` compila sin variables de entorno), la calculadora funciona normal.
-- Solo participan estudiantes: el backend exige `uTipo = Estudiante`.
-- El navegador nunca recibe correo, nombre ni numero de cuenta. El backend lee la identidad de la sesion SAML y guarda un id pseudonimo (hash con `ID_SALT`) y el correo en MySQL.
+- El acceso depende de `REQUIERE_LOGIN`: `true` = login federado SAML (solo `uTipo = Estudiante`); `false` = acceso con solo el correo (`POST /api/acceso/correo`), limitado a `CORREO_DOMINIOS_PERMITIDOS` (por defecto `ucol.mx` y subdominios, sin verificar la identidad, `+alias` descartado). Nunca hay envios anonimos. `GET /api/me` devuelve `modoAcceso` para que el frontend (`LoginGate`) elija la pantalla; en modo `correo` no se carga la estrategia SAML.
+- El navegador nunca recibe correo, nombre ni numero de cuenta. El backend lee la identidad de la sesion y guarda un id pseudonimo (hash con `ID_SALT`), el correo y `metodo_acceso` (`saml`|`correo`) en MySQL. Una base existente se migra con `db/migraciones/001_metodo_acceso.sql`.
 - Una respuesta por participante y por correo (indices `UNIQUE` en `db/schema.sql`).
 - Las listas de opciones (sexo, carrera, semestre, planetas) deben coincidir entre `frontend/src/config/experiment.js` y `backend/src/validacion/respuestas.ts`.
 - Los secretos de `.env` no se versionan ni se muestran en respuestas. La llave `key.pem` de desarrollo si se versiona (autorizado por el asesor); una llave propia de produccion no debe versionarse.

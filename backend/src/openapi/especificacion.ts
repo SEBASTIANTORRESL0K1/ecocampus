@@ -58,10 +58,11 @@ export const especificacion = {
     title: "EcoCampus API",
     version: "1.0.0",
     description: [
-      "API del modo experimento de EcoCampus: login federado de la Universidad de Colima (SAML) y guardado del cuestionario de evaluación en MySQL.",
+      "API del modo experimento de EcoCampus: acceso del participante y guardado del cuestionario de evaluación en MySQL.",
       "",
-      "- La identidad del participante (id pseudónimo y correo) se toma siempre de la sesión SAML en el servidor; el cuerpo de las peticiones nunca la define.",
-      "- El estudio es solo para estudiantes (`uTipo = Estudiante`).",
+      "- El acceso depende de la variable `REQUIERE_LOGIN`: con `true` (modo `saml`) el participante entra con el login federado de la Universidad de Colima y solo se admite a estudiantes (`uTipo = Estudiante`); con `false` (modo `correo`) entra escribiendo únicamente su correo, que debe ser de un dominio permitido (`CORREO_DOMINIOS_PERMITIDOS`, por defecto `ucol.mx` y sus subdominios). El acceso por correo **no verifica** la identidad. `GET /api/me` informa el modo activo.",
+      "- Cada ruta indica con `x-modos` en qué modo se monta; sin esa marca existe en ambos.",
+      "- La identidad del participante (id pseudónimo y correo) se toma siempre de la sesión en el servidor; el cuerpo de las peticiones nunca la define. No hay envíos anónimos.",
       "- Hay un único registro por participante y por correo.",
       "- Esta documentación se genera desde el código (`backend/src/openapi/especificacion.ts`). El archivo `docs/openapi.json` del repositorio es su copia.",
     ].join("\n"),
@@ -69,7 +70,8 @@ export const especificacion = {
   servers: [{ url: "/", description: "El mismo origen desde el que se sirve la API (en desarrollo, http://localhost:4006)" }],
   tags: [
     { name: "Respuestas", description: "Guardado del cuestionario de evaluación" },
-    { name: "Autenticación", description: "Login federado SAML de la Universidad de Colima. Son rutas de navegación (redirecciones), no de una API JSON." },
+    { name: "Autenticación", description: "Estado de la sesión y login federado SAML de la Universidad de Colima (rutas de navegación con redirecciones, no de una API JSON)." },
+    { name: "Acceso por correo", description: "Acceso con solo el correo institucional (REQUIERE_LOGIN=false)" },
     { name: "Sistema", description: "Salud del servicio y metadatos" },
   ],
   paths: {
@@ -78,7 +80,7 @@ export const especificacion = {
         tags: ["Respuestas"],
         summary: "Guarda las respuestas del cuestionario de un participante",
         description:
-          "Requiere una sesión SAML de un estudiante (cookie `connect.sid`), salvo que el servidor corra con `REQUIERE_LOGIN=false` (solo desarrollo y pruebas de carga; entonces se guarda sin id ni correo). Valida todos los campos; si alguno es inválido no se guarda nada.",
+          "Requiere una sesión abierta (cookie `connect.sid`): login federado de un estudiante en modo `saml`, o acceso con un correo permitido en modo `correo`. No hay envíos anónimos. Valida todos los campos; si alguno es inválido no se guarda nada.",
         security: [{ cookieAuth: [] }],
         requestBody: {
           required: true,
@@ -104,7 +106,7 @@ export const especificacion = {
             },
           },
           "401": errorRespuesta("sin-sesion", "No hay sesión iniciada"),
-          "403": errorRespuesta("no-permitido", "La cuenta no es de un estudiante"),
+          "403": errorRespuesta("no-permitido", "La cuenta no es de un estudiante (modo `saml`) o su correo no es de un dominio permitido (modo `correo`)"),
           "409": errorRespuesta("duplicado", "Ese participante (o su correo) ya registró su respuesta"),
           "500": errorRespuesta("error-interno", "Error al guardar en la base de datos"),
         },
@@ -114,7 +116,7 @@ export const especificacion = {
       get: {
         tags: ["Autenticación"],
         summary: "Estado de la sesión del navegador",
-        description: "Lo usa el frontend para decidir si pide iniciar sesión. Nunca devuelve el correo, el nombre ni el número de cuenta.",
+        description: "Lo usa el frontend para decidir qué pantalla de entrada mostrar (`modoAcceso`) y si ya hay sesión. Nunca devuelve el correo, el nombre ni el número de cuenta. Una sesión abierta con el otro modo cuenta como sin sesión.",
         responses: {
           "200": {
             description: "Estado de la sesión",
@@ -122,9 +124,10 @@ export const especificacion = {
               "application/json": {
                 schema: { $ref: "#/components/schemas/EstadoSesion" },
                 examples: {
-                  sinSesion: { summary: "Sin sesión", value: { authenticated: false, permitido: false, participante: null } },
-                  estudiante: { summary: "Estudiante", value: { authenticated: true, permitido: true, participante: { id: "771d57a70fa584e2", tipo: "Estudiante" } } },
-                  noEstudiante: { summary: "Cuenta que no es de estudiante", value: { authenticated: true, permitido: false, participante: null } },
+                  sinSesion: { summary: "Sin sesión", value: { authenticated: false, permitido: false, modoAcceso: "saml", participante: null } },
+                  estudiante: { summary: "Estudiante (modo saml)", value: { authenticated: true, permitido: true, modoAcceso: "saml", participante: { id: "771d57a70fa584e2", tipo: "Estudiante" } } },
+                  noEstudiante: { summary: "Cuenta que no es de estudiante (modo saml)", value: { authenticated: true, permitido: false, modoAcceso: "saml", participante: null } },
+                  porCorreo: { summary: "Acceso por correo", value: { authenticated: true, permitido: true, modoAcceso: "correo", participante: { id: "5081449bbd9d2201", tipo: null } } },
                 },
               },
             },
@@ -132,7 +135,56 @@ export const especificacion = {
         },
       },
     },
+    "/api/acceso/correo": {
+      "x-modos": ["correo"],
+      post: {
+        tags: ["Acceso por correo"],
+        summary: "Abre la sesión con solo el correo",
+        description:
+          "Solo existe con `REQUIERE_LOGIN=false`. El correo se normaliza (minúsculas y sin `+alias`: `alumno+2@ucol.mx` es `alumno@ucol.mx`) y debe pertenecer a un dominio de `CORREO_DOMINIOS_PERMITIDOS` o a un subdominio. **No se verifica que la persona sea dueña del correo.** Si es válido se crea una sesión nueva (cookie `connect.sid`).",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CuerpoAccesoCorreo" },
+              example: { correo: "alumno@ucol.mx" },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Sesión abierta",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ExitoRespuesta" }, example: { success: true } } },
+          },
+          "400": errorRespuesta("correo-invalido", "El texto no es un correo válido"),
+          "403": {
+            description: "El dominio del correo no está permitido",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorRespuesta" },
+                example: { success: false, error: "dominio-no-permitido", dominios: ["ucol.mx"] },
+              },
+            },
+          },
+          "500": errorRespuesta("error-interno", "No se pudo crear la sesión"),
+        },
+      },
+    },
+    "/api/acceso/salir": {
+      "x-modos": ["correo"],
+      post: {
+        tags: ["Acceso por correo"],
+        summary: "Cierra la sesión",
+        responses: {
+          "200": {
+            description: "Sesión cerrada",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ExitoRespuesta" }, example: { success: true } } },
+          },
+        },
+      },
+    },
     "/login": {
+      "x-modos": ["saml"],
       get: {
         tags: ["Autenticación"],
         summary: "Inicia el login federado",
@@ -141,6 +193,7 @@ export const especificacion = {
       },
     },
     "/login/callback": {
+      "x-modos": ["saml"],
       post: {
         tags: ["Autenticación"],
         summary: "Callback SAML del login",
@@ -150,6 +203,7 @@ export const especificacion = {
       },
     },
     "/api/auth/login/callback": {
+      "x-modos": ["saml"],
       post: {
         tags: ["Autenticación"],
         summary: "Callback SAML del login (ruta que usa el IdP de la UCOL)",
@@ -159,6 +213,7 @@ export const especificacion = {
       },
     },
     "/login/fail": {
+      "x-modos": ["saml"],
       get: {
         tags: ["Autenticación"],
         summary: "Login fallido",
@@ -166,6 +221,7 @@ export const especificacion = {
       },
     },
     "/logout": {
+      "x-modos": ["saml"],
       get: {
         tags: ["Autenticación"],
         summary: "Cierra la sesión",
@@ -174,6 +230,7 @@ export const especificacion = {
       },
     },
     "/logout/callback": {
+      "x-modos": ["saml"],
       post: {
         tags: ["Autenticación"],
         summary: "Callback del cierre de sesión",
@@ -181,6 +238,7 @@ export const especificacion = {
       },
     },
     "/api/auth/logout/callback": {
+      "x-modos": ["saml"],
       post: {
         tags: ["Autenticación"],
         summary: "Callback del cierre de sesión (ruta de la demo original)",
@@ -188,6 +246,7 @@ export const especificacion = {
       },
     },
     "/": {
+      "x-modos": ["saml"],
       get: {
         tags: ["Autenticación"],
         summary: "Raíz del backend",
@@ -207,6 +266,7 @@ export const especificacion = {
       },
     },
     "/Metadata": {
+      "x-modos": ["saml"],
       get: {
         tags: ["Sistema"],
         summary: "Metadatos SAML del proveedor de servicio",
@@ -221,7 +281,7 @@ export const especificacion = {
         type: "apiKey",
         in: "cookie",
         name: "connect.sid",
-        description: "Cookie de sesión que se obtiene al iniciar sesión con la cuenta institucional (flujo SAML, `/login`).",
+        description: "Cookie de sesión que se obtiene al iniciar sesión: con la cuenta institucional (flujo SAML, `/login`) o con el correo (`POST /api/acceso/correo`), según el modo.",
       },
     },
     schemas: {
@@ -282,16 +342,23 @@ export const especificacion = {
         required: ["success", "error"],
         properties: {
           success: { type: "boolean", const: false },
-          error: { type: "string", enum: ["invalido", "sin-sesion", "no-permitido", "duplicado", "error-interno"] },
+          error: { type: "string", enum: ["invalido", "sin-sesion", "no-permitido", "duplicado", "error-interno", "correo-invalido", "dominio-no-permitido"] },
           detalle: { type: "array", items: { type: "string" }, description: "Solo con `invalido`: un mensaje por cada campo con error." },
+          dominios: { type: "array", items: { type: "string" }, description: "Solo con `dominio-no-permitido`: los dominios que se aceptan." },
         },
+      },
+      CuerpoAccesoCorreo: {
+        type: "object",
+        required: ["correo"],
+        properties: { correo: { type: "string", maxLength: 254, description: "Correo institucional del participante." } },
       },
       EstadoSesion: {
         type: "object",
-        required: ["authenticated", "permitido", "participante"],
+        required: ["authenticated", "permitido", "modoAcceso", "participante"],
         properties: {
-          authenticated: { type: "boolean", description: "Hay una sesión SAML iniciada." },
-          permitido: { type: "boolean", description: "La cuenta es de un estudiante y puede participar." },
+          authenticated: { type: "boolean", description: "Hay una sesión iniciada con el modo de acceso activo." },
+          permitido: { type: "boolean", description: "Puede participar: estudiante (modo `saml`) o correo de un dominio permitido (modo `correo`)." },
+          modoAcceso: { type: "string", enum: ["saml", "correo"], description: "Modo de acceso del servidor (`REQUIERE_LOGIN` true = saml, false = correo)." },
           participante: { oneOf: [{ $ref: "#/components/schemas/ParticipantePublico" }, { type: "null" }] },
         },
       },
@@ -301,7 +368,7 @@ export const especificacion = {
         description: "Lo único que el navegador conoce del participante: nunca el correo, el nombre ni la cuenta.",
         properties: {
           id: { type: "string", description: "Identificador pseudónimo (16 caracteres hexadecimales derivados de la cuenta con una sal secreta)." },
-          tipo: { type: ["string", "null"], description: "Tipo de cuenta que informa el IdP (por ejemplo `Estudiante`)." },
+          tipo: { type: ["string", "null"], description: "Tipo de cuenta que informa el IdP (por ejemplo `Estudiante`); nulo en el acceso por correo." },
         },
       },
       Salud: {

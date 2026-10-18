@@ -3,7 +3,7 @@
   "info": {
     "title": "EcoCampus API",
     "version": "1.0.0",
-    "description": "API del modo experimento de EcoCampus: login federado de la Universidad de Colima (SAML) y guardado del cuestionario de evaluación en MySQL.\n\n- La identidad del participante (id pseudónimo y correo) se toma siempre de la sesión SAML en el servidor; el cuerpo de las peticiones nunca la define.\n- El estudio es solo para estudiantes (`uTipo = Estudiante`).\n- Hay un único registro por participante y por correo.\n- Esta documentación se genera desde el código (`backend/src/openapi/especificacion.ts`). El archivo `docs/openapi.json` del repositorio es su copia."
+    "description": "API del modo experimento de EcoCampus: acceso del participante y guardado del cuestionario de evaluación en MySQL.\n\n- El acceso depende de la variable `REQUIERE_LOGIN`: con `true` (modo `saml`) el participante entra con el login federado de la Universidad de Colima y solo se admite a estudiantes (`uTipo = Estudiante`); con `false` (modo `correo`) entra escribiendo únicamente su correo, que debe ser de un dominio permitido (`CORREO_DOMINIOS_PERMITIDOS`, por defecto `ucol.mx` y sus subdominios). El acceso por correo **no verifica** la identidad. `GET /api/me` informa el modo activo.\n- Cada ruta indica con `x-modos` en qué modo se monta; sin esa marca existe en ambos.\n- La identidad del participante (id pseudónimo y correo) se toma siempre de la sesión en el servidor; el cuerpo de las peticiones nunca la define. No hay envíos anónimos.\n- Hay un único registro por participante y por correo.\n- Esta documentación se genera desde el código (`backend/src/openapi/especificacion.ts`). El archivo `docs/openapi.json` del repositorio es su copia."
   },
   "servers": [
     {
@@ -18,7 +18,11 @@
     },
     {
       "name": "Autenticación",
-      "description": "Login federado SAML de la Universidad de Colima. Son rutas de navegación (redirecciones), no de una API JSON."
+      "description": "Estado de la sesión y login federado SAML de la Universidad de Colima (rutas de navegación con redirecciones, no de una API JSON)."
+    },
+    {
+      "name": "Acceso por correo",
+      "description": "Acceso con solo el correo institucional (REQUIERE_LOGIN=false)"
     },
     {
       "name": "Sistema",
@@ -32,7 +36,7 @@
           "Respuestas"
         ],
         "summary": "Guarda las respuestas del cuestionario de un participante",
-        "description": "Requiere una sesión SAML de un estudiante (cookie `connect.sid`), salvo que el servidor corra con `REQUIERE_LOGIN=false` (solo desarrollo y pruebas de carga; entonces se guarda sin id ni correo). Valida todos los campos; si alguno es inválido no se guarda nada.",
+        "description": "Requiere una sesión abierta (cookie `connect.sid`): login federado de un estudiante en modo `saml`, o acceso con un correo permitido en modo `correo`. No hay envíos anónimos. Valida todos los campos; si alguno es inválido no se guarda nada.",
         "security": [
           {
             "cookieAuth": []
@@ -123,7 +127,7 @@
             }
           },
           "403": {
-            "description": "La cuenta no es de un estudiante",
+            "description": "La cuenta no es de un estudiante (modo `saml`) o su correo no es de un dominio permitido (modo `correo`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -173,7 +177,7 @@
           "Autenticación"
         ],
         "summary": "Estado de la sesión del navegador",
-        "description": "Lo usa el frontend para decidir si pide iniciar sesión. Nunca devuelve el correo, el nombre ni el número de cuenta.",
+        "description": "Lo usa el frontend para decidir qué pantalla de entrada mostrar (`modoAcceso`) y si ya hay sesión. Nunca devuelve el correo, el nombre ni el número de cuenta. Una sesión abierta con el otro modo cuenta como sin sesión.",
         "responses": {
           "200": {
             "description": "Estado de la sesión",
@@ -188,14 +192,16 @@
                     "value": {
                       "authenticated": false,
                       "permitido": false,
+                      "modoAcceso": "saml",
                       "participante": null
                     }
                   },
                   "estudiante": {
-                    "summary": "Estudiante",
+                    "summary": "Estudiante (modo saml)",
                     "value": {
                       "authenticated": true,
                       "permitido": true,
+                      "modoAcceso": "saml",
                       "participante": {
                         "id": "771d57a70fa584e2",
                         "tipo": "Estudiante"
@@ -203,11 +209,24 @@
                     }
                   },
                   "noEstudiante": {
-                    "summary": "Cuenta que no es de estudiante",
+                    "summary": "Cuenta que no es de estudiante (modo saml)",
                     "value": {
                       "authenticated": true,
                       "permitido": false,
+                      "modoAcceso": "saml",
                       "participante": null
+                    }
+                  },
+                  "porCorreo": {
+                    "summary": "Acceso por correo",
+                    "value": {
+                      "authenticated": true,
+                      "permitido": true,
+                      "modoAcceso": "correo",
+                      "participante": {
+                        "id": "5081449bbd9d2201",
+                        "tipo": null
+                      }
                     }
                   }
                 }
@@ -217,7 +236,121 @@
         }
       }
     },
+    "/api/acceso/correo": {
+      "x-modos": [
+        "correo"
+      ],
+      "post": {
+        "tags": [
+          "Acceso por correo"
+        ],
+        "summary": "Abre la sesión con solo el correo",
+        "description": "Solo existe con `REQUIERE_LOGIN=false`. El correo se normaliza (minúsculas y sin `+alias`: `alumno+2@ucol.mx` es `alumno@ucol.mx`) y debe pertenecer a un dominio de `CORREO_DOMINIOS_PERMITIDOS` o a un subdominio. **No se verifica que la persona sea dueña del correo.** Si es válido se crea una sesión nueva (cookie `connect.sid`).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CuerpoAccesoCorreo"
+              },
+              "example": {
+                "correo": "alumno@ucol.mx"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión abierta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExitoRespuesta"
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El texto no es un correo válido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRespuesta"
+                },
+                "example": {
+                  "success": false,
+                  "error": "correo-invalido"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "El dominio del correo no está permitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRespuesta"
+                },
+                "example": {
+                  "success": false,
+                  "error": "dominio-no-permitido",
+                  "dominios": [
+                    "ucol.mx"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "No se pudo crear la sesión",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorRespuesta"
+                },
+                "example": {
+                  "success": false,
+                  "error": "error-interno"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/acceso/salir": {
+      "x-modos": [
+        "correo"
+      ],
+      "post": {
+        "tags": [
+          "Acceso por correo"
+        ],
+        "summary": "Cierra la sesión",
+        "responses": {
+          "200": {
+            "description": "Sesión cerrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExitoRespuesta"
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/login": {
+      "x-modos": [
+        "saml"
+      ],
       "get": {
         "tags": [
           "Autenticación"
@@ -239,6 +372,9 @@
       }
     },
     "/login/callback": {
+      "x-modos": [
+        "saml"
+      ],
       "post": {
         "tags": [
           "Autenticación"
@@ -275,6 +411,9 @@
       }
     },
     "/api/auth/login/callback": {
+      "x-modos": [
+        "saml"
+      ],
       "post": {
         "tags": [
           "Autenticación"
@@ -311,6 +450,9 @@
       }
     },
     "/login/fail": {
+      "x-modos": [
+        "saml"
+      ],
       "get": {
         "tags": [
           "Autenticación"
@@ -332,6 +474,9 @@
       }
     },
     "/logout": {
+      "x-modos": [
+        "saml"
+      ],
       "get": {
         "tags": [
           "Autenticación"
@@ -353,6 +498,9 @@
       }
     },
     "/logout/callback": {
+      "x-modos": [
+        "saml"
+      ],
       "post": {
         "tags": [
           "Autenticación"
@@ -373,6 +521,9 @@
       }
     },
     "/api/auth/logout/callback": {
+      "x-modos": [
+        "saml"
+      ],
       "post": {
         "tags": [
           "Autenticación"
@@ -393,6 +544,9 @@
       }
     },
     "/": {
+      "x-modos": [
+        "saml"
+      ],
       "get": {
         "tags": [
           "Autenticación"
@@ -451,6 +605,9 @@
       }
     },
     "/Metadata": {
+      "x-modos": [
+        "saml"
+      ],
       "get": {
         "tags": [
           "Sistema"
@@ -478,7 +635,7 @@
         "type": "apiKey",
         "in": "cookie",
         "name": "connect.sid",
-        "description": "Cookie de sesión que se obtiene al iniciar sesión con la cuenta institucional (flujo SAML, `/login`)."
+        "description": "Cookie de sesión que se obtiene al iniciar sesión: con la cuenta institucional (flujo SAML, `/login`) o con el correo (`POST /api/acceso/correo`), según el modo."
       }
     },
     "schemas": {
@@ -735,7 +892,9 @@
               "sin-sesion",
               "no-permitido",
               "duplicado",
-              "error-interno"
+              "error-interno",
+              "correo-invalido",
+              "dominio-no-permitido"
             ]
           },
           "detalle": {
@@ -744,6 +903,26 @@
               "type": "string"
             },
             "description": "Solo con `invalido`: un mensaje por cada campo con error."
+          },
+          "dominios": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Solo con `dominio-no-permitido`: los dominios que se aceptan."
+          }
+        }
+      },
+      "CuerpoAccesoCorreo": {
+        "type": "object",
+        "required": [
+          "correo"
+        ],
+        "properties": {
+          "correo": {
+            "type": "string",
+            "maxLength": 254,
+            "description": "Correo institucional del participante."
           }
         }
       },
@@ -752,16 +931,25 @@
         "required": [
           "authenticated",
           "permitido",
+          "modoAcceso",
           "participante"
         ],
         "properties": {
           "authenticated": {
             "type": "boolean",
-            "description": "Hay una sesión SAML iniciada."
+            "description": "Hay una sesión iniciada con el modo de acceso activo."
           },
           "permitido": {
             "type": "boolean",
-            "description": "La cuenta es de un estudiante y puede participar."
+            "description": "Puede participar: estudiante (modo `saml`) o correo de un dominio permitido (modo `correo`)."
+          },
+          "modoAcceso": {
+            "type": "string",
+            "enum": [
+              "saml",
+              "correo"
+            ],
+            "description": "Modo de acceso del servidor (`REQUIERE_LOGIN` true = saml, false = correo)."
           },
           "participante": {
             "oneOf": [
@@ -792,7 +980,7 @@
               "string",
               "null"
             ],
-            "description": "Tipo de cuenta que informa el IdP (por ejemplo `Estudiante`)."
+            "description": "Tipo de cuenta que informa el IdP (por ejemplo `Estudiante`); nulo en el acceso por correo."
           }
         }
       },

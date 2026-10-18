@@ -7,11 +7,13 @@ import test, { after, before, describe } from "node:test";
 import type { Express } from "express";
 import type { Pool } from "mysql2/promise";
 import { crearApp } from "../app";
+import type { Participante } from "../auth/tipos";
 import { cargarConfig } from "../config/cargar";
 import { respuestasSchema, validarRespuesta } from "../validacion/respuestas";
 import { ejemploCuerpo, especificacion } from "./especificacion";
 import { RUTA_SALIDA, serializar } from "./generar";
 
+const participantePrueba: Participante = { id: "abcd1234abcd1234", tipo: "Estudiante", correo: "alumno@ucol.mx", metodoAcceso: "saml" };
 const poolSimulado = { query: async () => [{ insertId: 1 }] } as unknown as Pool;
 
 type Capa = { route?: { path: string; methods: Record<string, boolean> }; handle?: { stack?: Capa[] } };
@@ -29,10 +31,13 @@ function rutasDeExpress(app: Express): string[] {
   return [...salida].sort();
 }
 
-function rutasDeLaEspecificacion(): string[] {
+/** Operaciones documentadas para un modo de acceso (las rutas sin `x-modos` existen en ambos). */
+function rutasDeLaEspecificacion(modo: "saml" | "correo"): string[] {
   const salida: string[] = [];
   for (const [ruta, operaciones] of Object.entries(especificacion.paths)) {
-    for (const metodo of Object.keys(operaciones)) salida.push(`${metodo} ${ruta}`);
+    const modos = (operaciones as { "x-modos"?: readonly string[] })["x-modos"] ?? ["saml", "correo"];
+    if (!modos.includes(modo)) continue;
+    for (const metodo of Object.keys(operaciones)) if (!metodo.startsWith("x-")) salida.push(`${metodo} ${ruta}`);
   }
   return salida.sort();
 }
@@ -58,17 +63,19 @@ test("toda referencia $ref apunta a algo que existe en components", () => {
   }
 });
 
-test("la especificacion documenta exactamente las rutas registradas en Express", () => {
-  const app = crearApp({ config: cargarConfig({}), pool: poolSimulado });
-  // /openapi.json es la propia documentacion y no se describe a si misma
-  const enExpress = rutasDeExpress(app).filter((r) => r !== "get /openapi.json");
-  const enEspecificacion = rutasDeLaEspecificacion();
-  assert.deepStrictEqual(
-    enEspecificacion,
-    enExpress,
-    `Rutas desalineadas.\n  Solo en Express: ${enExpress.filter((r) => !enEspecificacion.includes(r)).join(", ") || "-"}\n  Solo en la especificacion: ${enEspecificacion.filter((r) => !enExpress.includes(r)).join(", ") || "-"}`
-  );
-});
+for (const [modo, env] of [["saml", {}], ["correo", { REQUIERE_LOGIN: "false" }]] as const) {
+  test(`la especificacion documenta exactamente las rutas registradas en Express (modo ${modo})`, () => {
+    const app = crearApp({ config: cargarConfig(env), pool: poolSimulado });
+    // /openapi.json es la propia documentacion y no se describe a si misma
+    const enExpress = rutasDeExpress(app).filter((r) => r !== "get /openapi.json");
+    const enEspecificacion = rutasDeLaEspecificacion(modo);
+    assert.deepStrictEqual(
+      enEspecificacion,
+      enExpress,
+      `Rutas desalineadas.\n  Solo en Express: ${enExpress.filter((r) => !enEspecificacion.includes(r)).join(", ") || "-"}\n  Solo en la especificacion: ${enEspecificacion.filter((r) => !enExpress.includes(r)).join(", ") || "-"}`
+    );
+  });
+}
 
 describe("el esquema de las respuestas coincide con la validacion real", () => {
   const esquema = especificacion.components.schemas.Respuestas;
@@ -82,14 +89,14 @@ describe("el esquema de las respuestas coincide con la validacion real", () => {
     for (const clave of claves) {
       const respuestas: Record<string, unknown> = { ...ejemploCuerpo.respuestas };
       delete respuestas[clave];
-      const aceptada = validarRespuesta({ ...ejemploCuerpo, respuestas }, null).ok;
+      const aceptada = validarRespuesta({ ...ejemploCuerpo, respuestas }, participantePrueba).ok;
       const obligatoria = (esquema.required as readonly string[]).includes(clave);
       assert.strictEqual(aceptada, !obligatoria, `la pregunta ${clave} ${obligatoria ? "debe ser" : "no debe ser"} obligatoria`);
     }
   });
 
   test("el ejemplo del cuerpo es una peticion valida", () => {
-    const r = validarRespuesta(ejemploCuerpo, null);
+    const r = validarRespuesta(ejemploCuerpo, participantePrueba);
     assert.ok(r.ok, r.ok ? "" : r.errores.join("; "));
   });
 });

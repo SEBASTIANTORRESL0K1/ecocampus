@@ -36,10 +36,20 @@ function cuerpoValido() {
   return { respuestas, tiempoMin: 3, planetas: "entre 1 y 2" };
 }
 
-const post = (url: string, cuerpo: unknown) =>
-  fetch(`${url}/api/respuestas`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) });
+const post = (url: string, cuerpo: unknown, cookie = "") =>
+  fetch(`${url}/api/respuestas`, { method: "POST", headers: { "Content-Type": "application/json", Cookie: cookie }, body: JSON.stringify(cuerpo) });
 
-describe("con login obligatorio (valor por defecto)", () => {
+const entrarConCorreo = (url: string, correo: unknown) =>
+  fetch(`${url}/api/acceso/correo`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ correo }) });
+
+/** Cookie de sesion (nombre=valor) de una respuesta de acceso. */
+function cookieDe(r: Response): string {
+  const cookie = r.headers.get("set-cookie")?.split(";")[0];
+  assert.ok(cookie, "la respuesta debe abrir una sesion");
+  return cookie;
+}
+
+describe("con login federado (valor por defecto)", () => {
   const { pool, consultas } = poolSimulado();
   let servidor: Server;
   let url = "";
@@ -49,7 +59,7 @@ describe("con login obligatorio (valor por defecto)", () => {
   test("GET /api/me sin sesion", async () => {
     const r = await fetch(`${url}/api/me`);
     assert.strictEqual(r.status, 200);
-    assert.deepStrictEqual(await r.json(), { authenticated: false, permitido: false, participante: null });
+    assert.deepStrictEqual(await r.json(), { authenticated: false, permitido: false, modoAcceso: "saml", participante: null });
   });
 
   test("POST /api/respuestas sin sesion devuelve 401 y no toca la base", async () => {
@@ -57,6 +67,10 @@ describe("con login obligatorio (valor por defecto)", () => {
     assert.strictEqual(r.status, 401);
     assert.deepStrictEqual(await r.json(), { success: false, error: "sin-sesion" });
     assert.strictEqual(consultas.length, 0);
+  });
+
+  test("no monta el acceso por correo", async () => {
+    assert.strictEqual((await entrarConCorreo(url, "alumno@ucol.mx")).status, 404);
   });
 
   test("GET /Metadata entrega el XML del proveedor de servicio con el EntityID configurado", async () => {
@@ -81,14 +95,93 @@ describe("con login obligatorio (valor por defecto)", () => {
   });
 });
 
-describe("guardado de respuestas (REQUIERE_LOGIN=false)", () => {
+describe("acceso con solo el correo (REQUIERE_LOGIN=false)", () => {
   const env = { REQUIERE_LOGIN: "false" };
 
-  test("guarda una respuesta valida con todos los parametros", async () => {
+  test("no monta el login federado y /api/me informa el modo", async () => {
+    const { pool } = poolSimulado();
+    const { url, servidor } = await levantar(env, pool);
+    try {
+      assert.strictEqual((await fetch(`${url}/login`, { redirect: "manual" })).status, 404);
+      assert.strictEqual((await fetch(`${url}/Metadata`)).status, 404);
+      const me = await (await fetch(`${url}/api/me`)).json();
+      assert.deepStrictEqual(me, { authenticated: false, permitido: false, modoAcceso: "correo", participante: null });
+    } finally {
+      servidor.close();
+    }
+  });
+
+  test("POST /api/respuestas sin sesion devuelve 401: no hay envios anonimos", async () => {
     const { pool, consultas } = poolSimulado();
     const { url, servidor } = await levantar(env, pool);
     try {
       const r = await post(url, cuerpoValido());
+      assert.strictEqual(r.status, 401);
+      assert.deepStrictEqual(await r.json(), { success: false, error: "sin-sesion" });
+      assert.strictEqual(consultas.length, 0);
+    } finally {
+      servidor.close();
+    }
+  });
+
+  test("rechaza correos invalidos (400) y de otros dominios (403) sin abrir sesion", async () => {
+    const { pool } = poolSimulado();
+    const { url, servidor } = await levantar(env, pool);
+    try {
+      const invalido = await entrarConCorreo(url, "no-es-correo");
+      assert.strictEqual(invalido.status, 400);
+      assert.deepStrictEqual(await invalido.json(), { success: false, error: "correo-invalido" });
+      const ajeno = await entrarConCorreo(url, "alguien@gmail.com");
+      assert.strictEqual(ajeno.status, 403);
+      assert.deepStrictEqual(await ajeno.json(), { success: false, error: "dominio-no-permitido", dominios: ["ucol.mx"] });
+      assert.strictEqual(ajeno.headers.get("set-cookie"), null);
+    } finally {
+      servidor.close();
+    }
+  });
+
+  test("acepta ucol.mx y sus subdominios; /api/me no expone el correo", async () => {
+    const { pool } = poolSimulado();
+    const { url, servidor } = await levantar(env, pool);
+    try {
+      const entrada = await entrarConCorreo(url, "Alumno+2@alumnos.UCOL.mx");
+      assert.strictEqual(entrada.status, 200);
+      const cookie = cookieDe(entrada);
+      const textoMe = await (await fetch(`${url}/api/me`, { headers: { Cookie: cookie } })).text();
+      const me = JSON.parse(textoMe) as { authenticated: boolean; permitido: boolean; modoAcceso: string; participante: { id: string } };
+      assert.strictEqual(me.authenticated, true);
+      assert.strictEqual(me.permitido, true);
+      assert.strictEqual(me.modoAcceso, "correo");
+      assert.match(me.participante.id, /^[0-9a-f]{16}$/);
+      assert.ok(!textoMe.includes("alumno"), "el navegador no debe recibir el correo");
+    } finally {
+      servidor.close();
+    }
+  });
+
+  test("alumno@ucol.mx y alumno+2@ucol.mx son el mismo participante", async () => {
+    const { pool } = poolSimulado();
+    const { url, servidor } = await levantar(env, pool);
+    try {
+      const ids: string[] = [];
+      for (const correo of ["alumno@ucol.mx", "alumno+2@ucol.mx", "otro@ucol.mx"]) {
+        const cookie = cookieDe(await entrarConCorreo(url, correo));
+        const me = (await (await fetch(`${url}/api/me`, { headers: { Cookie: cookie } })).json()) as { participante: { id: string } };
+        ids.push(me.participante.id);
+      }
+      assert.strictEqual(ids[0], ids[1]);
+      assert.notStrictEqual(ids[0], ids[2]);
+    } finally {
+      servidor.close();
+    }
+  });
+
+  test("guarda una respuesta valida con todos los parametros, el correo normalizado y el metodo", async () => {
+    const { pool, consultas } = poolSimulado();
+    const { url, servidor } = await levantar(env, pool);
+    try {
+      const cookie = cookieDe(await entrarConCorreo(url, "Alumno+2@ucol.mx"));
+      const r = await post(url, cuerpoValido(), cookie);
       assert.strictEqual(r.status, 201);
       assert.deepStrictEqual(await r.json(), { success: true });
       assert.strictEqual(consultas.length, 1);
@@ -96,8 +189,25 @@ describe("guardado de respuestas (REQUIERE_LOGIN=false)", () => {
       assert.ok(consulta);
       assert.strictEqual(consulta.valores.length, COLUMNAS.length);
       assert.strictEqual((consulta.sql.match(/\?/g) ?? []).length, COLUMNAS.length);
-      assert.strictEqual(consulta.valores[COLUMNAS.indexOf("participante_id")], null);
+      assert.match(String(consulta.valores[COLUMNAS.indexOf("participante_id")]), /^[0-9a-f]{16}$/);
+      assert.strictEqual(consulta.valores[COLUMNAS.indexOf("correo")], "alumno@ucol.mx");
+      assert.strictEqual(consulta.valores[COLUMNAS.indexOf("metodo_acceso")], "correo");
       assert.strictEqual(consulta.valores[COLUMNAS.indexOf("habito_cambiar")], "ñ á é");
+    } finally {
+      servidor.close();
+    }
+  });
+
+  test("salir cierra la sesion", async () => {
+    const { pool } = poolSimulado();
+    const { url, servidor } = await levantar(env, pool);
+    try {
+      const cookie = cookieDe(await entrarConCorreo(url, "alumno@ucol.mx"));
+      const salir = await fetch(`${url}/api/acceso/salir`, { method: "POST", headers: { Cookie: cookie } });
+      assert.strictEqual(salir.status, 200);
+      const me = (await (await fetch(`${url}/api/me`, { headers: { Cookie: cookie } })).json()) as { authenticated: boolean };
+      assert.strictEqual(me.authenticated, false);
+      assert.strictEqual((await post(url, cuerpoValido(), cookie)).status, 401);
     } finally {
       servidor.close();
     }
@@ -107,10 +217,11 @@ describe("guardado de respuestas (REQUIERE_LOGIN=false)", () => {
     const { pool, consultas } = poolSimulado();
     const { url, servidor } = await levantar(env, pool);
     try {
+      const cookie = cookieDe(await entrarConCorreo(url, "alumno@ucol.mx"));
       const cuerpo = cuerpoValido();
       cuerpo.respuestas["1"] = "12";
       cuerpo.respuestas["2"] = "Docente";
-      const r = await post(url, cuerpo);
+      const r = await post(url, cuerpo, cookie);
       assert.strictEqual(r.status, 400);
       const json = (await r.json()) as { error: string; detalle: string[] };
       assert.strictEqual(json.error, "invalido");
@@ -127,7 +238,8 @@ describe("guardado de respuestas (REQUIERE_LOGIN=false)", () => {
     const { pool } = poolSimulado(() => duplicado);
     const { url, servidor } = await levantar(env, pool);
     try {
-      const r = await post(url, cuerpoValido());
+      const cookie = cookieDe(await entrarConCorreo(url, "alumno@ucol.mx"));
+      const r = await post(url, cuerpoValido(), cookie);
       assert.strictEqual(r.status, 409);
       assert.deepStrictEqual(await r.json(), { success: false, error: "duplicado" });
     } finally {
@@ -139,7 +251,8 @@ describe("guardado de respuestas (REQUIERE_LOGIN=false)", () => {
     const { pool } = poolSimulado(() => Object.assign(new Error("connection lost"), { code: "PROTOCOL_CONNECTION_LOST" }));
     const { url, servidor } = await levantar(env, pool);
     try {
-      const r = await post(url, cuerpoValido());
+      const cookie = cookieDe(await entrarConCorreo(url, "alumno@ucol.mx"));
+      const r = await post(url, cuerpoValido(), cookie);
       assert.strictEqual(r.status, 500);
       assert.deepStrictEqual(await r.json(), { success: false, error: "error-interno" });
     } finally {
