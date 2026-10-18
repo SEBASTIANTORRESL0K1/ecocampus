@@ -17,7 +17,7 @@ Reporte de las pruebas aplicadas al sitio desplegado en Lightsail, donde si hay 
 | Compatibilidad en navegadores y dispositivos | Playwright (5 perfiles) | `resultados/compatibilidad.json` | [Compatibilidad](#compatibilidad) |
 | Carga concurrente sobre el servidor | k6 | `resultados/produccion-ligero.json`, `resultados/produccion-medio.json` | [Carga](#carga-concurrente) |
 | Endpoints de la API evaluados | k6 y Playwright | esta seccion | [Endpoints](#endpoints-evaluados) |
-| Hardware, uso de recursos y logs del servidor | `recolectar-servidor.sh` (se ejecuta en el servidor) | pendiente de ejecutar | [Servidor](#servidor-hardware-logs-y-tiempos-del-backend) |
+| Hardware, uso de recursos y logs del servidor | `recolectar-servidor.sh` (se ejecuta en el servidor) | `resultados/servidor.txt` | [Servidor](#servidor-hardware-logs-y-tiempos-del-backend) |
 | Georreferenciacion de los contenedores | `validar-georreferencia.mjs` | `resultados/georreferencia-validacion.md` | [Georreferenciacion](#georreferenciacion-de-los-contenedores) |
 
 No se uso WebPageTest: es un servicio externo que no se ejecuto desde este equipo. Lighthouse cubre el rendimiento del cliente; si el asesor pide WebPageTest, se corre sobre la misma URL y se agrega aqui.
@@ -133,15 +133,42 @@ Numero de peticiones del experimento de carga: 1741 (ligero) y 7363 (medio), tod
 
 ## Servidor: hardware, logs y tiempos del backend
 
-Estos datos no se pueden obtener desde fuera: hay que ejecutar `recolectar-servidor.sh` en el servidor (el asistente no tiene SSH a produccion). El script solo lee y no imprime secretos; entrega:
+Datos tomados en el servidor con `recolectar-servidor.sh` el 18 de octubre de 2026, 07:21 UTC (salida completa en `resultados/servidor.txt`). El script solo lee y no imprime secretos.
 
-- Hardware: sistema operativo, vCPU, memoria, disco, version de Docker.
-- Uso de recursos de cada contenedor (CPU y memoria) y reinicios.
-- Distribucion de tiempos de respuesta del backend (media, p50, p95, p99 y maximo) y codigos de estado por endpoint, a partir de los logs del backend en la ventana indicada.
-- Errores y advertencias distintos del backend.
-- Conteo de respuestas guardadas por metodo de acceso y de sesiones (sin correos).
+| Recurso | Valor |
+| :--- | :--- |
+| Sistema operativo | Ubuntu 24.04.4 LTS (kernel 7.0.0-1012-aws) |
+| CPU | 2 vCPU, Intel Xeon Platinum 8259CL a 2.5 GHz |
+| Memoria | 1906 MB en total, sin swap; 845 MB disponibles en reposo |
+| Disco | 58 GB, 11 % usado (6.2 GB) |
+| Docker | 29.9.1; Compose v5.6.0 |
+| Region | AWS Lightsail `us-east-2` |
 
-Ejecutalo justo despues de una prueba de carga para ver el efecto en CPU y memoria, y guarda la salida en `resultados/servidor.txt`. Hasta entonces este apartado queda pendiente; no se asumio ningun dato de hardware.
+Uso en reposo (instantaneo, sin carga):
+
+| Contenedor | CPU | Memoria | Limite | Reinicios |
+| :--- | ---: | ---: | ---: | ---: |
+| `db` (MySQL 8.0) | 0.61 % | 375 MiB | 1 GiB | 0 |
+| `backend` | 0.01 % | 42.8 MiB | 512 MiB | 0 |
+| `proxy` (Caddy) | 0.00 % | 20.4 MiB | 128 MiB | 0 |
+| `frontend` (nginx) | 0.00 % | 4.0 MiB | 128 MiB | 0 |
+
+La carga promedio del sistema es 0.04 y todos los contenedores estan sanos y sin reinicios. MySQL es el mayor consumidor; con la memoria total de 1.9 GB y sin swap queda margen (845 MB), pero no mucho si se agregan servicios.
+
+Distribucion de tiempos de respuesta del backend (log de las ultimas 24 h, que incluye las pruebas de carga de este reporte y las pruebas manuales; son tiempos de procesamiento del servidor, sin el viaje de red):
+
+| Endpoint | Peticiones | 2xx/3xx | 4xx | 5xx | Media (ms) | p50 | p95 | p99 | Maximo |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `GET /api/me` | 1597 | 1597 | 0 | 0 | 1 | 1 | 1 | 2 | 24 |
+| `GET /health` | 467 | 467 | 0 | 0 | 2 | 2 | 4 | 7 | 49 |
+| `POST /api/acceso/correo` | 27 | 16 | 11 | 0 | 9 | 9 | 29 | 48 | 48 |
+| `POST /api/respuestas` | 12 | 1 | 11 | 0 | 3 | 1 | 28 | 28 | 28 |
+
+- No hubo ningun error 5xx. Los 4xx son esperados: dominios ajenos rechazados en las pruebas (403) y envios sin sesion (401).
+- El backend atiende en 1 a 2 ms las lecturas: durante la carga de 30 usuarios virtuales (66.7 peticiones por segundo en total) no fue el cuello de botella; los ~65 ms medidos desde el cliente son casi todos de red.
+- Los tiempos de `POST /api/acceso/correo` (hasta 48 ms) incluyen crear la sesion en MySQL.
+- La base tiene 1 respuesta (la de prueba del despliegue, del 18 de octubre a las 06:04, con acceso por correo, que debe borrarse antes de abrir el estudio) y 16 sesiones activas (de las pruebas de compatibilidad y manuales).
+- Limitacion: el log del backend solo guarda el tiempo del servidor y el estado; no hay logs de acceso del proxy con tiempos (Caddy registro 48 lineas, sin detalle por peticion). Tampoco se midio el trafico de red del servidor.
 
 ## Georreferenciacion de los contenedores
 
@@ -167,7 +194,8 @@ Validacion automatica (`validar-georreferencia.mjs`, tabla completa en `resultad
 | Media | Imagen de `ucol.mx` bloqueada en inicio (10 de 565 peticiones) | Copiarla al proyecto o quitarla |
 | Media | Una redireccion de unos 1.1 s en movil | Identificar cual es (probablemente `/ecocampus` a `/ecocampus/`) y evitarla |
 | Baja | CLS de 0.176 en la calculadora en movil | Reservar el tamano de la imagen de cada pregunta |
-| Baja | Datos del servidor y procedimiento de georreferenciacion incompletos | Ejecutar `recolectar-servidor.sh` y completar la seccion de georreferenciacion |
+| Media | Servidor de 1.9 GB de RAM sin swap; MySQL usa 375 MiB en reposo | Vigilar la memoria durante el estudio; subir de plan o agregar swap si hay picos |
+| Baja | Procedimiento de georreferenciacion sin confirmar | Completar la seccion con quien capturo las coordenadas |
 
 ## Archivos de esta carpeta
 
