@@ -185,6 +185,52 @@ const Calculadora = () => {
     setPasoActual(pasos.length - 1);
   };
 
+  // Fin del cuestionario del experimento: envia las respuestas al backend y muestra el resultado.
+  const manejarCuestionarioCompleto = async (datosCuestionario) => {
+    if (datosCuestionario === null) {
+      // Usuario rechazo participar
+      reiniciarCuestionario();
+      return;
+    }
+
+    // El tiempo y los planetas se calculan solos; la identidad la toma el backend de la sesion (SAML o correo).
+    const cuerpo = {
+      respuestas: datosCuestionario.respuestasExperimento,
+      tiempoMin: Math.round((Date.now() - tiempoInicio) / 1000 / 60),
+      planetas: resultado.interpretacion.planetasTexto,
+    };
+
+    const MENSAJES_ENVIO = {
+      duplicado: "Ya habías registrado tu participación; no se guardó una segunda respuesta.",
+      "sin-sesion": "Tu sesión expiró y no se guardó tu respuesta. Recarga la página e ingresa de nuevo.",
+      "no-permitido": "Tu cuenta o tu correo no está permitido en este estudio; no se guardó tu respuesta.",
+      invalido: "Alguna respuesta no es válida y no se guardó. Revisa el cuestionario.",
+    };
+    const MENSAJE_GENERICO = "No se pudo guardar tu respuesta. Avisa a la persona que aplica el estudio.";
+
+    try {
+      if (API_URL) {
+        const response = await fetch(`${API_URL}/api/respuestas`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(cuerpo),
+        });
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          setAvisoEnvio(MENSAJES_ENVIO[error.error] ?? MENSAJE_GENERICO);
+        }
+      }
+    } catch (error) {
+      console.error("Error al enviar las respuestas:", error);
+      setAvisoEnvio(MENSAJE_GENERICO);
+    }
+
+    // Mostrar resultado final
+    setVerCuestionario(false);
+    setVerResultado(true);
+  };
+
   const { ref: progressRef, isVisible: progressVisible } = useScrollReveal();
   const { ref: cardRef, isVisible: cardVisible } = useScrollReveal();
   const { ref: resultRef, isVisible: resultVisible } = useScrollReveal();
