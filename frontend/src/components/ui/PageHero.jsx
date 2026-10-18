@@ -18,6 +18,7 @@ const PageHero = ({
       alt=""
       aria-hidden="true"
       fetchPriority="high"
+      referrerPolicy="no-referrer"
       width="1920"
       height="600"
       style={{

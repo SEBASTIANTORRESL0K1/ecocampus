@@ -17,6 +17,7 @@ const tools = [
     name: "Calculadora",
     description: "Mide tu huella ecológica personal",
     to: "/calculadora",
+    bgImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDuHhA7Tq-lPpA3Islk-iNypGt2qKXdCxK3o7pLCxU9g0EH3hn5AiJY8-g&s=10",
   },
   {
     Icon: Map,
@@ -265,8 +266,8 @@ const LandingPage = () => {
               }}
             >
               <img
-                src="https://www.ucol.mx/content/portal/banner_733551615849.jpg"
-                alt="Campo natural con vegetación"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDuHhA7Tq-lPpA3Islk-iNypGt2qKXdCxK3o7pLCxU9g0EH3hn5AiJY8-g&s=10"
+                alt="Huella ecológica"
                 loading="lazy"
                 width="800"
                 height="600"
@@ -329,6 +330,7 @@ const LandingPage = () => {
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
+                        referrerPolicy="no-referrer"
                         style={{
                           position: "absolute",
                           inset: 0,
