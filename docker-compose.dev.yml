@@ -1,5 +1,6 @@
 # Desarrollo: recarga en vivo, puertos abiertos hacia tu maquina y herramientas de base de datos.
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+# Sin valores por defecto: las variables salen del .env (plantilla: .env.dev.example).
 services:
   db:
     ports:
@@ -9,10 +10,6 @@ services:
     build:
       context: ./backend
       target: dev
-    environment:
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173/ecocampus/calculadora}
-      COOKIE_SECURE: "false"
-      TRUST_PROXY: "false"
     volumes:
       # Codigo y certificados de desarrollo montados; node_modules queda el de la imagen (Linux)
       - ./backend:/app
@@ -25,9 +22,9 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
     environment:
-      VITE_API_URL: ${API_URL:-http://localhost:4006}
-      VITE_EXPERIMENTO_ACTIVO: ${EXPERIMENTO_ACTIVO:-true}
-      VITE_USE_POLLING: "true"
+      VITE_API_URL: ${API_URL:?define API_URL en .env}
+      VITE_EXPERIMENTO_ACTIVO: ${EXPERIMENTO_ACTIVO:?define EXPERIMENTO_ACTIVO en .env}
+      VITE_USE_POLLING: ${VITE_USE_POLLING:?define VITE_USE_POLLING en .env}
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -40,7 +37,7 @@ services:
     depends_on:
       - db
     environment:
-      ADMINER_DEFAULT_SERVER: db
+      ADMINER_DEFAULT_SERVER: ${DB_HOST:?define DB_HOST en .env}
     ports:
       - "127.0.0.1:8081:8080"
 
@@ -50,8 +47,8 @@ services:
     depends_on:
       - db
     environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      UPLOAD_LIMIT: 64M
+      PMA_HOST: ${DB_HOST:?define DB_HOST en .env}
+      PMA_PORT: ${DB_PORT:?define DB_PORT en .env}
+      UPLOAD_LIMIT: ${PMA_UPLOAD_LIMIT:?define PMA_UPLOAD_LIMIT en .env}
     ports:
       - "127.0.0.1:8082:80"

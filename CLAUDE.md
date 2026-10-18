@@ -107,8 +107,9 @@ Esta dividido en `docker-compose.yml` (base comun), `docker-compose.dev.yml` y `
 | phpMyAdmin | `http://127.0.0.1:8082` (usuario `ecocampus`, contrasena `MYSQL_PASSWORD` del `.env`) |
 | MySQL en el host | `127.0.0.1:3307` (el 3306 esta reservado en la maquina del usuario) |
 
+- Los compose NO tienen valores por defecto ni literales de entorno: toda variable sale del `.env` con `${VAR:?mensaje}` y, si falta o esta vacia, `docker compose` falla. Al agregar una variable, ponerla en `.env.dev.example`, `.env.prod.example` y `.env.loadtest.example`. Las pruebas de carga usan `--env-file .env.loadtest`.
 - Produccion: solo el contenedor `proxy` (Caddy) publica puertos; MySQL, backend y frontend quedan internos; Adminer y phpMyAdmin solo con `--profile tools`. Sin dominio se sirve por HTTP (`SITE_ADDRESS=:80`).
-- Los valores SAML de arriba son los **defectos de desarrollo**; `backend/app.js` los lee de `SAML_ISSUER`, `SAML_CALLBACK_URL`, `SAML_LOGOUT_CALLBACK_URL`, `SAML_ENTRY_POINT`, `SAML_LOGOUT_URL`, `SAML_CERT_DIR` y `SAML_CLOCK_SKEW_MS` para poder usar credenciales propias en produccion sin tocar el codigo.
+- Los valores SAML de arriba son los de **desarrollo** (viven en `.env.dev.example`); `backend/app.js` los lee de `SAML_ISSUER`, `SAML_CALLBACK_URL`, `SAML_LOGOUT_CALLBACK_URL`, `SAML_ENTRY_POINT`, `SAML_LOGOUT_URL`, `SAML_CERT_DIR` y `SAML_CLOCK_SKEW_MS` para poder usar credenciales propias en produccion sin tocar el codigo.
 - El flujo de ramas es `main -> experiment/survey-questions` (traer cambios de main a la rama del experimento). No fusionar `survey` en `main` hasta publicar el experimento; ver el historial de `49a704e`.
 - Pruebas del backend: `cd backend && npm test`. Pruebas del frontend: `cd frontend && npx vitest run`.
 - Dos pruebas de imagen de `Calculadora.test.jsx` fallan tambien en `main`; no son regresiones.

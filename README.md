@@ -119,7 +119,9 @@ Requiere Docker Desktop (o Docker Engine con el plugin compose). La configuracio
 | `docker-compose.dev.yml` | Desarrollo: recarga en vivo, puertos abiertos, Adminer y phpMyAdmin |
 | `docker-compose.prod.yml` | Produccion: imagenes construidas, solo el proxy publica puertos, limites, rotacion de logs |
 | `docker-compose.loadtest.yml` | Entorno aislado para pruebas de carga (ver `docs/testing/rendimiento.md`) |
-| `.env.dev.example` / `.env.prod.example` | Plantillas de variables para cada entorno |
+| `.env.dev.example`, `.env.prod.example`, `.env.loadtest.example` | Plantillas con TODAS las variables de cada entorno |
+
+**Los compose no tienen valores por defecto:** toda variable se carga del `.env` y, si falta o esta vacia, `docker compose` se detiene con un mensaje como `required variable SAML_ISSUER is missing a value`. Al agregar una variable nueva, anadela a las tres plantillas. Solo quedan fijos en los compose lo que no es configuracion de entorno (imagenes, puertos internos, rutas de volumenes, limites de memoria y healthchecks).
 
 ### Desarrollo
 
@@ -152,8 +154,8 @@ docker compose up -d --build     # .env ya indica COMPOSE_FILE (base + prod)
 Sin un `.env` con `COMPOSE_FILE`, usa los archivos de forma explicita: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`.
 
 - **Un solo punto de entrada:** el contenedor `proxy` (Caddy) es el unico que publica puertos (80 y 443). Reenvia `/api`, `/login`, `/logout` y `/Metadata` al backend y todo lo demas al frontend. MySQL, backend y frontend no se publican.
-- **Sin dominio todavia:** deja `SITE_ADDRESS=:80` y `PUBLIC_URL=http://IP-DEL-SERVIDOR`; el sitio se sirve por HTTP. Con dominio, pon `SITE_ADDRESS=tu.dominio`, `PUBLIC_URL=https://tu.dominio` y `COOKIE_SECURE=true`: Caddy obtiene y renueva el certificado HTTPS solo (el dominio debe apuntar al servidor y los puertos 80 y 443 deben estar abiertos).
-- **Login SAML:** sin `SAML_ISSUER` ni certificados propios se usan los de desarrollo, que solo funcionan con callback en `localhost:4006` y no sirven para usuarios remotos (el backend lo avisa en sus logs). Los valores propios los tramita sistemas@ucol.mx; se configuran con `SAML_ISSUER`, `SAML_CALLBACK_URL`, `SAML_LOGOUT_CALLBACK_URL` y `SAML_CERT_HOST_DIR` (carpeta del servidor, fuera del repositorio, con `cert.pem`, `idp.crt` y `key.pem`). Los callbacks se derivan de `PUBLIC_URL` si no los defines.
+- **Sin dominio todavia:** deja `SITE_ADDRESS=:80` y usa `http://IP-DEL-SERVIDOR` en `API_URL`, `FRONTEND_URL` (con `/ecocampus/calculadora`) y los callbacks SAML; el sitio se sirve por HTTP. Con dominio, pon `SITE_ADDRESS=tu.dominio`, esas URLs con `https://tu.dominio` y `COOKIE_SECURE=true`: Caddy obtiene y renueva el certificado HTTPS solo (el dominio debe apuntar al servidor y los puertos 80 y 443 deben estar abiertos).
+- **Login SAML:** sin `SAML_ISSUER` ni certificados propios se usan los de desarrollo, que solo funcionan con callback en `localhost:4006` y no sirven para usuarios remotos (el backend lo avisa en sus logs). Los valores propios los tramita sistemas@ucol.mx; se configuran con `SAML_ISSUER`, `SAML_CALLBACK_URL`, `SAML_LOGOUT_CALLBACK_URL` y `SAML_CERT_HOST_DIR` (carpeta del servidor, fuera del repositorio, con `cert.pem`, `idp.crt` y `key.pem`). Todas las variables `SAML_*` y `SAML_CERT_HOST_DIR` son obligatorias en el `.env`.
 - **Herramientas de base de datos:** no arrancan por defecto. Para usarlas: `docker compose --profile tools up -d` y entra por un tunel SSH a `127.0.0.1:8081` (Adminer) o `127.0.0.1:8082` (phpMyAdmin).
 - **Operacion:** `restart: unless-stopped`, limites de memoria (MySQL 1 GB, backend 512 MB, el resto 128 MB) y rotacion de logs (3 archivos de 10 MB por servicio).
 

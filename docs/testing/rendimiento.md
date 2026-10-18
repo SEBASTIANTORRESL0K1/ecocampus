@@ -119,15 +119,16 @@ Si en una repeticion aparecen fallos, el script cuenta cada error por endpoint y
 El entorno de prueba usa un proyecto de compose aparte (volumen y base propios, sin puertos publicados), asi que no toca los datos del estudio. Conviene detener antes el stack principal para liberar memoria.
 
 ```bash
+cp .env.loadtest.example .env.loadtest      # solo la primera vez
 docker compose stop
-docker compose -p ecocampus-loadtest -f docker-compose.yml -f docker-compose.loadtest.yml up -d --build
+docker compose --env-file .env.loadtest -p ecocampus-loadtest -f docker-compose.yml -f docker-compose.loadtest.yml up -d --build
 
 # perfil de carga (cambiar PERFIL=estres para el de estres)
 MSYS_NO_PATHCONV=1 docker run --rm --network ecocampus-loadtest_default \
   -e PERFIL=carga -v "$(pwd -W)/loadtest:/scripts" grafana/k6 run \
   --summary-export=/scripts/results/resumen.json /scripts/k6.js
 
-docker compose -p ecocampus-loadtest -f docker-compose.yml -f docker-compose.loadtest.yml down -v
+docker compose --env-file .env.loadtest -p ecocampus-loadtest -f docker-compose.yml -f docker-compose.loadtest.yml down -v
 docker compose start
 ```
 
