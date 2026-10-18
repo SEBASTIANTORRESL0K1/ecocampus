@@ -2,6 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Sprout, Map, Users, Recycle, Leaf } from "lucide-react";
 import PageLayout from "../../components/layout/PageLayout";
+import PageHero from "../../components/ui/PageHero";
+import CtaButton from "../../components/ui/CtaButton";
+import SectionWrapper from "../../components/ui/SectionWrapper";
+import SectionHeading from "../../components/ui/SectionHeading";
+import FeatureCard from "../../components/ui/FeatureCard";
+import IconCircle from "../../components/ui/IconCircle";
+import useScrollReveal from "../../hooks/useScrollReveal";
+import "../../styles/scroll-animations.css";
 
 const tools = [
   {
@@ -9,122 +17,79 @@ const tools = [
     name: "Calculadora",
     description: "Mide tu huella ecológica personal",
     to: "/calculadora",
+    bgImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDuHhA7Tq-lPpA3Islk-iNypGt2qKXdCxK3o7pLCxU9g0EH3hn5AiJY8-g&s=10",
   },
   {
     Icon: Map,
     name: "Mapa interactivo",
-    description: "Visualiza el impacto ambiental en tu zona",
+    description: "Localiza puntos de reciclaje en tu zona",
     to: "/mapa",
+    bgImage: "https://images.pexels.com/photos/19507080/pexels-photo-19507080.jpeg?cs=srgb&dl=pexels-rndiid-19507080.jpg&fm=jpg",
   },
   {
     Icon: Users,
     name: "Comunidad",
     description: "Comparte y aprende con otros usuarios",
     to: "/comunidad",
+    bgImage: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cmVjaWNsYXJ8ZW58MHx8MHx8fDA%3D",
   },
   {
     Icon: Recycle,
     name: "Guía de reciclaje",
     description: "Aprende a reducir y gestionar tus residuos",
     to: "/guia-reciclaje",
+    bgImage: "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cmVjaWNsYXJ8ZW58MHx8MHx8fDA%3D",
   },
 ];
 
 const LandingPage = () => {
-  return (
-    <PageLayout>
-      <main>
-        {/* ── Hero ── */}
-        <section
-          style={{
-            backgroundImage:
-              "url('https://picsum.photos/seed/ecocampus/1920/600')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div
-            style={{
-              background: "rgba(34,85,44,0.65)",
-              minHeight: "100dvh",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "4rem 1.5rem",
-            }}
-          >
-            <p
-              style={{
-                fontStyle: "italic",
-                color: "#b8e0c8",
-                fontSize: "1.1rem",
-                marginBottom: "0.5rem",
-                letterSpacing: "0.05em",
-              }}
-            >
-              Plataforma ambiental universitaria
-            </p>
-            <h1
-              style={{
-                color: "#ffffff",
-                fontSize: "clamp(2.2rem, 6vw, 4.5rem)",
-                fontWeight: 700,
-                textAlign: "center",
-                letterSpacing: "0.02em",
-                textWrap: "balance",
-                margin: "0 0 1rem",
-                lineHeight: 1.1,
-              }}
-            >
-              Calcula tu huella ecológica
-            </h1>
-            <p
-              style={{
-                color: "#d4ead9",
-                fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
-                textAlign: "center",
-                maxWidth: "520px",
-                marginBottom: "2rem",
-                textWrap: "balance",
-              }}
-            >
-              Conoce tu impacto ambiental y actúa hoy
-            </p>
-            <Link to="/calculadora">
-              <button
-                style={{
-                  background: "#2d6a2d",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "4px",
-                  padding: "0.85rem 2.5rem",
-                  fontSize: "0.95rem",
-                  fontWeight: 600,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  cursor: "pointer",
-                  transition: "transform 200ms ease, box-shadow 200ms ease, background 200ms ease",
-                  boxShadow: "0 4px 14px rgba(45,106,45,0.4)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#1e4d1e";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 20px rgba(45,106,45,0.5)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#2d6a2d";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 14px rgba(45,106,45,0.4)";
-                }}
-              >
-                Comenzar cálculo
-              </button>
-            </Link>
-          </div>
-        </section>
+  /* ── About section refs ── */
+  const { ref: aboutTextRef, isVisible: aboutTextVisible } = useScrollReveal();
+  const { ref: aboutRightRef, isVisible: aboutRightVisible } = useScrollReveal();
+  const { ref: stat0Ref, isVisible: stat0Visible } = useScrollReveal();
+  const { ref: stat1Ref, isVisible: stat1Visible } = useScrollReveal();
 
-        {/* ── Welcome / About ── */}
+  /* ── Tools section refs ── */
+  const { ref: toolsHeadingRef, isVisible: toolsHeadingVisible } = useScrollReveal();
+  const { ref: card0Ref, isVisible: card0Visible } = useScrollReveal();
+  const { ref: card1Ref, isVisible: card1Visible } = useScrollReveal();
+  const { ref: card2Ref, isVisible: card2Visible } = useScrollReveal();
+  const { ref: card3Ref, isVisible: card3Visible } = useScrollReveal();
+
+  /* Map card refs so we can index into them during render */
+  const cardReveal = [
+    { ref: card0Ref, visible: card0Visible },
+    { ref: card1Ref, visible: card1Visible },
+    { ref: card2Ref, visible: card2Visible },
+    { ref: card3Ref, visible: card3Visible },
+  ];
+
+  return (
+    <PageLayout navTransparent>
+      <main>
+        {/* ── Hero — load-time animation (not scroll-triggered) ── */}
+        {/*
+          PageHero is a shared component and must not be modified.
+          We wrap it with reveal-load so the entire hero fades in on mount.
+          Individual element stagger would require changes inside PageHero.
+        */}
+        <div className="reveal-load" style={{ '--reveal-delay': '0ms' }}>
+          <PageHero
+            backgroundImageUrl="https://www.ucol.mx/content/portal/banner_733551615849.jpg"
+            backgroundSeed="ecocampus"
+            eyebrow="Plataforma ambiental universitaria"
+            title="Calcula tu huella ecológica"
+            description="Conoce tu impacto ambiental y actúa hoy"
+            minHeight="100dvh"
+            cta={
+              <Link to="/calculadora">
+                <CtaButton>Comenzar cálculo</CtaButton>
+              </Link>
+            }
+          />
+        </div>
+
+        {/* ── About — 2-column scroll reveal with staggered stats ── */}
         <section
           style={{
             background: "#ffffff",
@@ -142,71 +107,77 @@ const LandingPage = () => {
             }}
             className="landing-about-grid"
           >
-            {/* Left: text */}
+            {/* Left: text content block — reveals first */}
             <div>
-              <p
-                style={{
-                  fontStyle: "italic",
-                  color: "#4a7c59",
-                  fontSize: "1.05rem",
-                  marginBottom: "0.4rem",
-                }}
-              >
-                Bienvenido a EcoCampus
-              </p>
-              <h2
-                style={{
-                  fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  color: "#1a2e1a",
-                  margin: "0 0 1rem",
-                  textWrap: "balance",
-                  lineHeight: 1.2,
-                }}
-              >
-                ¿Qué es la huella ecológica?
-              </h2>
-              {/* Decorative leaf divider */}
               <div
-                style={{
-                  marginBottom: "1.25rem",
-                  lineHeight: 1,
-                }}
-                aria-hidden="true"
+                ref={aboutTextRef}
+                className={`reveal${aboutTextVisible ? " is-visible" : ""}`}
+                style={{ '--reveal-delay': '0ms' }}
               >
-                <Leaf size={28} color="#4a7c59" />
+                <p
+                  style={{
+                    fontStyle: "italic",
+                    color: "#4a7c59",
+                    fontSize: "1.05rem",
+                    marginBottom: "0.4rem",
+                  }}
+                >
+                  Bienvenido a EcoCampus
+                </p>
+                <h2
+                  style={{
+                    fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    color: "#1a2e1a",
+                    margin: "0 0 1rem",
+                    textWrap: "balance",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  ¿Qué es la huella ecológica?
+                </h2>
+                {/* Decorative leaf divider */}
+                <div
+                  style={{
+                    marginBottom: "1.25rem",
+                    lineHeight: 1,
+                  }}
+                  aria-hidden="true"
+                >
+                  <Leaf size={28} color="#4a7c59" />
+                </div>
+                <p
+                  style={{
+                    color: "#3a4a3a",
+                    lineHeight: 1.75,
+                    marginBottom: "1.25rem",
+                    fontSize: "1rem",
+                  }}
+                >
+                  La huella ecológica es un indicador que mide el impacto de las
+                  actividades humanas en el medio ambiente. Evalúa la cantidad de
+                  tierra y agua necesarias para producir los recursos que
+                  consumimos y absorber los desechos generados.
+                </p>
+                <p
+                  style={{
+                    color: "#3a4a3a",
+                    lineHeight: 1.75,
+                    fontSize: "1rem",
+                  }}
+                >
+                  México tiene una huella ecológica de aproximadamente{" "}
+                  <strong style={{ color: "#2d6a2d" }}>3.1 hectáreas globales</strong>{" "}
+                  por persona, según datos del WWF. Además, México ocupa el lugar
+                  26 en el ranking de concentración anual de PM2.5, con un
+                  promedio de{" "}
+                  <strong style={{ color: "#2d6a2d" }}>20.1 µg/m³</strong>.
+                </p>
               </div>
-              <p
-                style={{
-                  color: "#3a4a3a",
-                  lineHeight: 1.75,
-                  marginBottom: "1.25rem",
-                  fontSize: "1rem",
-                }}
-              >
-                La huella ecológica es un indicador que mide el impacto de las
-                actividades humanas en el medio ambiente. Evalúa la cantidad de
-                tierra y agua necesarias para producir los recursos que
-                consumimos y absorber los desechos generados.
-              </p>
-              <p
-                style={{
-                  color: "#3a4a3a",
-                  lineHeight: 1.75,
-                  fontSize: "1rem",
-                }}
-              >
-                México tiene una huella ecológica de aproximadamente{" "}
-                <strong style={{ color: "#2d6a2d" }}>3.1 hectáreas globales</strong>{" "}
-                por persona, según datos del WWF. Además, México ocupa el lugar
-                26 en el ranking de concentración anual de PM2.5, con un
-                promedio de{" "}
-                <strong style={{ color: "#2d6a2d" }}>20.1 µg/m³</strong>.
-              </p>
 
-              {/* Stats row */}
+              {/* Stats row — each stat reveals with 80ms stagger */}
               <div
                 style={{
                   display: "flex",
@@ -214,7 +185,11 @@ const LandingPage = () => {
                   marginTop: "2rem",
                 }}
               >
-                <div>
+                <div
+                  ref={stat0Ref}
+                  className={`reveal${stat0Visible ? " is-visible" : ""}`}
+                  style={{ '--reveal-delay': '0ms' }}
+                >
                   <p
                     style={{
                       fontSize: "2rem",
@@ -238,6 +213,7 @@ const LandingPage = () => {
                     ha globales / persona
                   </p>
                 </div>
+
                 <div
                   style={{
                     width: "1px",
@@ -246,7 +222,12 @@ const LandingPage = () => {
                   }}
                   aria-hidden="true"
                 />
-                <div>
+
+                <div
+                  ref={stat1Ref}
+                  className={`reveal${stat1Visible ? " is-visible" : ""}`}
+                  style={{ '--reveal-delay': '80ms' }}
+                >
                   <p
                     style={{
                       fontSize: "2rem",
@@ -273,17 +254,23 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Right: image */}
+            {/* Right: image — reveals 150ms after left column */}
             <div
+              ref={aboutRightRef}
+              className={`reveal${aboutRightVisible ? " is-visible" : ""}`}
               style={{
+                '--reveal-delay': '150ms',
                 borderRadius: "8px",
                 overflow: "hidden",
                 boxShadow: "0 16px 40px rgba(34,85,44,0.15)",
               }}
             >
               <img
-                src="https://picsum.photos/seed/campo/800/600"
-                alt="Campo natural con vegetación"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDuHhA7Tq-lPpA3Islk-iNypGt2qKXdCxK3o7pLCxU9g0EH3hn5AiJY8-g&s=10"
+                alt="Huella ecológica"
+                loading="lazy"
+                width="800"
+                height="600"
                 style={{
                   width: "100%",
                   height: "100%",
@@ -295,125 +282,136 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* ── Services ── */}
-        <section
-          style={{
-            background: "#f7f9f4",
-            padding: "5rem 1.5rem",
-          }}
-        >
-          <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-            {/* Heading */}
-            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-              <p
-                style={{
-                  fontStyle: "italic",
-                  color: "#4a7c59",
-                  fontSize: "1.05rem",
-                  marginBottom: "0.4rem",
-                }}
-              >
-                Todo lo que necesitas
-              </p>
-              <h2
-                style={{
-                  fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  color: "#1a2e1a",
-                  margin: "0 0 0.5rem",
-                  textWrap: "balance",
-                }}
-              >
-                Nuestras herramientas
-              </h2>
-              <div
-                style={{ marginTop: "0.5rem", display: "flex", justifyContent: "center" }}
-                aria-hidden="true"
-              >
-                <Leaf size={24} color="#4a7c59" />
-              </div>
-            </div>
-
-            {/* Cards grid */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                gap: "1.5rem",
-              }}
-            >
-              {tools.map((tool) => (
-                <Link
-                  key={tool.to}
-                  to={tool.to}
-                  style={{ textDecoration: "none" }}
-                >
-                  <article
-                    style={{
-                      background: "#ffffff",
-                      borderRadius: "8px",
-                      padding: "2rem 1.5rem",
-                      textAlign: "center",
-                      boxShadow: "0 2px 12px rgba(34,85,44,0.08)",
-                      transition: "transform 200ms ease, box-shadow 200ms ease",
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "scale(1.02)";
-                      e.currentTarget.style.boxShadow =
-                        "0 8px 28px rgba(34,85,44,0.18)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "scale(1)";
-                      e.currentTarget.style.boxShadow =
-                        "0 2px 12px rgba(34,85,44,0.08)";
-                    }}
-                  >
-                    {/* Icon circle */}
-                    <div
-                      style={{
-                        width: "64px",
-                        height: "64px",
-                        borderRadius: "50%",
-                        background: "#e8f4ec",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        margin: "0 auto 1rem",
-                      }}
-                      aria-hidden="true"
-                    >
-                      <tool.Icon size={28} color="#4a7c59" strokeWidth={1.5} />
-                    </div>
-                    <h3
-                      style={{
-                        fontSize: "1.05rem",
-                        fontWeight: 600,
-                        color: "#1a2e1a",
-                        margin: "0 0 0.5rem",
-                        letterSpacing: "0.02em",
-                      }}
-                    >
-                      {tool.name}
-                    </h3>
-                    <p
-                      style={{
-                        fontSize: "0.88rem",
-                        color: "#5a7a5a",
-                        margin: 0,
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      {tool.description}
-                    </p>
-                  </article>
-                </Link>
-              ))}
-            </div>
+        {/* ── Herramientas — heading then staggered cards ── */}
+        <SectionWrapper background="var(--color-section-alt)">
+          {/* Section heading reveals first */}
+          <div
+            ref={toolsHeadingRef}
+            className={`reveal${toolsHeadingVisible ? " is-visible" : ""}`}
+            style={{ '--reveal-delay': '0ms' }}
+          >
+            <SectionHeading eyebrow="Todo lo que necesitas" title="Nuestras herramientas" />
           </div>
-        </section>
+
+          {/* Cards grid — each card staggered 80ms apart */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: "1.5rem",
+              alignItems: "stretch",
+            }}
+          >
+            {tools.map((tool, index) => (
+              <div
+                key={tool.to}
+                ref={cardReveal[index].ref}
+                className={`reveal-card${cardReveal[index].visible ? " is-visible" : ""}`}
+                style={{ '--reveal-delay': `${index * 80}ms`, height: "100%" }}
+              >
+                <Link
+                  to={tool.to}
+                  style={{ textDecoration: "none", display: "block", height: "100%" }}
+                >
+                  {tool.bgImage ? (
+                    <article
+                      style={{
+                        position: "relative",
+                        overflow: "hidden",
+                        borderRadius: "var(--radius-card)",
+                        boxShadow: "var(--shadow-card)",
+                        cursor: "pointer",
+                        height: "100%",
+                        minHeight: "220px",
+                      }}
+                    >
+                      <img
+                        src={tool.bgImage}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          background: "rgba(20,50,20,0.55)",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "relative",
+                          zIndex: 1,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          padding: "2rem 1.5rem",
+                          textAlign: "center",
+                        }}
+                      >
+                        <IconCircle Icon={tool.Icon} />
+                        <h3
+                          style={{
+                            fontSize: "1.05rem",
+                            fontWeight: 600,
+                            color: "#fff",
+                            margin: "0 0 0.5rem",
+                            letterSpacing: "0.02em",
+                          }}
+                        >
+                          {tool.name}
+                        </h3>
+                        <p
+                          style={{
+                            fontSize: "0.88rem",
+                            color: "#fff",
+                            margin: 0,
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {tool.description}
+                        </p>
+                      </div>
+                    </article>
+                  ) : (
+                    <FeatureCard cursor="pointer">
+                      <IconCircle Icon={tool.Icon} />
+                      <h3
+                        style={{
+                          fontSize: "1.05rem",
+                          fontWeight: 600,
+                          color: "#1a2e1a",
+                          margin: "0 0 0.5rem",
+                          letterSpacing: "0.02em",
+                        }}
+                      >
+                        {tool.name}
+                      </h3>
+                      <p
+                        style={{
+                          fontSize: "0.88rem",
+                          color: "#5a7a5a",
+                          margin: 0,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {tool.description}
+                      </p>
+                    </FeatureCard>
+                  )}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </SectionWrapper>
       </main>
 
       <style>{`

@@ -1,0 +1,89 @@
+/*
+ * scroll-animations.css
+ *
+ * Utility classes for the blur-fade-up scroll reveal system used in LandingPage.
+ * Driven by useScrollReveal (IntersectionObserver hook).
+ *
+ * Usage:
+ *   - Add class "reveal" (or "reveal-card") to the element.
+ *   - Set --reveal-delay as an inline CSS custom property for stagger timing.
+ *   - Add class "is-visible" (via React state) to trigger the transition.
+ *
+ * Timing curve: cubic-bezier(0.32, 0.72, 0, 1) — spring-damped feel.
+ * Duration: 700ms base.
+ */
+
+/* ── Scroll-triggered reveal ─────────────────────────────────────────────── */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 700ms cubic-bezier(0.32, 0.72, 0, 1),
+    transform 700ms cubic-bezier(0.32, 0.72, 0, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  will-change: auto;
+}
+
+/* Card variant: reduced vertical displacement for grid items */
+.reveal-card {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 700ms cubic-bezier(0.32, 0.72, 0, 1),
+    transform 700ms cubic-bezier(0.32, 0.72, 0, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform;
+}
+
+.reveal-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  will-change: auto;
+}
+
+/* ── Load-time hero animation (no scroll trigger) ────────────────────────── */
+
+/*
+ * Applied directly as a className. The animation fires once on mount.
+ * --reveal-delay controls per-element stagger.
+ */
+.reveal-load {
+  animation: blur-fade-up 700ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@keyframes blur-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Accessibility: respect reduced-motion preference ────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+
+  .reveal-load {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

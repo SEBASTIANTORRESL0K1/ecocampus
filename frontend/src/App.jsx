@@ -1,29 +1,33 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LandingPage from "./features/landing/LandingPage";
-import Calculadora from "./features/calculadora/Calculadora";
-import LoginGate from "./features/auth/LoginGate";
-import Mapa from "./features/mapa/Mapa";
-import Comunidad from "./features/comunidad/Comunidad";
-import GuiaReciclaje from "./features/guiaReciclaje/GuiaReciclaje";
+import React, { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+
+const LandingPage = lazy(() => import("./features/landing/LandingPage"));
+const Calculadora = lazy(() => import("./features/calculadora/Calculadora"));
+const Mapa = lazy(() => import("./features/mapa/Mapa"));
+const Comunidad = lazy(() => import("./features/comunidad/Comunidad"));
+const GuiaReciclaje = lazy(() => import("./features/guiaReciclaje/GuiaReciclaje"));
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function App() {
   return (
     <Router basename="/ecocampus">
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route
-          path="/calculadora"
-          element={
-            <LoginGate>
-              <Calculadora />
-            </LoginGate>
-          }
-        />
-        <Route path="/mapa" element={<Mapa />} />
-        <Route path="/comunidad" element={<Comunidad />} />
-        <Route path="/guia-reciclaje" element={<GuiaReciclaje />} />
-      </Routes>
+      <ScrollToTop />
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/calculadora" element={<Calculadora />} />
+          <Route path="/mapa" element={<Mapa />} />
+          <Route path="/comunidad" element={<Comunidad />} />
+          <Route path="/guia-reciclaje" element={<GuiaReciclaje />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

@@ -5,8 +5,27 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: '/ecocampus/',
-  // Con el codigo montado desde Windows en Docker no llegan eventos de archivos: se usa polling.
-  server: { watch: process.env.VITE_USE_POLLING === 'true' ? { usePolling: true } : undefined },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-dom/') ||
+            id.includes('node_modules/react-router-dom/')
+          ) {
+            return 'vendor-react';
+          }
+          if (
+            id.includes('node_modules/leaflet/') ||
+            id.includes('node_modules/react-leaflet/')
+          ) {
+            return 'vendor-leaflet';
+          }
+        },
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     environmentOptions: {

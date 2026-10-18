@@ -1,38 +1,152 @@
 import React from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { MapPin } from "lucide-react";
 import PageLayout from "../../components/layout/PageLayout";
 import { puntosReciclaje } from "./puntosReciclaje";
 import { customIcon } from "./customIcon";
+import useScrollReveal from "../../hooks/useScrollReveal";
+import "../../styles/scroll-animations.css";
 
 const Mapa = () => {
-  const posicionCampus = [19.249437, -103.698893]; // Coordenadas del Campus Central
+  const posicionCampus = [19.249437, -103.698893];
+
+  const { ref: heroRef, isVisible: heroVisible } = useScrollReveal();
+  const { ref: counterRef, isVisible: counterVisible } = useScrollReveal();
+  const { ref: mapRef, isVisible: mapVisible } = useScrollReveal();
 
   return (
-    <PageLayout>
-      <main className="flex-grow flex flex-col items-center text-center px-4 py-10">
-        <h1 className="text-2xl sm:text-3xl font-bold mt-6">Mapa de Puntos de Reciclaje</h1>
-        <p className="text-lg text-gray-700">Ubicación de los depósitos de reciclaje en el Campus</p>
+    <PageLayout navTransparent>
+      <main>
+        {/* ── Hero compacto ── */}
+        <section
+          style={{
+            backgroundImage:
+              "url('https://images.pexels.com/photos/19507080/pexels-photo-19507080.jpeg?cs=srgb&dl=pexels-rndiid-19507080.jpg&fm=jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            height: "280px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            ref={heroRef}
+            className={`reveal${heroVisible ? " is-visible" : ""}`}
+            style={{
+              background: "rgba(34,85,44,0.7)",
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "2rem 1.5rem",
+              textAlign: "center",
+            }}
+          >
+            <h1
+              style={{
+                color: "#ffffff",
+                fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
+                fontWeight: 700,
+                letterSpacing: "0.02em",
+                margin: "0 0 0.75rem",
+                lineHeight: 1.1,
+              }}
+            >
+              Mapa de Reciclaje
+            </h1>
+            <p
+              style={{
+                fontStyle: "italic",
+                color: "#d4ead9",
+                fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
+                maxWidth: "540px",
+                margin: 0,
+                lineHeight: 1.5,
+              }}
+            >
+              Localiza los contenedores en el Campus Central de la Universidad de Colima
+            </p>
+          </div>
+        </section>
 
-        <MapContainer center={posicionCampus} zoom={17} className="w-full sm:w-11/12 h-[300px] sm:h-[500px] mt-6 rounded-lg shadow-lg">
-          {/* Capa de mapa */}
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          />
+        {/* ── Contador de puntos ── */}
+        <section
+          ref={counterRef}
+          className={`reveal${counterVisible ? " is-visible" : ""}`}
+          style={{
+            background: "#f7f9f4",
+            padding: "1.25rem 1.5rem",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              color: "#2d6a2d",
+              fontSize: "1rem",
+              fontWeight: 600,
+              margin: 0,
+            }}
+          >
+            <MapPin size={18} color="#4a7c59" aria-hidden="true" />
+            21 puntos de reciclaje en el campus
+          </p>
+        </section>
 
-          {/* Agregar marcadores con el ícono personalizado */}
-          {puntosReciclaje.map((punto) => (
-            <Marker key={punto.id} position={punto.coordenadas} icon={customIcon}>
-              <Popup>
-                <div className="text-center">
-                  <h2 className="font-bold text-lg">{punto.nombre}</h2>
-                  <img src={`${import.meta.env.BASE_URL}${punto.imagen.slice(1)}`} alt={punto.nombre} className="w-40 h-32 object-cover rounded-lg mt-2" />
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        {/* ── Mapa ── */}
+        <section
+          style={{
+            background: "#ffffff",
+            padding: "2.5rem 1.5rem 3rem",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            ref={mapRef}
+            className={`reveal${mapVisible ? " is-visible" : ""}`}
+            style={{
+              width: "100%",
+              maxWidth: "1100px",
+              borderRadius: "12px",
+              overflow: "hidden",
+              boxShadow: "0 8px 32px rgba(34,85,44,0.15)",
+              height: "520px",
+            }}
+          >
+            <MapContainer
+              center={posicionCampus}
+              zoom={17}
+              style={{ width: "100%", height: "100%" }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              />
+
+              {puntosReciclaje.map((punto) => (
+                <Marker key={punto.id} position={punto.coordenadas} icon={customIcon}>
+                  <Popup>
+                    <div className="text-center">
+                      <h2 className="font-bold text-lg">{punto.nombre}</h2>
+                      <img
+                        src={`${import.meta.env.BASE_URL}${punto.imagen.slice(1)}`}
+                        alt={punto.nombre}
+                        className="w-40 h-32 object-cover rounded-lg mt-2"
+                      />
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
+        </section>
       </main>
     </PageLayout>
   );

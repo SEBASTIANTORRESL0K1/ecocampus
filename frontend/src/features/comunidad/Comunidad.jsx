@@ -1,34 +1,134 @@
 import React from "react";
+import { Calendar, Newspaper, CalendarDays } from "lucide-react";
 import PageLayout from "../../components/layout/PageLayout";
 import { noticiasEventos } from "./noticiasEventos";
+import PageHero from "../../components/ui/PageHero";
+import SectionWrapper from "../../components/ui/SectionWrapper";
+import FeatureCard from "../../components/ui/FeatureCard";
+import useScrollReveal from "../../hooks/useScrollReveal";
+import "../../styles/scroll-animations.css";
+
+const badgeIcon = (tipo) => {
+  if (tipo === "Noticia") return <Newspaper size={14} color="#2d6a2d" strokeWidth={1.5} aria-hidden="true" />;
+  return <CalendarDays size={14} color="#2d6a2d" strokeWidth={1.5} aria-hidden="true" />;
+};
 
 const Comunidad = () => {
-  return (
-    <PageLayout>
-      {/* Encabezado */}
-      <header className="bg-gray-800 text-white text-center p-6">
-        <h2 className="text-2xl sm:text-3xl font-bold">Comunidad EcoCampus</h2>
-        <p>Mantente informado sobre eventos y noticias ambientales</p>
-      </header>
+  const { ref: heroRef, isVisible: heroVisible } = useScrollReveal();
+  const { ref: gridRef, isVisible: gridVisible } = useScrollReveal();
 
-      {/* Contenido principal */}
-      <main className="flex-grow p-6 flex flex-col items-center">
-        <section className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-          {noticiasEventos.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white border border-gray-200 rounded-lg shadow-md p-5 hover:shadow-lg transition-shadow duration-300"
-            >
-              <h3 className="text-xl font-bold text-green-700 mb-1">{item.titulo}</h3>
-              <p className="text-sm text-gray-500 italic mb-2">{item.fecha}</p>
-              <p className="text-gray-700">{item.descripcion}</p>
-              <span className="inline-block mt-3 px-3 py-1 text-sm rounded-full bg-green-100 text-green-800">
-                {item.tipo}
-              </span>
-            </div>
-          ))}
-        </section>
+  return (
+    <PageLayout navTransparent>
+      <main>
+        {/* ── Hero ── */}
+        <div
+          ref={heroRef}
+          className={`reveal${heroVisible ? " is-visible" : ""}`}
+          style={{ "--reveal-delay": "0ms" }}
+        >
+          <PageHero
+            backgroundImageUrl="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cmVjaWNsYXJ8ZW58MHx8MHx8fDA%3D"
+            backgroundSeed="comunidad"
+            eyebrow="Noticias y eventos ambientales"
+            title="Comunidad EcoCampus"
+            description="Mantente informado sobre eventos y noticias ambientales"
+            minHeight="42vh"
+          />
+        </div>
+
+        {/* ── Cards grid ── */}
+        <SectionWrapper background="var(--color-section-alt)" padding="4rem 1.5rem">
+          <div
+            ref={gridRef}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: "1.5rem",
+            }}
+            className="comunidad-cards-grid"
+          >
+            {noticiasEventos.map((item, index) => (
+              <div
+                key={item.id}
+                className={`reveal-card${gridVisible ? " is-visible" : ""}`}
+                style={{ "--reveal-delay": `${index * 80}ms` }}
+              >
+              <FeatureCard padding="1.75rem">
+                {/* Badge */}
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                    background: "#e8f4ec",
+                    color: "#2d6a2d",
+                    borderRadius: "999px",
+                    padding: "0.3rem 0.75rem",
+                    fontSize: "0.78rem",
+                    fontWeight: 600,
+                    letterSpacing: "0.04em",
+                    marginBottom: "0.9rem",
+                  }}
+                >
+                  {badgeIcon(item.tipo)}
+                  {item.tipo}
+                </div>
+
+                {/* Title */}
+                <h2
+                  style={{
+                    fontSize: "1.1rem",
+                    fontWeight: 700,
+                    color: "#2d6a2d",
+                    margin: "0 0 0.4rem",
+                    lineHeight: 1.3,
+                    textWrap: "balance",
+                  }}
+                >
+                  {item.titulo}
+                </h2>
+
+                {/* Date */}
+                <p
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    fontSize: "0.85rem",
+                    color: "#6a8a6a",
+                    fontStyle: "italic",
+                    margin: "0 0 0.85rem",
+                  }}
+                >
+                  <Calendar size={14} color="#6a8a6a" strokeWidth={1.5} aria-hidden="true" />
+                  {item.fecha}
+                </p>
+
+                {/* Description */}
+                <p
+                  style={{
+                    color: "#3a4a3a",
+                    lineHeight: 1.65,
+                    fontSize: "0.95rem",
+                    margin: 0,
+                  }}
+                >
+                  {item.descripcion}
+                </p>
+              </FeatureCard>
+              </div>
+            ))}
+          </div>
+        </SectionWrapper>
       </main>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .comunidad-cards-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </PageLayout>
   );
 };
