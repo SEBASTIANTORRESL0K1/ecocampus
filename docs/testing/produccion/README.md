@@ -15,7 +15,7 @@ Reporte de las pruebas aplicadas al sitio desplegado en Lightsail, donde si hay 
 | Rendimiento del cliente | Lighthouse 13.5.0 (3 corridas por pagina, movil y escritorio) | `resultados/lighthouse-resumen.md` y los JSON en `resultados/lighthouse/` | [Lighthouse](#rendimiento-del-cliente-lighthouse) |
 | Peticiones de red del navegador | Playwright (5 corridas en frio por pagina) | `resultados/red-resumen.md`, datos en `resultados/red.json` | [Red](#peticiones-de-red-del-navegador) |
 | Compatibilidad en navegadores y dispositivos | Playwright (5 perfiles) | `resultados/compatibilidad.json` | [Compatibilidad](#compatibilidad) |
-| Carga concurrente sobre el servidor | k6 | `resultados/produccion-ligero.json`, `resultados/produccion-medio.json` | [Carga](#carga-concurrente) |
+| Carga concurrente sobre el servidor (lectura y escritura) | k6 | `resultados/produccion-ligero.json`, `produccion-medio.json`, `produccion-escritura-ligero.json`, `produccion-escritura-medio.json` | [Carga](#carga-concurrente) |
 | Endpoints de la API evaluados | k6 y Playwright | esta seccion | [Endpoints](#endpoints-evaluados) |
 | Hardware, uso de recursos y logs del servidor | `recolectar-servidor.sh` (se ejecuta en el servidor) | `resultados/servidor.txt` | [Servidor](#servidor-hardware-logs-y-tiempos-del-backend) |
 | Georreferenciacion de los contenedores | `validar-georreferencia.mjs` | `resultados/georreferencia-validacion.md` | [Georreferenciacion](#georreferenciacion-de-los-contenedores) |
@@ -32,7 +32,8 @@ cd frontend
 npx playwright test -c playwright.produccion.config.js
 cd .. && node docs/testing/produccion/resumir-red.mjs > docs/testing/produccion/resultados/red-resumen.md
 
-# Carga (solo GET; perfiles ligero, medio y alto)
+# Carga de lectura (solo GET; perfiles ligero, medio y alto). La de escritura es loadtest/k6-produccion-escritura.js
+# (escribe filas y sesiones en produccion: borrarlas despues, ver su cabecera)
 docker run --rm -v "$(pwd -W)/loadtest:/scripts" -e BASE=http://3.143.203.113 -e PERFIL=ligero \
   grafana/k6 run --summary-export=/scripts/results/produccion-ligero.json /scripts/k6-produccion.js
 
@@ -45,7 +46,7 @@ cd /opt/ecocampus && bash docs/testing/produccion/recolectar-servidor.sh > /tmp/
 
 Lighthouse se ejecuto con `lighthouse@13.5.0` y Chrome 155 sin interfaz, perfil movil (emulacion y limitacion de red por defecto) y perfil de escritorio (`--preset=desktop`), tres corridas por pagina; la tabla muestra la mediana. El script `resumir-lighthouse.mjs` genera la tabla desde los JSON.
 
-Para evitar escrituras en la base de datos de produccion, ninguna prueba envia el cuestionario. Las de compatibilidad solo abren una sesion con el correo `prueba-playwright@ucol.mx` (queda una fila temporal en la tabla de sesiones, sin datos del estudio).
+Las pruebas de compatibilidad y de lectura no envian el cuestionario: solo abren, como mucho, una sesion con el correo `prueba-playwright@ucol.mx`. Unicamente la prueba de escritura (k6) guarda filas.
 
 ## Rendimiento del cliente (Lighthouse)
 
@@ -106,7 +107,7 @@ Durante esta ejecucion se detecto que el titulo del mapa cambio a "Mapa de Recic
 
 ## Carga concurrente
 
-k6 desde el mismo equipo, `loadtest/k6-produccion.js`, **solo lecturas** (`GET`), para no escribir en la base de datos ni gastar la cuota de transferencia. No pide las fotos de los contenedores. Cada usuario virtual repite: inicio, calculadora, mapa, JS, CSS y `/api/me`, con 1 s de pausa.
+k6 desde el mismo equipo, `loadtest/k6-produccion.js`, **solo lecturas** (`GET`) para no gastar la cuota de transferencia. No pide las fotos de los contenedores. Cada usuario virtual repite: inicio, calculadora, mapa, JS, CSS y `/api/me`, con 1 s de pausa.
 
 | Perfil | Usuarios virtuales (maximo) | Duracion | Peticiones | Por segundo | Fallos | Media (ms) | p95 (ms) | p99 (ms) | Maximo (ms) | Datos recibidos |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -115,7 +116,22 @@ k6 desde el mismo equipo, `loadtest/k6-produccion.js`, **solo lecturas** (`GET`)
 
 Mediana por endpoint en el perfil medio: inicio 64 ms, calculadora 64 ms, mapa 64 ms, CSS 68 ms, `/api/me` 65 ms y el JS principal 192 ms (el unico mayor porque pesa mas). El p95 de todos queda por debajo de 215 ms y todos los umbrales de k6 se cumplieron (fallos por debajo de 1 %, p95 por debajo de 1.5 s).
 
-Con 3 veces mas usuarios el tiempo de respuesta no aumento: el servidor no llego a su limite en estos perfiles. No se probo el perfil `alto` (60 usuarios) ni se midio la escritura (`POST /api/respuestas`): la escritura necesitaria abrir sesiones y guardar filas en la base de produccion, asi que conviene hacerla en el entorno aislado de pruebas de carga (`docs/testing/rendimiento.md`) y no sobre el servidor real. Esas mediciones locales siguen vigentes, pero hay que repetirlas con el acceso por correo (ver la nota en ese documento).
+Con 3 veces mas usuarios el tiempo de respuesta no aumento: el servidor no llego a su limite en estos perfiles.
+
+### Escritura (`POST /api/respuestas`)
+
+Con autorizacion de la tesista, que borrara los datos despues, se midio la escritura sobre produccion: `loadtest/k6-produccion-escritura.js`. Cada iteracion abre una sesion con un correo unico (`k6-carga-<usuario>-<iteracion>-<marca>@ucol.mx`, con `POST /api/acceso/correo`) y envia un cuestionario valido, con 1 s de pausa. Escribe una fila en `respuestas` y una sesion en `sessions` por iteracion.
+
+| Perfil | Usuarios virtuales (maximo) | Duracion | Respuestas guardadas | Peticiones por segundo | Fallos | Acceso por correo: media / p95 / max (ms) | Envio: media / p95 / max (ms) |
+| :--- | ---: | ---: | ---: | ---: | ---: | :--- | :--- |
+| ligero | 10 | 1 min 20 s | 366 | 9.1 | 0.00 % | 115 / 153 / 201 | 98 / 117 / 140 |
+| medio | 30 | 1 min 50 s | 1611 | 29.2 | 0.00 % | 80 / 125 / 230 | 79 / 102 / 183 |
+
+- Todas las respuestas se guardaron (codigo 201) y todos los accesos dieron 200; no hubo 4xx, 5xx ni duplicados. Los umbrales de k6 (fallos por debajo de 1 %, p95 por debajo de 1.5 s) se cumplieron.
+- Se escribieron 1977 filas en total (366 + 1611). Cada envio completo (acceso mas guardado) tarda alrededor de 200 ms en el cliente, incluidos ~65 ms de red por peticion.
+- El ritmo maximo probado fue de unos 14.6 respuestas guardadas por segundo con 30 usuarios; un estudio real tendra muchisimo menos simultaneidad.
+- Los filtros de limpieza estan al inicio del script: `DELETE FROM respuestas WHERE correo LIKE 'k6-carga-%';` y `DELETE FROM sessions;` (la segunda tambien cierra las sesiones de cualquier persona conectada en ese momento).
+- No se probo un perfil mayor. Si se necesita, `k6-produccion.js` (lectura) tiene el perfil `alto`, pero conviene hacerlo en el entorno aislado de pruebas de carga.
 
 ## Endpoints evaluados
 
@@ -124,12 +140,12 @@ La API de produccion se expone solo a traves del proxy; `/health` y `/docs` no s
 | Endpoint | Metodo | Se evaluo con | Resultado |
 | :--- | :--- | :--- | :--- |
 | `/api/me` | GET | k6 (carga) y Playwright | 200 en todas las peticiones; media 65 ms |
-| `/api/acceso/correo` | POST | Playwright | 403 con dominio ajeno; 200 con `@ucol.mx` |
-| `/api/respuestas` | POST | Playwright (sin sesion) | 401 sin sesion; no se envio ninguna respuesta |
+| `/api/acceso/correo` | POST | Playwright y k6 (escritura) | 403 con dominio ajeno; 200 con `@ucol.mx` en las 1977 iteraciones de carga |
+| `/api/respuestas` | POST | Playwright (sin sesion) y k6 (escritura) | 401 sin sesion; 201 en las 1977 escrituras de carga |
 | `/ecocampus/`, `/calculadora`, `/mapa` | GET | k6 y Lighthouse | 200; media 64 ms |
 | Archivos JS y CSS | GET | k6 | 200; JS 192 ms, CSS 68 ms |
 
-Numero de peticiones del experimento de carga: 1741 (ligero) y 7363 (medio), todas con codigo 2xx.
+Numero de peticiones de las pruebas de carga: lectura 1741 (ligero) y 7363 (medio); escritura 732 (ligero) y 3222 (medio). Todas con el codigo esperado.
 
 ## Servidor: hardware, logs y tiempos del backend
 
