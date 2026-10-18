@@ -18,7 +18,7 @@ const textoAbierto = z
   .transform((s) => (s === "" ? null : s));
 
 // Las claves son los ids de pregunta del cuestionario (frontend/src/config/experiment.js).
-const respuestasSchema = z.object({
+export const respuestasSchema = z.object({
   "1": entero(15, 99), // edad
   S1: z.enum(SEXO),
   "2": z.enum(CARRERA),

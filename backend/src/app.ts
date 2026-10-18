@@ -8,6 +8,7 @@ import { crearEstrategiaSaml } from "./auth/saml";
 import type { PerfilSaml } from "./auth/tipos";
 import { log } from "./logger";
 import { rutasAuth } from "./routes/auth";
+import { rutasDocs } from "./routes/docs";
 import { rutasRespuestas } from "./routes/respuestas";
 import { rutasSalud } from "./routes/salud";
 
@@ -53,6 +54,7 @@ export function crearApp({ config, pool, almacenSesiones }: DependenciasApp): Ex
 
   app.use(rutasAuth(config, estrategia));
   app.use(rutasSalud(pool));
+  app.use(rutasDocs(config));
   app.use(rutasRespuestas(config, pool));
 
   app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
