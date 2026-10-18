@@ -131,6 +131,7 @@ docker compose up --build        # el .env ya indica COMPOSE_FILE (base + dev)
 | :--- | :--- |
 | Frontend (Vite, recarga en vivo) | http://localhost:5173/ecocampus/ |
 | Backend (TypeScript con nodemon, reinicia al guardar) | http://localhost:4006 (`/health`, `/Metadata`) |
+| Documentación de la API (Swagger UI) | http://localhost:4006/docs (la especificación en JSON: `/openapi.json`) |
 | Adminer (consulta y exporta a CSV) | http://localhost:8081, servidor `db`, usuario `ecocampus`, base `ecocampus` |
 | phpMyAdmin | http://localhost:8082, usuario `ecocampus` y la `MYSQL_PASSWORD` de tu `.env` (`root` usa `MYSQL_ROOT_PASSWORD`) |
 | MySQL desde tu equipo | 127.0.0.1:3307 |
@@ -169,6 +170,7 @@ backend/src/
   auth/                estrategia SAML, perfil de la UCOL y derivación del participante
   routes/              auth, respuestas y salud
   validacion/          esquema Zod de las respuestas: valida y genera el tipo de la fila a insertar
+  openapi/             especificación OpenAPI de la API y el generador de docs/openapi.json
   db.ts, logger.ts
 ```
 
@@ -178,7 +180,22 @@ backend/src/
 | `npm run typecheck` | Comprueba los tipos sin generar archivos |
 | `npm test` | Pruebas unitarias y de rutas (no necesitan MySQL ni el IdP) |
 | `npm run build` | Compila a `dist/` |
+| `npm run openapi` | Regenera `docs/openapi.json` a partir de la especificación en el código |
 | `npm start` | Ejecuta el JavaScript compilado (lo que corre producción) |
+
+### API (OpenAPI)
+
+La API está documentada con OpenAPI 3.1 (12 operaciones en tres grupos: respuestas, autenticación y sistema).
+
+| Dónde | Qué |
+| :--- | :--- |
+| `docs/openapi.json` | Copia versionada de la especificación; se puede abrir en [editor.swagger.io](https://editor.swagger.io/) sin ejecutar nada |
+| `http://localhost:4006/docs` | Swagger UI interactiva (solo en desarrollo; permite probar las rutas) |
+| `http://localhost:4006/openapi.json` | La especificación servida por el backend |
+
+- La especificación vive en el código (`backend/src/openapi/especificacion.ts`) y reutiliza las opciones y límites de la validación, así que no duplica valores.
+- Las pruebas fallan si la documentación se desalinea del código: cada ruta registrada en Express debe estar documentada, los campos obligatorios deben coincidir con el esquema Zod, el ejemplo debe ser una petición válida y `docs/openapi.json` debe estar al día. Si cambias una ruta o una respuesta, actualiza la especificación y ejecuta `npm run openapi` en `backend/`.
+- En producción la interfaz `/docs` no se monta (Swagger es una dependencia de desarrollo y no va en la imagen) y el proxy tampoco enruta `/openapi.json`; la especificación queda disponible en el repositorio.
 
 ## Producción
 

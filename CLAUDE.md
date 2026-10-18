@@ -101,6 +101,7 @@ El login usa la configuracion y los certificados de desarrollo que proporciono e
 - Comandos desde `backend/`: `npm run typecheck`, `npm test` (28+ pruebas, sin MySQL ni IdP), `npm run build`, `npm run dev`. El CI tiene un job `backend` con typecheck, pruebas y build.
 - La configuracion se valida en `src/config/cargar.ts`; una variable nueva se agrega ahi y tambien al compose y a las tres plantillas `.env.*.example`. La identidad del participante se deriva en el servidor (`src/auth/participante.ts`); el correo nunca sale hacia el navegador.
 - El esquema de las respuestas (`src/validacion/respuestas.ts`) define a la vez la validacion y el tipo de la fila de MySQL; si cambia `db/schema.sql`, cambian ambos y la lista `COLUMNAS`.
+- La API esta documentada con OpenAPI en `backend/src/openapi/especificacion.ts` (copia en `docs/openapi.json`; `npm run openapi` la regenera; Swagger UI en `/docs` solo fuera de produccion). Toda ruta nueva o cambio en una respuesta se refleja ahi: las pruebas fallan si la especificacion se desalinea de las rutas de Express o del esquema Zod, o si `docs/openapi.json` esta desactualizado.
 - Tras cambiar dependencias, recrear el contenedor de desarrollo con `docker compose up -d --build -V` (renueva el volumen de `node_modules`).
 - Node 22 en las imagenes y en el CI.
 
