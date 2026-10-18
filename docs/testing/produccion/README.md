@@ -109,7 +109,7 @@ Porcentaje de fallos: 10 de 565 peticiones (1.8 %), todas la misma imagen extern
 
 ## Compatibilidad
 
-Playwright 1.63, mismas pruebas de las vistas publicas que `docs/testing/compatibilidad.md`, ahora contra el servidor. Resultado: **41 de 41 correctas** (40 de compatibilidad y 1 de registro de red), 2 min 53 s.
+Playwright 1.63, mismas pruebas de las vistas publicas que `frontend/e2e/compatibilidad.spec.js`, ahora contra el servidor. Resultado: **41 de 41 correctas** (40 de compatibilidad y 1 de registro de red), 2 min 53 s.
 
 | Proyecto | Motor y version | Sistema (agente de usuario) | Ventana | Tactil |
 | :--- | :--- | :--- | :--- | :--- |
@@ -153,7 +153,7 @@ Con autorizacion de la tesista, que borrara los datos despues, se midio la escri
 - Se escribieron 1977 filas en total (366 + 1611). Cada envio completo (acceso mas guardado) tarda alrededor de 200 ms en el cliente, incluidos ~65 ms de red por peticion.
 - El ritmo maximo probado fue de unos 14.6 respuestas guardadas por segundo con 30 usuarios; un estudio real tendra muchisimo menos simultaneidad.
 - Los filtros de limpieza estan al inicio del script: `DELETE FROM respuestas WHERE correo LIKE 'k6-carga-%';` y `DELETE FROM sessions;` (la segunda tambien cierra las sesiones de cualquier persona conectada en ese momento).
-- Con 100 usuarios (perfil `cien`, 17:33 a 17:40 UTC) se guardaron 10 989 respuestas mas, todas con codigo 201, sin fallos y sin que los tiempos crecieran; el consumo de CPU y memoria del servidor en esa prueba esta en [CPU y memoria durante 100 usuarios simultaneos](#cpu-y-memoria-durante-100-usuarios-simultaneos). No se probo un perfil mayor; conviene hacerlo en el entorno aislado de pruebas de carga.
+- Con 100 usuarios (perfil `cien`, 17:33 a 17:40 UTC) se guardaron 10 989 respuestas mas, todas con codigo 201, sin fallos y sin que los tiempos crecieran; el consumo de CPU y memoria del servidor en esa prueba esta en [CPU y memoria durante 100 usuarios simultaneos](#cpu-y-memoria-durante-100-usuarios-simultaneos). No se probo un perfil mayor.
 
 ## Endpoints evaluados
 

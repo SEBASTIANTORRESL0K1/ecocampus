@@ -1,4 +1,4 @@
-// Prueba de carga de Ecocampus con k6. Ver docs/testing/rendimiento.md.
+// Prueba de carga de Ecocampus con k6. Ver docs/testing/produccion/README.md (las pruebas medidas estan en el servidor de produccion).
 // Ejecucion (red del compose de pruebas):
 //   docker run --rm --network ecocampus-loadtest_default -v <repo>/loadtest:/scripts grafana/k6 run \
 //     --summary-export=/scripts/results/resumen.json /scripts/k6.js

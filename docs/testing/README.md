@@ -34,7 +34,7 @@ npm run test:e2e
 npx playwright test e2e/compatibilidad.spec.js
 ```
 
-Los comandos anteriores se ejecutan desde el directorio `frontend/`. Las pruebas del backend (validacion de respuestas) se ejecutan con `npm test` desde `backend/`. Las pruebas de carga se describen en [rendimiento.md](./rendimiento.md). Las pruebas contra el servidor de produccion (Lightsail: Lighthouse, red, compatibilidad, carga, servidor y georreferenciacion) estan en [produccion/README.md](./produccion/README.md).
+Los comandos anteriores se ejecutan desde el directorio `frontend/`. Las pruebas del backend (validacion de respuestas) se ejecutan con `npm test` desde `backend/`. Las pruebas de carga contra el servidor se describen en [rendimiento.md](./rendimiento.md). Las pruebas contra el servidor de produccion (Lightsail: Lighthouse, red, compatibilidad, carga, servidor y georreferenciacion) estan en [produccion/README.md](./produccion/README.md).
 
 ---
 
@@ -62,7 +62,7 @@ Archivos existentes:
 | Archivo | Que cubre |
 |---------|-----------|
 | `frontend/e2e/calculadora.spec.js` | Navegacion, flujos completos y validaciones de la calculadora (solo en `chromium`) |
-| `frontend/e2e/compatibilidad.spec.js` | Vistas publicas en Chromium, Firefox, WebKit, Pixel 7 y iPhone 14; ver [compatibilidad.md](./compatibilidad.md) |
+| `frontend/e2e/compatibilidad.spec.js` | Vistas publicas en Chromium, Firefox, WebKit, Pixel 7 y iPhone 14 contra un servidor de desarrollo; el equivalente contra el servidor de produccion esta en `frontend/e2e-produccion/` y en [produccion/README.md](./produccion/README.md#compatibilidad) |
 
 ### Pruebas del backend
 
@@ -77,7 +77,7 @@ Se ejecutan con `npm test` desde `backend/` (corren TypeScript con `tsx`, sin My
 
 ### Pruebas de carga
 
-Script `loadtest/k6.js` (k6) sobre un entorno Docker aislado: `docker-compose.loadtest.yml`. Resultados y metodologia en [rendimiento.md](./rendimiento.md).
+Scripts de k6 en `loadtest/` (`k6-produccion.js` y `k6-produccion-escritura.js`) contra el servidor de produccion. Resultados y metodologia en [rendimiento.md](./rendimiento.md).
 
 ---
 
@@ -93,5 +93,5 @@ Script `loadtest/k6.js` (k6) sobre un entorno Docker aislado: `docker-compose.lo
 
 - [Guia de pruebas de componentes con Vitest](./vitest-guidelines.md)
 - [Guia de pruebas E2E con Playwright](./playwright-e2e.md)
-- [Pruebas de rendimiento (k6)](./rendimiento.md)
-- [Pruebas de compatibilidad (navegadores y dispositivos)](./compatibilidad.md)
+- [Pruebas de carga (k6) sobre el servidor de produccion](./rendimiento.md)
+- [Pruebas sobre el servidor de produccion (Lighthouse, red, compatibilidad, servidor)](./produccion/README.md)

@@ -71,7 +71,7 @@ ecocampus/
 ├── docs/
 │   ├── README.md                # documentación general
 │   ├── vista_1_inicio.md ... vista_5_guia_reciclaje.md   # una por vista
-│   └── testing/                 # guías de pruebas, rendimiento.md y compatibilidad.md
+│   └── testing/                 # guías de pruebas y reportes del servidor de producción
 └── frontend/
     ├── index.html               # entrada de Vite (carga /src/index.jsx)
     ├── vite.config.js           # plugins, base /ecocampus/ y configuración de Vitest
@@ -293,7 +293,7 @@ docker compose start
 
 - En Linux o macOS se usa `$(pwd)` en lugar de `$(pwd -W)` y no hace falta `MSYS_NO_PATHCONV`.
 - Perfiles: `carga` (hasta 100 usuarios virtuales, 3 min 21 s) y `estres` (hasta 300).
-- El script es `loadtest/k6.js`. Los resultados medidos están en `loadtest/results/` y su análisis (ambiente, distribución de tiempos, recursos y limitaciones) en [docs/testing/rendimiento.md](docs/testing/rendimiento.md).
+- El script es `loadtest/k6.js`. Sirve para repetir pruebas sin tocar el servidor real. Los resultados medidos y su análisis son los del servidor de producción, en [docs/testing/rendimiento.md](docs/testing/rendimiento.md) y [docs/testing/produccion/](docs/testing/produccion/README.md).
 - `.env.loadtest` no se versiona. Las pruebas de carga corren contra el backend compilado (etapa `prod` del Dockerfile).
 
 ## Sitio público (GitHub Pages)
@@ -309,7 +309,7 @@ La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `b
 | Frontend: componentes y unitarias | Vitest (jsdom, globals, setup en `src/setupTests.js`), junto al código (`*.test.jsx` / `*.test.js`). `npm test` en `frontend/` |
 | Backend: validación, configuración y rutas | `node:test` con `tsx` en `backend/src/**/*.test.ts`. `npm test` en `backend/` (no necesita MySQL ni el IdP) |
 | E2E de la calculadora | Playwright en Chromium: `frontend/e2e/calculadora.spec.js` |
-| Compatibilidad | Playwright en Chromium, Firefox, WebKit, Pixel 7 e iPhone 14: `frontend/e2e/compatibilidad.spec.js` (resultados en [docs/testing/compatibilidad.md](docs/testing/compatibilidad.md)) |
+| Compatibilidad | Playwright en Chromium, Firefox, WebKit, Pixel 7 e iPhone 14: `frontend/e2e/compatibilidad.spec.js` (resultados contra el servidor de producción en [docs/testing/produccion/](docs/testing/produccion/README.md#compatibilidad)) |
 | Carga | k6, ver [Pruebas de carga](#pruebas-de-carga) |
 
 - Antes de la primera ejecución de Playwright hay que instalar los navegadores: `npx playwright install chromium firefox webkit`.
@@ -322,4 +322,4 @@ La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `b
 - [docs/README.md](docs/README.md) — documentación general del proyecto
 - Una guía por vista: [Inicio](docs/vista_1_inicio.md), [Calculadora](docs/vista_2_calculadora.md), [Mapa](docs/vista_3_mapa.md), [Comunidad](docs/vista_4_comunidad.md), [Guía de reciclaje](docs/vista_5_guia_reciclaje.md)
 - [Despliegue automático en AWS Lightsail](docs/despliegue-lightsail.md)
-- Pruebas: [docs/testing/](docs/testing/README.md), con [rendimiento](docs/testing/rendimiento.md) y [compatibilidad](docs/testing/compatibilidad.md)
+- Pruebas: [docs/testing/](docs/testing/README.md), con [rendimiento](docs/testing/rendimiento.md) y el [reporte del servidor de producción](docs/testing/produccion/README.md)
