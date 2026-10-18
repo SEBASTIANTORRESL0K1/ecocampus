@@ -8,7 +8,7 @@ const Navbar = ({ transparent = false }) => {
 
   const navBase = transparent
     ? "absolute top-0 left-0 right-0 z-50 bg-transparent"
-    : "relative bg-lime-600";
+    : "relative bg-lime-600 z-50";
 
   const linkClass = (to) => {
     const isActive = pathname === to;
