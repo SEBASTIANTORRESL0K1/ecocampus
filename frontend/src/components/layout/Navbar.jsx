@@ -70,8 +70,8 @@ const Navbar = ({ transparent = false }) => {
   const bgClass = atTop
     ? transparent
       ? "bg-transparent"
-      : "bg-lime-600/80 backdrop-blur-sm"
-    : "bg-lime-600";
+      : "bg-[#046E3B]/80 backdrop-blur-sm"
+    : "bg-[#046E3B]";
 
   const visibilityClass = visible ? "translate-y-0" : "-translate-y-full";
 
@@ -91,7 +91,7 @@ const Navbar = ({ transparent = false }) => {
 
   const mobileMenuBg = transparent
     ? "bg-black/70 backdrop-blur-sm"
-    : "bg-lime-700";
+    : "bg-[#035530]";
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 ${bgClass} ${visibilityClass} transition-transform duration-300 ease-in-out text-white px-8 h-16`}>
