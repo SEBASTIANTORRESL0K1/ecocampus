@@ -32,7 +32,7 @@ npm run test:e2e
 npx playwright test e2e/compatibilidad.spec.js
 ```
 
-Los comandos anteriores se ejecutan desde el directorio `frontend/`. Las pruebas del backend (validacion de respuestas) se ejecutan con `npm test` desde `backend/`. Las pruebas de carga se describen en [rendimiento.md](./rendimiento.md).
+Los comandos anteriores se ejecutan desde el directorio `frontend/`. Las pruebas del backend (validacion de respuestas) se ejecutan con `npm test` desde `backend/`. Las pruebas de carga se describen en [rendimiento.md](./rendimiento.md). Las pruebas contra el servidor de produccion (Lightsail: Lighthouse, red, compatibilidad, carga, servidor y georreferenciacion) estan en [produccion/README.md](./produccion/README.md).
 
 ---
 
