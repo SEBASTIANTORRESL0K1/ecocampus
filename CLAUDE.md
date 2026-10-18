@@ -38,8 +38,8 @@ Antes de realizar cualquier cambio en pruebas (componentes o E2E), leer el archi
 | Inicio rapido, filosofia, cuando agregar pruebas | `docs/testing/README.md` |
 | Pruebas de componentes con Vitest | `docs/testing/vitest-guidelines.md` |
 | Pruebas E2E con Playwright | `docs/testing/playwright-e2e.md` |
-| Pruebas de rendimiento (k6) | `docs/testing/rendimiento.md` |
-| Pruebas de compatibilidad (navegadores y dispositivos) | `docs/testing/compatibilidad.md` |
+| Pruebas de carga (k6) sobre el servidor de produccion | `docs/testing/rendimiento.md` |
+| Compatibilidad (navegadores y dispositivos) y demas pruebas de produccion | `docs/testing/produccion/README.md` |
 | Indice de pruebas y respuesta a la revision | `docs/testing/index.md` |
 | Pruebas sobre el servidor de produccion (Lightsail) | `docs/testing/produccion/README.md` |
 
@@ -127,4 +127,4 @@ Esta dividido en `docker-compose.yml` (base comun), `docker-compose.dev.yml` y `
 - Pruebas del backend: `cd backend && npm test`. Pruebas del frontend: `cd frontend && npx vitest run`.
 - Dos pruebas de imagen de `Calculadora.test.jsx` fallan tambien en `main`; no son regresiones.
 - E2E y compatibilidad (Playwright): `cd frontend && npx playwright test`. Usa su propio servidor en el puerto 5174 con `VITE_API_URL` vacia y `VITE_EXPERIMENTO_ACTIVO=false`.
-- Carga (k6): `loadtest/k6.js` con `docker-compose.loadtest.yml`; el procedimiento esta en `docs/testing/rendimiento.md`. El equipo del usuario tiene poca RAM libre: detener el stack de desarrollo (`docker compose stop`) antes y no ejecutar a la vez pruebas pesadas.
+- Carga (k6): `loadtest/k6.js` con `docker-compose.loadtest.yml`; el procedimiento contra produccion esta en `docs/testing/rendimiento.md` y `docs/testing/produccion/README.md`. El equipo del usuario tiene poca RAM libre: detener el stack de desarrollo (`docker compose stop`) antes y no ejecutar a la vez pruebas pesadas.
