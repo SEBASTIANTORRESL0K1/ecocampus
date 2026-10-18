@@ -402,6 +402,66 @@ describe("Calculadora - persistencia en localStorage", () => {
 	});
 });
 
+describe("Calculadora - paso habitantesHogar", () => {
+	// Secciones A (Q1-Q15) y B (Q16-Q20) suman 20 pasos; habitantesHogar es el índice 20.
+	const irAHabitantes = () => {
+		localStorage.setItem(
+			CLAVE_PROGRESO,
+			JSON.stringify({
+				version: 1,
+				pasoActual: 20,
+				respuestas: { 1: 27, habitantesHogar: 1 },
+				verResultado: false,
+			}),
+		);
+		renderCalculadora();
+	};
+
+	test("Siguiente esta habilitado sin necesidad de interaccion", () => {
+		irAHabitantes();
+		expect(screen.getByRole("button", { name: "Siguiente" })).toBeEnabled();
+		expect(
+			screen.queryByText("Selecciona una opción para continuar."),
+		).not.toBeInTheDocument();
+	});
+
+	test("limpiar el campo no resetea al valor 1 mientras se escribe", () => {
+		irAHabitantes();
+		const input = screen.getByRole("spinbutton");
+		expect(input).toHaveValue(1);
+
+		fireEvent.change(input, { target: { value: "" } });
+		// Antes del fix el input volvía a 1 inmediatamente; ahora debe quedar vacío.
+		expect(input).toHaveValue(null);
+	});
+
+	test("acepta un numero mayor que 1", () => {
+		irAHabitantes();
+		const input = screen.getByRole("spinbutton");
+
+		fireEvent.change(input, { target: { value: "4" } });
+		expect(input).toHaveValue(4);
+	});
+
+	test("al perder el foco con campo vacio corrige a 1", () => {
+		irAHabitantes();
+		const input = screen.getByRole("spinbutton");
+
+		fireEvent.change(input, { target: { value: "" } });
+		fireEvent.blur(input);
+		expect(input).toHaveValue(1);
+	});
+
+	test("al perder el foco con valor por debajo de 1 corrige a 1", () => {
+		irAHabitantes();
+		const input = screen.getByRole("spinbutton");
+
+		fireEvent.change(input, { target: { value: "0" } });
+		fireEvent.blur(input);
+		expect(input).toHaveValue(1);
+	});
+});
+
 describe("pasoRespondido", () => {
 	const pasoUnica = { tipo: "unica", pregunta: { id: 3 } };
 	const pasoQ21 = { tipo: "multipleCheckbox", pregunta: { id: 21 } };
