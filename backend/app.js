@@ -21,6 +21,20 @@ const REQUIERE_LOGIN = process.env.REQUIERE_LOGIN !== "false";
 const COOKIE_SECURE = process.env.COOKIE_SECURE === "true";
 const TRUST_PROXY = process.env.TRUST_PROXY === "true";
 
+// SAML: los valores por defecto son los de desarrollo que entrego el asesor (UCOL). En produccion se
+// sobrescriben con variables de entorno (EntityID, callback y certificados propios de sistemas@ucol.mx).
+const SAML_ISSUER_DEV = "http://localhost/20166932";
+const SAML = {
+  issuer: process.env.SAML_ISSUER || SAML_ISSUER_DEV,
+  callbackUrl: process.env.SAML_CALLBACK_URL || "http://localhost:4006/login/callback",
+  logoutCallbackUrl: process.env.SAML_LOGOUT_CALLBACK_URL || "http://localhost:4006/logout/callback",
+  entryPoint: process.env.SAML_ENTRY_POINT || "https://wayf.ucol.mx/saml2/idp/SSOService.php",
+  logoutUrl: process.env.SAML_LOGOUT_URL || "https://wayf.ucol.mx/saml2/idp/SingleLogoutService.php",
+  certDir: process.env.SAML_CERT_DIR || __dirname + "/cert",
+  // -1 desactiva la validacion de timestamps (desfase de reloj del IdP de UCOL); en produccion usar el desfase real en ms.
+  clockSkewMs: process.env.SAML_CLOCK_SKEW_MS ? Number(process.env.SAML_CLOCK_SKEW_MS) : -1,
+};
+
 // Logs con hora y nivel. Nunca se registran correos, nombres, cuentas ni respuestas SAML completas.
 function log(nivel, mensaje, extra) {
   const linea = `${new Date().toISOString()} [${nivel.toUpperCase()}] ${mensaje}`;
@@ -49,16 +63,14 @@ passport.deserializeUser((user, done) => done(null, user));
 
 const samlStrategy = new saml.Strategy(
   {
-    callbackUrl: "http://localhost:4006/login/callback",
-    entryPoint: "https://wayf.ucol.mx/saml2/idp/SSOService.php",
-    logoutUrl: "https://wayf.ucol.mx/saml2/idp/SingleLogoutService.php",
-    logoutCallbackUrl: "http://localhost:4006/logout/callback",
-    issuer: "http://localhost/20166932",
-    decryptionPvk: fs.readFileSync(__dirname + "/cert/key.pem", "utf8"),
-    idpCert: fs.readFileSync(__dirname + "/cert/idp.crt", "utf8"),
-    // El IdP de UCOL tiene desfase de reloj; -1 desactiva la validacion de timestamps.
-    // En produccion usar el desfase real en ms.
-    acceptedClockSkewMs: -1,
+    callbackUrl: SAML.callbackUrl,
+    entryPoint: SAML.entryPoint,
+    logoutUrl: SAML.logoutUrl,
+    logoutCallbackUrl: SAML.logoutCallbackUrl,
+    issuer: SAML.issuer,
+    decryptionPvk: fs.readFileSync(SAML.certDir + "/key.pem", "utf8"),
+    idpCert: fs.readFileSync(SAML.certDir + "/idp.crt", "utf8"),
+    acceptedClockSkewMs: SAML.clockSkewMs,
   },
   (profile, done) => done(null, profile)
 );
@@ -206,7 +218,7 @@ app.get("/login/fail", (_req, res) => res.status(401).send("Login failed"));
 
 app.get("/Metadata", (_req, res) => {
   res.type("application/xml");
-  res.send(samlStrategy.generateServiceProviderMetadata(fs.readFileSync(__dirname + "/cert/cert.pem", "utf8")));
+  res.send(samlStrategy.generateServiceProviderMetadata(fs.readFileSync(SAML.certDir + "/cert.pem", "utf8")));
 });
 
 app.use((err, req, res, _next) => {
@@ -219,6 +231,9 @@ esperarBD(pool, log)
     app.listen(PORT, () => {
       log("info", `Backend escuchando en http://localhost:${PORT} (MySQL conectado)`);
       log("info", `FRONTEND_URL=${FRONTEND_URL} (origen CORS: ${FRONTEND_ORIGIN}) REQUIERE_LOGIN=${REQUIERE_LOGIN}`);
+      if (process.env.NODE_ENV === "production" && SAML.issuer === SAML_ISSUER_DEV) {
+        log("warn", "Produccion con el EntityID de desarrollo: el login solo funciona con callback en localhost:4006");
+      }
       if (!process.env.SESSION_SECRET || !process.env.ID_SALT) {
         log("warn", "SESSION_SECRET o ID_SALT no definidos: usando valores de desarrollo");
       }

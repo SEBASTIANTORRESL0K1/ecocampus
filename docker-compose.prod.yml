@@ -1,0 +1,99 @@
+# Produccion: imagenes construidas (sin codigo montado), MySQL sin puertos publicados y un unico
+# punto de entrada (Caddy) que reparte el trafico al frontend y al backend.
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Herramientas de base de datos (solo 127.0.0.1, acceder por tunel SSH):
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile tools up -d
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  backend:
+    build:
+      context: ./backend
+      target: prod
+    logging: *logging
+    environment:
+      NODE_ENV: production
+      FRONTEND_URL: ${PUBLIC_URL:?define PUBLIC_URL en .env}/ecocampus/calculadora
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUST_PROXY: "true"
+      # Los callbacks SAML son rutas del propio sitio (las reenvia Caddy al backend)
+      SAML_CALLBACK_URL: ${SAML_CALLBACK_URL:-${PUBLIC_URL}/login/callback}
+      SAML_LOGOUT_CALLBACK_URL: ${SAML_LOGOUT_CALLBACK_URL:-${PUBLIC_URL}/logout/callback}
+    volumes:
+      # Certificados SAML propios del servidor, fuera del repositorio. Por defecto usa los de desarrollo.
+      - ${SAML_CERT_HOST_DIR:-./backend/cert}:/app/cert:ro
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # El navegador llama a la API por el mismo origen del sitio (Caddy la reenvia al backend)
+        VITE_API_URL: ${PUBLIC_URL:?define PUBLIC_URL en .env}
+        VITE_EXPERIMENTO_ACTIVO: ${EXPERIMENTO_ACTIVO:-true}
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    environment:
+      # Sin dominio: ":80" (HTTP). Con dominio: pon el dominio y Caddy activa HTTPS solo.
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  adminer:
+    image: adminer:4
+    profiles: ["tools"]
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "127.0.0.1:8081:8080"
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    profiles: ["tools"]
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "127.0.0.1:8082:80"
+
+volumes:
+  caddy_data:
+  caddy_config:

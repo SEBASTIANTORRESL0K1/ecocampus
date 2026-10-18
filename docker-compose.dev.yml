@@ -1,0 +1,57 @@
+# Desarrollo: recarga en vivo, puertos abiertos hacia tu maquina y herramientas de base de datos.
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+services:
+  db:
+    ports:
+      - "127.0.0.1:3307:3306"
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    environment:
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173/ecocampus/calculadora}
+      COOKIE_SECURE: "false"
+      TRUST_PROXY: "false"
+    volumes:
+      # Codigo y certificados de desarrollo montados; node_modules queda el de la imagen (Linux)
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "4006:4006"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      VITE_API_URL: ${API_URL:-http://localhost:4006}
+      VITE_EXPERIMENTO_ACTIVO: ${EXPERIMENTO_ACTIVO:-true}
+      VITE_USE_POLLING: "true"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+
+  adminer:
+    image: adminer:4
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "127.0.0.1:8081:8080"
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "127.0.0.1:8082:80"

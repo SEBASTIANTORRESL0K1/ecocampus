@@ -1,3 +1,7 @@
+# Base comun a todos los entornos. No se usa sola: se combina con un archivo de entorno.
+#   Desarrollo:  docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#   Produccion:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# (o define COMPOSE_FILE en .env; ver .env.dev.example y .env.prod.example)
 services:
   db:
     image: mysql:8.0
@@ -11,8 +15,6 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-    ports:
-      - "127.0.0.1:3307:3306"
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 5s
@@ -33,14 +35,14 @@ services:
       DB_NAME: ecocampus
       SESSION_SECRET: ${SESSION_SECRET:?define SESSION_SECRET en .env}
       ID_SALT: ${ID_SALT:?define ID_SALT en .env}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080/ecocampus/calculadora}
       REQUIERE_LOGIN: ${REQUIERE_LOGIN:-true}
-      COOKIE_SECURE: ${COOKIE_SECURE:-false}
-      TRUST_PROXY: ${TRUST_PROXY:-false}
-    volumes:
-      - ./backend/cert:/app/cert:ro
-    ports:
-      - "4006:4006"
+      # SAML: vacio = valores de desarrollo del asesor (ver backend/app.js)
+      SAML_ISSUER: ${SAML_ISSUER:-}
+      SAML_CALLBACK_URL: ${SAML_CALLBACK_URL:-}
+      SAML_LOGOUT_CALLBACK_URL: ${SAML_LOGOUT_CALLBACK_URL:-}
+      SAML_ENTRY_POINT: ${SAML_ENTRY_POINT:-}
+      SAML_LOGOUT_URL: ${SAML_LOGOUT_URL:-}
+      SAML_CLOCK_SKEW_MS: ${SAML_CLOCK_SKEW_MS:-}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:4006/health || exit 1"]
       interval: 10s
@@ -49,38 +51,9 @@ services:
       start_period: 15s
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_API_URL: ${API_URL:-http://localhost:4006}
-        VITE_EXPERIMENTO_ACTIVO: "true"
     restart: unless-stopped
     depends_on:
       - backend
-    ports:
-      - "8080:80"
-
-  adminer:
-    image: adminer:4
-    restart: unless-stopped
-    depends_on:
-      - db
-    environment:
-      ADMINER_DEFAULT_SERVER: db
-    ports:
-      - "127.0.0.1:8081:8080"
-
-  phpmyadmin:
-    image: phpmyadmin:5
-    restart: unless-stopped
-    depends_on:
-      - db
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      UPLOAD_LIMIT: 64M
-    ports:
-      - "127.0.0.1:8082:80"
 
 volumes:
   db_data:

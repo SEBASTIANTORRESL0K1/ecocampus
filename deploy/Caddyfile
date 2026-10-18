@@ -1,0 +1,16 @@
+# Punto de entrada de produccion. SITE_ADDRESS=":80" sirve HTTP; con un dominio (por ejemplo
+# ecocampus.ejemplo.mx) Caddy obtiene y renueva el certificado HTTPS automaticamente.
+{$SITE_ADDRESS::80} {
+	encode gzip zstd
+
+	# Rutas del backend: API, login/logout SAML (incluye los callbacks del IdP) y metadatos
+	@backend path /api/* /login /login/* /logout /logout/* /Metadata
+	handle @backend {
+		reverse_proxy backend:4006
+	}
+
+	# Todo lo demas es el frontend (nginx)
+	handle {
+		reverse_proxy frontend:80
+	}
+}
