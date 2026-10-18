@@ -28,7 +28,7 @@ const PERFILES = {
   ],
 };
 
-const ENDPOINTS = ["home", "calculadora", "asset_js", "asset_css", "health", "api_me", "post_respuestas"];
+const ENDPOINTS = ["home", "calculadora", "asset_js", "asset_css", "health", "api_me", "acceso_correo", "post_respuestas"];
 // Un umbral por endpoint hace que k6 reporte la distribucion de cada uno por separado.
 const umbralesPorEndpoint = Object.fromEntries(
   ENDPOINTS.map((e) => [`http_req_duration{endpoint:${e}}`, ["p(95)<1000"]])
@@ -93,8 +93,15 @@ export default function (datos) {
 
   sleep(1);
 
-  // 3) 20% de las iteraciones terminan enviando el cuestionario (escritura en MySQL)
+  // 3) 20% de las iteraciones terminan enviando el cuestionario (escritura en MySQL). No hay envios anonimos:
+  //    antes se abre sesion con un correo unico (acceso por correo, REQUIERE_LOGIN=false); la cookie queda en el VU.
   if (Math.random() < 0.2) {
+    const correo = `k6-${__VU}-${__ITER}-${Date.now()}@ucol.mx`;
+    const acceso = http.post(`${API}/api/acceso/correo`, JSON.stringify({ correo }), {
+      headers: { "Content-Type": "application/json" },
+      tags: { endpoint: "acceso_correo" },
+    });
+    if (!verificar(acceso, "acceso_correo")) return;
     const res = http.post(`${API}/api/respuestas`, cuerpoRespuesta(), {
       headers: { "Content-Type": "application/json" },
       tags: { endpoint: "post_respuestas" },

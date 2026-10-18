@@ -18,7 +18,7 @@ Proyecto de tesis — Universidad de Colima.
 **Backend (modo experimento)**
 - Node.js 22 con [Express](https://expressjs.com/) 4 y [TypeScript](https://www.typescriptlang.org/) estricto
 - [Zod](https://zod.dev/) para validar la configuración y las respuestas del cuestionario
-- [Passport](https://www.passportjs.org/) con `@node-saml/passport-saml`: login federado de la Universidad de Colima (SAML)
+- [Passport](https://www.passportjs.org/) con `@node-saml/passport-saml`: login federado de la Universidad de Colima (SAML) o acceso con solo el correo (ver [Acceso al estudio](#acceso-al-estudio))
 - `mysql2` y `express-session` con las sesiones guardadas en MySQL
 
 **Datos e infraestructura**
@@ -37,7 +37,8 @@ El proyecto funciona de dos maneras:
 - **Modo experimento (Docker):** la misma SPA más un backend, una base MySQL y el login institucional. Al terminar la calculadora, los participantes (solo estudiantes de la UCOL) responden un cuestionario que se guarda en MySQL. Se activa con `VITE_EXPERIMENTO_ACTIVO=true`; sin esa variable la calculadora funciona normal.
 
 En el modo experimento:
-- El navegador nunca recibe el correo, el nombre ni el número de cuenta: el backend los lee de la sesión SAML y guarda un identificador pseudónimo y el correo en MySQL.
+- El acceso se elige con `REQUIERE_LOGIN`: login federado de la UCOL o solo el correo (ver [Acceso al estudio](#acceso-al-estudio)). No hay envíos anónimos.
+- El navegador nunca recibe el correo, el nombre ni el número de cuenta: el backend los lee de la sesión y guarda un identificador pseudónimo y el correo en MySQL.
 - Hay un solo registro por participante y por correo (índices `UNIQUE` en `db/schema.sql`).
 
 Sobre el código:
@@ -103,6 +104,35 @@ ecocampus/
 | `/comunidad`         | Noticias y eventos ambientales                                       |
 | `/guia-reciclaje`    | Guía con los principios y beneficios del reciclaje                   |
 
+## Acceso al estudio
+
+La variable `REQUIERE_LOGIN` del `.env` decide cómo entra el participante. El backend informa el modo en `GET /api/me` (`modoAcceso`), así que el frontend muestra la pantalla que corresponde sin recompilarse.
+
+| `REQUIERE_LOGIN` | Modo | Qué ve el participante | Qué necesita el servidor |
+| :--- | :--- | :--- | :--- |
+| `true` | `saml`: login federado | Botón «Iniciar sesión con UCOL». Solo pasan cuentas con `uTipo = Estudiante` | EntityID, callbacks y certificados registrados con sistemas@ucol.mx (variables `SAML_*`) y HTTPS |
+| `false` | `correo`: solo el correo | Un campo para escribir el correo institucional | Nada más: no usa certificados, el IdP ni HTTPS |
+
+Acceso por correo (`REQUIERE_LOGIN=false`):
+
+- `CORREO_DOMINIOS_PERMITIDOS` (por defecto `ucol.mx`) lista los dominios aceptados, separados por comas. Cada uno admite también sus subdominios: `ucol.mx` acepta `alumno@alumnos.ucol.mx`.
+- Se normaliza el correo antes de guardarlo: minúsculas y sin `+alias`, así que `alumno+2@ucol.mx` y `alumno@ucol.mx` son la misma persona (índices `UNIQUE`).
+- **No se verifica que el correo sea de quien lo escribe** (no se envía ningún código). Cualquiera que conozca un correo de la universidad podría participar a su nombre. Las defensas son el dominio, el índice `UNIQUE` y los logs; úsalo cuando ese riesgo sea aceptable para el estudio y documéntalo en la tesis.
+- Tampoco distingue alumnos de docentes: solo mira el dominio.
+- No existen envíos anónimos en ningún modo: siempre hay una sesión con un participante identificado. Una sesión abierta con el otro modo no sirve (por ejemplo, al cambiar `REQUIERE_LOGIN`, quien entró con SAML debe volver a entrar).
+- Cada fila guarda cómo entró el participante en la columna `metodo_acceso` (`saml` o `correo`) para poder separar los datos al analizarlos.
+- En modo `correo` el backend no carga la estrategia SAML ni exige los certificados, y no monta `/login`, `/logout` ni `/Metadata`. Las variables `SAML_*` (y `SAML_CERT_HOST_DIR` en producción) siguen siendo obligatorias en el `.env` porque los compose no tienen valores por defecto: puedes dejar las de desarrollo y, en producción, apuntar `SAML_CERT_HOST_DIR` a una carpeta vacía.
+
+### Migrar una base de datos existente
+
+`db/schema.sql` solo corre al crear el volumen. Si tu base ya existía, agrega la columna `metodo_acceso` **antes** de levantar esta versión (si no, los envíos fallarán):
+
+```bash
+docker compose exec -T db sh -c 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE"' < db/migraciones/001_metodo_acceso.sql
+```
+
+Las filas anteriores quedan como `saml`. Si ya se había aplicado, MySQL responde `Duplicate check constraint name` y no cambia nada. Las bases nuevas ya la traen. En un servidor existente, agrega también `CORREO_DOMINIOS_PERMITIDOS=ucol.mx` a su `.env`: los compose no tienen valores por defecto y no arrancan sin ella.
+
 ## Entornos
 
 | Entorno | Para qué sirve | Archivos de compose | Variables | Cómo se levanta |
@@ -167,8 +197,8 @@ backend/src/
   server.ts            punto de entrada: carga la configuración, espera a MySQL y escucha
   app.ts               arma la aplicación de Express (crearApp), sin escuchar; también la usan las pruebas
   config/              variables de entorno validadas con Zod (falla al arrancar con un mensaje claro)
-  auth/                estrategia SAML, perfil de la UCOL y derivación del participante
-  routes/              auth, respuestas y salud
+  auth/                estrategia SAML, correo (normalización y dominios) y derivación del participante
+  routes/              saml (login federado), acceso (por correo), sesion (/api/me), respuestas, salud y docs
   validacion/          esquema Zod de las respuestas: valida y genera el tipo de la fila a insertar
   openapi/             especificación OpenAPI de la API y el generador de docs/openapi.json
   db.ts, logger.ts
@@ -185,7 +215,7 @@ backend/src/
 
 ### API (OpenAPI)
 
-La API está documentada con OpenAPI 3.1 (12 operaciones en tres grupos: respuestas, autenticación y sistema).
+La API está documentada con OpenAPI 3.1 (14 operaciones en cuatro grupos: respuestas, autenticación, acceso por correo y sistema; cada ruta indica con `x-modos` en qué modo existe).
 
 | Dónde | Qué |
 | :--- | :--- |
@@ -194,7 +224,7 @@ La API está documentada con OpenAPI 3.1 (12 operaciones en tres grupos: respues
 | `http://localhost:4006/openapi.json` | La especificación servida por el backend |
 
 - La especificación vive en el código (`backend/src/openapi/especificacion.ts`) y reutiliza las opciones y límites de la validación, así que no duplica valores.
-- Las pruebas fallan si la documentación se desalinea del código: cada ruta registrada en Express debe estar documentada, los campos obligatorios deben coincidir con el esquema Zod, el ejemplo debe ser una petición válida y `docs/openapi.json` debe estar al día. Si cambias una ruta o una respuesta, actualiza la especificación y ejecuta `npm run openapi` en `backend/`.
+- Las pruebas fallan si la documentación se desalinea del código: cada ruta registrada en Express (en cada modo de acceso) debe estar documentada, los campos obligatorios deben coincidir con el esquema Zod, el ejemplo debe ser una petición válida y `docs/openapi.json` debe estar al día. Si cambias una ruta o una respuesta, actualiza la especificación y ejecuta `npm run openapi` en `backend/`.
 - En producción la interfaz `/docs` no se monta (Swagger es una dependencia de desarrollo y no va en la imagen) y el proxy tampoco enruta `/openapi.json`; la especificación queda disponible en el repositorio.
 
 ## Producción
@@ -207,6 +237,7 @@ docker compose up -d --build     # el .env ya indica COMPOSE_FILE (base + prod)
 - **Un solo punto de entrada:** el contenedor `proxy` (Caddy) es el único que publica puertos (80 y 443). Reenvía `/api`, `/login`, `/logout` y `/Metadata` al backend y todo lo demás al frontend. MySQL, backend y frontend no se publican.
 - **Sin dominio todavía:** deja `SITE_ADDRESS=:80` y usa `http://IP-DEL-SERVIDOR` en `API_URL`, en `FRONTEND_URL` (con `/ecocampus/calculadora`) y en los callbacks SAML; el sitio se sirve por HTTP.
 - **Con dominio:** pon `SITE_ADDRESS=tu.dominio`, esas URLs con `https://tu.dominio` y `COOKIE_SECURE=true`. Caddy obtiene y renueva el certificado HTTPS solo (el dominio debe apuntar al servidor y los puertos 80 y 443 deben estar abiertos).
+- **Modo de acceso:** `REQUIERE_LOGIN=true` usa el login SAML (siguiente punto); `REQUIERE_LOGIN=false` deja entrar con solo el correo y no necesita nada de SAML, útil mientras no estén tramitados los datos con sistemas o no haya dominio con HTTPS. Detalles y riesgos en [Acceso al estudio](#acceso-al-estudio).
 - **Login SAML:** las credenciales de desarrollo solo funcionan con callback en `localhost:4006` y no sirven para usuarios remotos (el backend lo avisa en sus logs). Los valores propios se tramitan con sistemas@ucol.mx y se configuran con `SAML_ISSUER`, `SAML_CALLBACK_URL`, `SAML_LOGOUT_CALLBACK_URL` y `SAML_CERT_HOST_DIR` (carpeta del servidor, fuera del repositorio, con `cert.pem`, `idp.crt` y `key.pem`). Todas las variables `SAML_*` son obligatorias en el `.env`.
 - **Secretos obligatorios:** con `NODE_ENV=production` el backend exige `SESSION_SECRET` (mínimo 16 caracteres), `ID_SALT` y `DB_PASSWORD`, y no arranca sin ellos. Genéralos con `openssl rand -hex 32`.
 - **Imagen:** la del backend contiene solo `dist/` y las dependencias de ejecución (sin TypeScript, tsx ni nodemon) y corre como usuario `node`.
@@ -218,7 +249,7 @@ docker compose up -d --build     # el .env ya indica COMPOSE_FILE (base + prod)
 1. Instancia Linux con Docker y el plugin de compose. En el grupo de seguridad abre solo los puertos 22 (limitado a tu IP), 80 y 443.
 2. `git clone` del repositorio, la rama a desplegar, y `cp .env.prod.example .env` con todos los valores.
 3. `docker compose up -d --build`. Para actualizar: `git pull` y el mismo comando.
-4. Prueba `http://IP/ecocampus/` y `http://IP/api/me`. Registra una respuesta de prueba (con `REQUIERE_LOGIN=false` temporal) antes de abrir el estudio y borra esa fila después.
+4. Prueba `http://IP/ecocampus/` y `http://IP/api/me`. Con `REQUIERE_LOGIN=false` entra con un correo `@ucol.mx` y registra una respuesta de prueba antes de abrir el estudio; borra esa fila después.
 
 ### Respaldo y restauración de MySQL (manual)
 
@@ -234,7 +265,7 @@ Haz un respaldo antes de iniciar el estudio y de forma periódica durante él. S
 
 ## Pruebas de carga
 
-Se miden en un entorno aislado: un proyecto de compose aparte (`ecocampus-loadtest`) con su propio volumen de MySQL y sin puertos publicados, así que no toca los datos del estudio. El backend corre con `REQUIERE_LOGIN=false` para poder medir `POST /api/respuestas` sin una sesión SAML.
+Se miden en un entorno aislado: un proyecto de compose aparte (`ecocampus-loadtest`) con su propio volumen de MySQL y sin puertos publicados, así que no toca los datos del estudio. El backend corre con `REQUIERE_LOGIN=false`: como no hay envíos anónimos, k6 abre una sesión con un correo único (`POST /api/acceso/correo`) antes de cada envío, sin necesitar SAML.
 
 ```bash
 cp .env.loadtest.example .env.loadtest      # solo la primera vez

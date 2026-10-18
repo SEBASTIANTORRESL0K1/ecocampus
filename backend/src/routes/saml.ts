@@ -2,11 +2,12 @@ import { Router, type NextFunction, type Request, type RequestHandler, type Resp
 import passport from "passport";
 import type { Strategy as SamlStrategy } from "@node-saml/passport-saml";
 import type { Config } from "../config/cargar";
-import { aPublico, esEstudiante, participanteDe } from "../auth/participante";
+import { participanteDe } from "../auth/participante";
 import { metadatosSp } from "../auth/saml";
 import { log } from "../logger";
 
-export function rutasAuth(config: Config, estrategia: SamlStrategy): Router {
+/** Rutas del login federado (solo se montan con REQUIERE_LOGIN=true). */
+export function rutasSaml(config: Config, estrategia: SamlStrategy): Router {
   const router = Router();
   const volverAlFrontend: RequestHandler = (_req, res) => res.redirect(config.frontendUrl);
 
@@ -39,18 +40,6 @@ export function rutasAuth(config: Config, estrategia: SamlStrategy): Router {
   };
   router.post("/login/callback", autenticarCallback);
   router.post("/api/auth/login/callback", autenticarCallback);
-
-  router.get("/api/me", (req, res) => {
-    const autenticado = req.isAuthenticated();
-    const participante = autenticado && req.user ? participanteDe(req.user, config.idSalt) : null;
-    const estudiante = participante !== null && esEstudiante(participante);
-    if (autenticado && !estudiante) log("warn", `Acceso denegado participante=${participante?.id} tipo=${participante?.tipo}`);
-    res.json({
-      authenticated: autenticado,
-      permitido: estudiante,
-      participante: participante && estudiante ? aPublico(participante) : null,
-    });
-  });
 
   router.get("/logout", (req, res) => {
     if (!req.user) return res.redirect(config.frontendUrl);

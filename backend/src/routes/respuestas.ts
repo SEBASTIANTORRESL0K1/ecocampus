@@ -1,8 +1,7 @@
 import { Router } from "express";
 import type { Pool, ResultSetHeader } from "mysql2/promise";
 import type { Config } from "../config/cargar";
-import { esEstudiante, participanteDe } from "../auth/participante";
-import type { Participante } from "../auth/tipos";
+import { participanteDeSesion, puedeParticipar } from "../auth/participante";
 import { codigoDe, log } from "../logger";
 import { COLUMNAS, validarRespuesta } from "../validacion/respuestas";
 
@@ -12,16 +11,14 @@ export function rutasRespuestas(config: Config, pool: Pool): Router {
   const router = Router();
 
   router.post("/api/respuestas", async (req, res) => {
-    let participante: Participante | null = null;
-    if (config.requiereLogin) {
-      participante = req.isAuthenticated() && req.user ? participanteDe(req.user, config.idSalt) : null;
-      if (!participante) return res.status(401).json({ success: false, error: "sin-sesion" });
-      if (!esEstudiante(participante)) {
-        log("warn", `Envio rechazado participante=${participante.id} tipo=${participante.tipo}`);
-        return res.status(403).json({ success: false, error: "no-permitido" });
-      }
+    // Siempre se exige sesion (login federado o correo): no hay envios anonimos
+    const participante = participanteDeSesion(req, config);
+    if (!participante) return res.status(401).json({ success: false, error: "sin-sesion" });
+    if (!puedeParticipar(participante, config)) {
+      log("warn", `Envio rechazado participante=${participante.id} tipo=${participante.tipo}`);
+      return res.status(403).json({ success: false, error: "no-permitido" });
     }
-    const quien = participante?.id ?? "-";
+    const quien = participante.id;
 
     const validacion = validarRespuesta(req.body, participante);
     if (!validacion.ok) {

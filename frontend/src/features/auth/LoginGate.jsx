@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import PageLayout from "../../components/layout/PageLayout";
+import AccesoCorreo from "./AccesoCorreo";
 import { API_URL, LOGIN_REQUERIDO } from "../../config/experiment";
 
-// Pide login institucional (UCOL) antes de mostrar a los hijos, solo cuando LOGIN_REQUERIDO.
-// El backend lee la identidad de la sesion SAML; el navegador no recibe correo ni cuenta.
+// Pide acceso antes de mostrar a los hijos, solo cuando LOGIN_REQUERIDO. El backend decide el modo
+// (/api/me -> modoAcceso): "saml" = login institucional de la UCOL, "correo" = solo el correo.
+// La identidad se lee de la sesion en el servidor; el navegador no recibe correo ni cuenta.
 const LoginGate = ({ children }) => {
   const [estado, setEstado] = useState(LOGIN_REQUERIDO ? "cargando" : "libre");
+  const [modo, setModo] = useState("saml");
 
   useEffect(() => {
     if (!LOGIN_REQUERIDO) return;
@@ -14,6 +17,7 @@ const LoginGate = ({ children }) => {
       .then((r) => r.json())
       .then((datos) => {
         if (cancelado) return;
+        setModo(datos.modoAcceso === "correo" ? "correo" : "saml");
         setEstado(!datos.authenticated ? "sin-sesion" : datos.permitido ? "autenticado" : "no-permitido");
       })
       .catch(() => !cancelado && setEstado("error"));
@@ -30,7 +34,9 @@ const LoginGate = ({ children }) => {
         <div className="bg-white p-8 rounded-md shadow-lg w-full max-w-md text-center">
           {estado === "cargando" && <p className="text-gray-600">Verificando sesión...</p>}
 
-          {estado === "sin-sesion" && (
+          {estado === "sin-sesion" && modo === "correo" && <AccesoCorreo alEntrar={() => setEstado("autenticado")} />}
+
+          {estado === "sin-sesion" && modo === "saml" && (
             <>
               <h2 className="text-2xl font-semibold text-gray-800 mb-3">Inicia sesión para participar</h2>
               <p className="text-gray-600 mb-6">

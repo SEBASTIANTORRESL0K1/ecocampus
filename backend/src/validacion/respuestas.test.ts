@@ -3,7 +3,7 @@ import test from "node:test";
 import type { Participante } from "../auth/tipos";
 import { COLUMNAS, validarRespuesta, type FilaRespuesta } from "./respuestas";
 
-const participante: Participante = { id: "abcd1234abcd1234", tipo: "Estudiante", correo: "Alumno@UCOL.mx" };
+const participante: Participante = { id: "abcd1234abcd1234", tipo: "Estudiante", correo: "Alumno@UCOL.mx", metodoAcceso: "saml" };
 
 function cuerpoValido() {
   const respuestas: Record<string, unknown> = {
@@ -13,7 +13,7 @@ function cuerpoValido() {
   return { respuestas, tiempoMin: 5, planetas: "entre 1 y 2" } as { respuestas: Record<string, unknown>; tiempoMin: unknown; planetas: unknown };
 }
 
-function datosDe(body: unknown, p: Participante | null): FilaRespuesta {
+function datosDe(body: unknown, p: Participante): FilaRespuesta {
   const r = validarRespuesta(body, p);
   if (!r.ok) throw new Error(`se esperaba valido: ${r.errores.join("; ")}`);
   return r.datos;
@@ -35,10 +35,12 @@ test("datos cubren exactamente las columnas que se insertan", () => {
   assert.strictEqual(Object.keys(datos).length, COLUMNAS.length);
 });
 
-test("sin participante guarda id y correo nulos", () => {
-  const datos = datosDe(cuerpoValido(), null);
-  assert.strictEqual(datos.participante_id, null);
-  assert.strictEqual(datos.correo, null);
+test("guarda el metodo de acceso del participante", () => {
+  assert.strictEqual(datosDe(cuerpoValido(), participante).metodo_acceso, "saml");
+  const porCorreo: Participante = { id: "0123456789abcdef", tipo: null, correo: "alumno@ucol.mx", metodoAcceso: "correo" };
+  const datos = datosDe(cuerpoValido(), porCorreo);
+  assert.strictEqual(datos.metodo_acceso, "correo");
+  assert.strictEqual(datos.participante_id, porCorreo.id);
 });
 
 test("ignora campos de identidad enviados en el cuerpo (la identidad viene de la sesion)", () => {

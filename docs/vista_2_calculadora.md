@@ -273,13 +273,18 @@ Claves especiales en `respuestas`:
 
 Es opt-in: se activa solo con `VITE_EXPERIMENTO_ACTIVO=true` (`EXPERIMENTO_ACTIVO` en `src/config/experiment.js`). Sin esa variable, por ejemplo en el despliegue publico de GitHub Pages, la calculadora funciona normal sin login ni cuestionario. Si esta activo, al pulsar "Finalizar" en la ultima pregunta se muestra el cuestionario de evaluacion (`CuestionarioExperimento`) a pantalla completa, y solo despues la pantalla de resultados.
 
-### Login federado
+### Acceso (login federado o correo)
 
-Si ademas existe `VITE_API_URL`, `/calculadora` se envuelve en `LoginGate` (`src/features/auth/LoginGate.jsx`), que consulta `GET /api/me` y pide iniciar sesion con la cuenta institucional de la UCOL. Solo pasan estudiantes (`uTipo = Estudiante`). El navegador nunca recibe correo, nombre ni numero de cuenta.
+Si ademas existe `VITE_API_URL`, `/calculadora` se envuelve en `LoginGate` (`src/features/auth/LoginGate.jsx`), que consulta `GET /api/me`. La respuesta trae `modoAcceso`, definido por la variable `REQUIERE_LOGIN` del backend (no se recompila el frontend):
+
+- `saml` (`REQUIERE_LOGIN=true`): pide iniciar sesion con la cuenta institucional de la UCOL. Solo pasan estudiantes (`uTipo = Estudiante`).
+- `correo` (`REQUIERE_LOGIN=false`): muestra `AccesoCorreo` (`src/features/auth/AccesoCorreo.jsx`), un campo para escribir el correo institucional que se envia a `POST /api/acceso/correo`. Solo se admiten los dominios de `CORREO_DOMINIOS_PERMITIDOS` (por defecto `ucol.mx` y subdominios) y la identidad no se verifica.
+
+En ambos modos el navegador nunca recibe correo, nombre ni numero de cuenta, y no se puede enviar el cuestionario sin una sesion.
 
 ### Guardado de respuestas
 
-Al finalizar el cuestionario se envia `POST {VITE_API_URL}/api/respuestas` con `respuestas`, `tiempoMin` y `planetas`. El tiempo y los planetas se calculan solos. El backend toma el id y el correo de la sesion SAML, valida los datos y los inserta en la tabla `respuestas` de MySQL. Hay un solo registro por participante y por correo; un segundo envio devuelve `duplicado` y la pantalla de resultados muestra un aviso (`avisoEnvio`).
+Al finalizar el cuestionario se envia `POST {VITE_API_URL}/api/respuestas` con `respuestas`, `tiempoMin` y `planetas`. El tiempo y los planetas se calculan solos. El backend toma el id y el correo de la sesion (SAML o correo), valida los datos y los inserta en la tabla `respuestas` de MySQL. Hay un solo registro por participante y por correo; un segundo envio devuelve `duplicado` y la pantalla de resultados muestra un aviso (`avisoEnvio`).
 
 ### Estado adicional
 

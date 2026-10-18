@@ -45,8 +45,9 @@ export type CuerpoRespuesta = z.infer<typeof cuerpoSchema>;
 
 /** Una fila de la tabla `respuestas` (db/schema.sql), sin id ni fecha. */
 export interface FilaRespuesta {
-  participante_id: string | null;
+  participante_id: string;
   correo: string | null;
+  metodo_acceso: Participante["metodoAcceso"];
   edad: number;
   sexo: (typeof SEXO)[number];
   carrera: (typeof CARRERA)[number];
@@ -67,7 +68,7 @@ export interface FilaRespuesta {
 
 // Orden de las columnas del INSERT. El compilador exige que toda clave sea de FilaRespuesta.
 export const COLUMNAS = [
-  "participante_id", "correo", "edad", "sexo", "carrera", "semestre", "conocia_calculadora",
+  "participante_id", "correo", "metodo_acceso", "edad", "sexo", "carrera", "semestre", "conocia_calculadora",
   "completo_calculo", "tiempo_min", "planetas",
   "u9", "u10", "u11", "u12", "u13", "u14", "u15", "u16", "u17", "u18",
   "c19", "c20", "c21", "c22", "i23", "i24",
@@ -76,11 +77,12 @@ export const COLUMNAS = [
 
 export type ResultadoValidacion = { ok: true; datos: FilaRespuesta } | { ok: false; errores: string[] };
 
-function aFila(c: CuerpoRespuesta, participante: Participante | null): FilaRespuesta {
+function aFila(c: CuerpoRespuesta, participante: Participante): FilaRespuesta {
   const r = c.respuestas;
   return {
-    participante_id: participante?.id ?? null,
+    participante_id: participante.id,
     correo: participante?.correo ? participante.correo.trim().toLowerCase() : null,
+    metodo_acceso: participante.metodoAcceso,
     edad: r["1"],
     sexo: r.S1,
     carrera: r["2"],
@@ -101,7 +103,7 @@ function aFila(c: CuerpoRespuesta, participante: Participante | null): FilaRespu
 }
 
 /** Valida el cuerpo recibido y lo convierte en la fila a insertar. La identidad viene de la sesion, no del cuerpo. */
-export function validarRespuesta(body: unknown, participante: Participante | null): ResultadoValidacion {
+export function validarRespuesta(body: unknown, participante: Participante): ResultadoValidacion {
   const resultado = cuerpoSchema.safeParse(body);
   if (!resultado.success) {
     const errores = resultado.error.issues.map((i) => `${i.path.join(".") || "cuerpo"}: ${i.message}`);

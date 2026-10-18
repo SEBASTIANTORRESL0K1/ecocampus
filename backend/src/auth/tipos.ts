@@ -1,4 +1,9 @@
-/** Perfil que devuelve el IdP de la UCOL (atributos SAML). Todos opcionales: dependen de la cuenta. */
+export type MetodoAcceso = "saml" | "correo";
+
+/**
+ * Usuario guardado en la sesion. En modo SAML es el perfil que devuelve el IdP de la UCOL (todos los atributos
+ * son opcionales: dependen de la cuenta); en modo correo solo trae metodoAcceso y uCorreo.
+ */
 export interface PerfilSaml {
   nameID?: string;
   sessionIndex?: string;
@@ -7,6 +12,7 @@ export interface PerfilSaml {
   uNombre?: string;
   uTipo?: string;
   uDependencia?: string;
+  metodoAcceso?: MetodoAcceso;
   [atributo: string]: unknown;
 }
 
@@ -15,6 +21,7 @@ export interface Participante {
   id: string;
   tipo: string | null;
   correo: string | null;
+  metodoAcceso: MetodoAcceso;
 }
 
 /** Lo unico que el navegador puede ver del participante (nunca el correo, el nombre ni la cuenta). */
