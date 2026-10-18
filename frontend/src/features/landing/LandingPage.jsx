@@ -61,7 +61,7 @@ const LandingPage = () => {
   ];
 
   return (
-    <PageLayout>
+    <PageLayout navTransparent>
       <main>
         {/* ── Hero — load-time animation (not scroll-triggered) ── */}
         {/*
