@@ -44,7 +44,7 @@ Nota: el sitio publico de GitHub Pages sigue siendo solo estatico y para el no c
 | Numero de solicitudes al servidor y endpoints evaluados | Lectura: 1741 peticiones (10 usuarios) y 7363 (30 usuarios). Escritura: 732 (10 usuarios) y 3222 (30 usuarios). Endpoints evaluados: `/api/me`, `/api/acceso/correo`, `/api/respuestas`, las paginas y los archivos JS y CSS. Todos respondieron con el codigo esperado | [Endpoints evaluados](./produccion/README.md#endpoints-evaluados) |
 | Logs del servidor y distribucion de tiempos de respuesta del backend | 2103 peticiones en el log del backend (24 h): lecturas en 1 a 2 ms (p95 de `/api/me` 1 ms), `POST /api/acceso/correo` con p95 de 29 ms y `POST /api/respuestas` con p95 de 28 ms. Cero errores 5xx y cero reinicios. Tabla completa con media, p50, p95, p99 y maximo | [Servidor](./produccion/README.md#servidor-hardware-logs-y-tiempos-del-backend) y `produccion/resultados/servidor.txt` |
 | Hardware y red del servidor | Ubuntu 24.04, 2 vCPU (Intel Xeon Platinum 8259CL, 2.5 GHz), 1.9 GB de RAM sin swap, disco de 58 GB (11 % usado), AWS Lightsail `us-east-2`. En reposo: MySQL 375 MiB, backend 43 MiB, proxy 20 MiB. Red: unos 60 ms de latencia minima desde Colima hasta Ohio | [Servidor](./produccion/README.md#servidor-hardware-logs-y-tiempos-del-backend) |
-| Pruebas de carga concurrente | Con k6: hasta 30 usuarios virtuales simultaneos, en lectura (66.7 peticiones por segundo, 0 % de fallos, p95 de 197 ms) y en escritura (1611 respuestas guardadas, 14.6 por segundo, 0 % de fallos, p95 de 125 ms). Es un servidor propio, sin restricciones de uso justo | [Carga concurrente](./produccion/README.md#carga-concurrente) |
+| Pruebas de carga concurrente | Con k6, hasta **100 usuarios virtuales simultaneos**: lectura a 300.6 peticiones por segundo (0 % de fallos, p95 de 195 ms) y escritura con 10 989 respuestas guardadas a 64.4 por segundo (0 % de fallos, p95 de 200 ms). Con 30 usuarios: lectura a 66.7 por segundo y 1611 respuestas guardadas. Es un servidor propio, sin restricciones de uso justo. Consumo del servidor durante la carga de 100 usuarios: CPU maxima de 48.1 % de los 2 vCPU, CPU robada de 0.8 % o menos y memoria usada maxima de 1150 MB con al menos 756 MB disponibles | [Carga concurrente](./produccion/README.md#carga-concurrente) |
 
 ## Respuestas a las pruebas planeadas
 
@@ -59,7 +59,7 @@ Nota: el sitio publico de GitHub Pages sigue siendo solo estatico y para el no c
 
 - Las mediciones se hicieron desde un solo equipo (Windows 11, AMD Ryzen 5 5500U) en Colima, hacia el servidor en Ohio; los tiempos incluyen la red.
 - WebPageTest se corrio una sola vez por perfil y solo en la pagina de inicio; Edge y los dispositivos fisicos (iPhone, Mac, telefonos Android) no se probaron.
-- Los datos del servidor son de un instante en reposo y de los logs de las ultimas 24 horas; no se vigilo el consumo de CPU y memoria durante la carga.
+- Los datos del servidor en reposo y del log son de un instante; el consumo de CPU y memoria durante la carga solo se midio en la prueba de 100 usuarios, de unos 6 minutos (muestreo cada ~3 s, sin la ultima parte de la escritura).
 - La escritura se probo sobre la base de produccion con datos de prueba que se borran despues (correos `k6-carga-...@ucol.mx`).
 - El sitio se sirve por HTTP, sin dominio ni HTTPS; esto afecta la puntuacion de "buenas practicas" de Lighthouse.
 - Las pruebas de carga son de pocos minutos y no miden degradacion a largo plazo.

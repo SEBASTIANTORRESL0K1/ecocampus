@@ -19,6 +19,7 @@ Reporte de las pruebas aplicadas al sitio desplegado en Lightsail, donde si hay 
 | Carga concurrente sobre el servidor (lectura y escritura) | k6 | `resultados/produccion-ligero.json`, `produccion-medio.json`, `produccion-escritura-ligero.json`, `produccion-escritura-medio.json` | [Carga](#carga-concurrente) |
 | Endpoints de la API evaluados | k6 y Playwright | esta seccion | [Endpoints](#endpoints-evaluados) |
 | Hardware, uso de recursos y logs del servidor | `recolectar-servidor.sh` (se ejecuta en el servidor) | `resultados/servidor.txt` | [Servidor](#servidor-hardware-logs-y-tiempos-del-backend) |
+| CPU y memoria con 100 usuarios simultaneos | `muestrear-recursos.sh` (en el servidor) y `graficar-recursos.mjs` | `resultados/recursos.csv` y graficas SVG | [CPU y memoria](#cpu-y-memoria-durante-100-usuarios-simultaneos) |
 | Georreferenciacion de los contenedores | `validar-georreferencia.mjs` | `resultados/georreferencia-validacion.md` | [Georreferenciacion](#georreferenciacion-de-los-contenedores) |
 
 WebPageTest es un servicio externo: lo ejecuto la tesista desde su cuenta y aqui se documenta el resultado (ver [WebPageTest](#webpagetest)).
@@ -132,6 +133,7 @@ k6 desde el mismo equipo, `loadtest/k6-produccion.js`, **solo lecturas** (`GET`)
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | ligero | 10 | 1 min 20 s | 1741 | 21.5 | 0.00 % | 89 | 205 | 222 | 334 | 23 MB |
 | medio | 30 | 1 min 50 s | 7363 | 66.7 | 0.00 % | 87 | 197 | 210 | 845 | 97 MB |
+| cien | 100 | 2 min 50 s | 51 499 | 300.6 | 0.00 % | 87 | 195 | 203 | 638 | 680 MB |
 
 Mediana por endpoint en el perfil medio: inicio 64 ms, calculadora 64 ms, mapa 64 ms, CSS 68 ms, `/api/me` 65 ms y el JS principal 192 ms (el unico mayor porque pesa mas). El p95 de todos queda por debajo de 215 ms y todos los umbrales de k6 se cumplieron (fallos por debajo de 1 %, p95 por debajo de 1.5 s).
 
@@ -145,12 +147,13 @@ Con autorizacion de la tesista, que borrara los datos despues, se midio la escri
 | :--- | ---: | ---: | ---: | ---: | ---: | :--- | :--- |
 | ligero | 10 | 1 min 20 s | 366 | 9.1 | 0.00 % | 115 / 153 / 201 | 98 / 117 / 140 |
 | medio | 30 | 1 min 50 s | 1611 | 29.2 | 0.00 % | 80 / 125 / 230 | 79 / 102 / 183 |
+| cien | 100 | 2 min 50 s | 10 989 | 128.8 peticiones (64.4 respuestas) | 0.00 % | 93 media; p95 212 / p99 331 / max 479 | 79 mediana; p95 193 / p99 216 / max 236 |
 
 - Todas las respuestas se guardaron (codigo 201) y todos los accesos dieron 200; no hubo 4xx, 5xx ni duplicados. Los umbrales de k6 (fallos por debajo de 1 %, p95 por debajo de 1.5 s) se cumplieron.
 - Se escribieron 1977 filas en total (366 + 1611). Cada envio completo (acceso mas guardado) tarda alrededor de 200 ms en el cliente, incluidos ~65 ms de red por peticion.
 - El ritmo maximo probado fue de unos 14.6 respuestas guardadas por segundo con 30 usuarios; un estudio real tendra muchisimo menos simultaneidad.
 - Los filtros de limpieza estan al inicio del script: `DELETE FROM respuestas WHERE correo LIKE 'k6-carga-%';` y `DELETE FROM sessions;` (la segunda tambien cierra las sesiones de cualquier persona conectada en ese momento).
-- No se probo un perfil mayor. Si se necesita, `k6-produccion.js` (lectura) tiene el perfil `alto`, pero conviene hacerlo en el entorno aislado de pruebas de carga.
+- Con 100 usuarios (perfil `cien`, 17:33 a 17:40 UTC) se guardaron 10 989 respuestas mas, todas con codigo 201, sin fallos y sin que los tiempos crecieran; el consumo de CPU y memoria del servidor en esa prueba esta en [CPU y memoria durante 100 usuarios simultaneos](#cpu-y-memoria-durante-100-usuarios-simultaneos). No se probo un perfil mayor; conviene hacerlo en el entorno aislado de pruebas de carga.
 
 ## Endpoints evaluados
 
@@ -205,6 +208,31 @@ Distribucion de tiempos de respuesta del backend (log de las ultimas 24 h, que i
 - La base tiene 1 respuesta (la de prueba del despliegue, del 18 de octubre a las 06:04, con acceso por correo, que debe borrarse antes de abrir el estudio) y 16 sesiones activas (de las pruebas de compatibilidad y manuales).
 - Limitacion: el log del backend solo guarda el tiempo del servidor y el estado; no hay logs de acceso del proxy con tiempos (Caddy registro 48 lineas, sin detalle por peticion). Tampoco se midio el trafico de red del servidor.
 
+### CPU y memoria durante 100 usuarios simultaneos
+
+Se muestreo el servidor cada ~3 s (`muestrear-recursos.sh`, datos en `resultados/recursos.csv`, 209 muestras) mientras se aplicaban, una tras otra, la carga de lectura y la de escritura con 100 usuarios virtuales. El muestreo no guarda la hora; las fases se identifican por el patron de CPU: reposo hasta ~100 s, lectura de ~100 s a ~275 s y escritura desde ~275 s. El muestreo termino a los 420 s y no incluye los ultimos ~30 s de la escritura (la bajada de usuarios).
+
+| Fase | CPU del servidor, media / maxima | CPU robada | MySQL | Backend | Proxy | Memoria usada (max.) | Memoria disponible (min.) |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Reposo | 5.2 % / 8.0 % | 0.0 % | 1.4 % | 0.0 % | 0.0 % | 1122 MB | 785 MB |
+| Lectura, 100 usuarios | 20.7 % / 28.5 % | 0.1 % (max. 0.8 %) | 1.4 % | 6.4 % | 15.6 % | 1141 MB | 765 MB |
+| Escritura, 100 usuarios | 37.5 % / 48.1 % | 0.1 % (max. 0.8 %) | 16.9 % (max. 25.5 %) | 32.1 % (max. 46.9 %) | 9.8 % | 1150 MB | 756 MB |
+
+La CPU del servidor es el porcentaje de los 2 vCPU; la de cada contenedor es porcentaje de un vCPU (100 % = un vCPU completo), medias de la fase.
+
+![CPU del servidor durante la carga](./resultados/recursos-cpu-servidor.svg)
+
+![CPU por contenedor](./resultados/recursos-cpu-contenedores.svg)
+
+![Memoria del servidor](./resultados/recursos-memoria.svg)
+
+- **El servidor no se saturo.** El maximo de CPU fue 48.1 % de los 2 vCPU, con 100 usuarios escribiendo, y 28.5 % con 100 usuarios leyendo; queda mas de la mitad de la capacidad libre.
+- **Sin estrangulamiento de CPU.** La CPU robada por el hipervisor se mantuvo en 0.8 % o menos durante toda la prueba: no se agoto la capacidad de rafaga de Lightsail en estos 6 minutos. Una carga sostenida durante horas podria comportarse distinto.
+- **La lectura la lleva el proxy; la escritura, el backend y MySQL.** En lectura el contenedor mas activo es Caddy (15.6 % de un vCPU) por servir los archivos; en escritura el backend llega a 46.9 % y MySQL a 25.5 % de un vCPU.
+- **La memoria no crece.** El uso total subio de unos 1104 MB en reposo a un maximo de 1150 MB (46 MB mas) y siempre quedaron al menos 756 MB disponibles; sin swap y sin presion de memoria. MySQL pasa de 388 MB a 399 MB y el backend de 50 MB a 57 MB.
+- **Carga del sistema.** El promedio de carga a 1 minuto llego a 3.03 con 2 vCPU, por encima de 2 aunque la CPU estaba al 48 %: hay procesos esperando (muy probablemente escrituras a disco de MySQL, que no se midieron aparte). Los tiempos de respuesta no se vieron afectados: la escritura con 100 usuarios tuvo p95 de 200 ms.
+- **Margen.** Con las cifras actuales, el estudio (muchisimo menos simultaneidad que 100 usuarios escribiendo a 64 respuestas por segundo) tiene un margen amplio de capacidad en este servidor.
+
 ## Georreferenciacion de los contenedores
 
 Los 21 contenedores estan en `frontend/src/features/mapa/puntosReciclaje.js` como pares `[latitud, longitud]` en WGS84 y se dibujan sobre mosaicos de OpenStreetMap (Leaflet, centro `[19.249437, -103.698893]`, zoom 17).
@@ -241,6 +269,8 @@ Validacion automatica (`validar-georreferencia.mjs`, tabla completa en `resultad
 | `resumir-red.mjs` | Convierte `red.json` en tablas de peticiones, tiempos y fallos |
 | `validar-georreferencia.mjs` | Valida las coordenadas de los contenedores |
 | `recolectar-servidor.sh` | Recolecta hardware, recursos y logs en el servidor |
+| `muestrear-recursos.sh` | Registra CPU y memoria cada ~3 s en un CSV mientras se aplica carga (se ejecuta en el servidor) |
+| `graficar-recursos.mjs` | Dibuja las graficas SVG de CPU y memoria a partir de `resultados/recursos.csv` |
 | `resultados/` | Datos crudos y resumenes de cada prueba |
 
 El codigo de las pruebas vive fuera de esta carpeta: `frontend/playwright.produccion.config.js`, `frontend/e2e-produccion/` y `loadtest/k6-produccion.js`.

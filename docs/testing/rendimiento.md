@@ -129,8 +129,11 @@ Ademas del entorno aislado, la carga se midio sobre el servidor real (2 vCPU, 1.
 | Lectura | medio | 30 | 7363 | 66.7 | 0.00 % | 197 | 845 |
 | Escritura (acceso por correo y `POST /api/respuestas`) | ligero | 10 | 732 (366 respuestas) | 9.1 | 0.00 % | 153 / 117 | 201 / 140 |
 | Escritura | medio | 30 | 3222 (1611 respuestas) | 29.2 | 0.00 % | 125 / 102 | 230 / 183 |
+| Lectura | cien | 100 | 51 499 | 300.6 | 0.00 % | 195 | 638 |
+| Escritura | cien | 100 | 21 978 (10 989 respuestas) | 128.8 | 0.00 % | 212 / 193 | 479 / 236 |
 
 - En escritura el p95 se da como acceso / envio. Todas las respuestas se guardaron (201) y el backend no registro errores 5xx.
+- Con 100 usuarios la CPU del servidor (2 vCPU) llego como maximo a 48.1 %, la CPU robada fue de 0.8 % o menos y la memoria usada subio unos 46 MB (maximo de 1150 MB, siempre con al menos 756 MB disponibles); graficas en [produccion/README.md](./produccion/README.md#cpu-y-memoria-durante-100-usuarios-simultaneos).
 - Desde un cliente remoto la latencia minima de cualquier peticion es de unos 60 ms (red hasta Ohio); el backend atiende las lecturas en 1 a 2 ms.
 - Las cifras del entorno aislado de arriba (mediciones anteriores al acceso por correo) siguen siendo una referencia de capacidad maxima; las de produccion reflejan el sistema actual con red real.
 
