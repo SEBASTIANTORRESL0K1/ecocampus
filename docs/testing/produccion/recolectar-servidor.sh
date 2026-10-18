@@ -8,7 +8,10 @@
 # Con DESDE se acota la ventana de logs (por defecto 24h): DESDE=2h bash ...
 set -u
 DESDE="${DESDE:-24h}"
-cd "$(dirname "$0")/../../.." 2>/dev/null || true
+# Si se ejecuta como archivo dentro del repo, entra a la raiz; si llega por tuberia ($0 = bash) se usa el directorio actual
+# (o REPO=/ruta). El compose se lee de ahi.
+if [ -n "${REPO:-}" ]; then cd "$REPO" || exit 1; elif [ -f "$0" ]; then cd "$(dirname "$0")/../../.." || exit 1; fi
+[ -f docker-compose.yml ] || { echo "Ejecutalo desde la raiz del repo (donde esta docker-compose.yml) o define REPO=/opt/ecocampus" >&2; exit 1; }
 PETICIONES="$(mktemp)"
 trap 'rm -f "$PETICIONES"' EXIT
 
