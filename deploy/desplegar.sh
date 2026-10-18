@@ -17,10 +17,12 @@ set -euo pipefail
 
 compose() { docker compose "$@" < /dev/null; }
 
-backend_sano()  { compose exec -T backend wget -qO- http://localhost:4006/health 2>/dev/null | grep -q '"status":"ok"'; }
+# La salida se captura en una variable y se compara: "cmd | grep -q" con pipefail da falsos fallos por SIGPIPE
+# (grep -q cierra la tuberia al primer acierto y el comando recibe SIGPIPE).
+backend_sano()  { local r; r="$(compose exec -T backend wget -qO- http://localhost:4006/health 2>/dev/null)" || return 1; [[ "$r" == *'"status":"ok"'* ]]; }
 frontend_sano() { compose exec -T frontend wget -qO /dev/null http://127.0.0.1/ecocampus/ 2>/dev/null; }
-proxy_activo()  { compose ps --status running --services 2>/dev/null | grep -qx proxy; }
-sitio_publico() { [ -z "$URL" ] || curl -fsS --max-time 10 "$URL/api/me" 2>/dev/null | grep -q '"authenticated"'; }
+proxy_activo()  { local r; r="$(compose ps --status running --services 2>/dev/null)" || return 1; [[ $'\n'"$r"$'\n' == *$'\nproxy\n'* ]]; }
+sitio_publico() { [ -z "$URL" ] && return 0; local r; r="$(curl -fsS --max-time 10 "$URL/api/me" 2>/dev/null)" || return 1; [[ "$r" == *'"authenticated"'* ]]; }
 
 verificar() {
   local i

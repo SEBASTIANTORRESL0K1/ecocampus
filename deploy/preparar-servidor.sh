@@ -23,18 +23,31 @@ apt-get update -y
 apt-get install -y ca-certificates curl git fail2ban
 
 echo "== Docker (repositorio oficial)"
-if ! command -v docker >/dev/null 2>&1; then
+# Un Docker instalado con snap no es compatible con el oficial (otro servicio, otras rutas): hay que quitarlo antes.
+if command -v snap >/dev/null 2>&1 && snap list docker >/dev/null 2>&1; then
+  echo "ERROR: hay un Docker instalado con snap. Quitalo con 'sudo snap remove docker' y vuelve a ejecutar este script."
+  exit 1
+fi
+# Se decide por el servicio (no por el comando docker): un "docker" suelto no basta para que el despliegue funcione.
+if ! systemctl cat docker.service >/dev/null 2>&1; then
   install -m 0755 -d /etc/apt/keyrings
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
   chmod a+r /etc/apt/keyrings/docker.asc
   # shellcheck disable=SC1091
   . /etc/os-release
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu ${VERSION_CODENAME} stable" \
-    > /etc/apt/sources.list.d/docker.list
+  ARQUITECTURA="$(dpkg --print-architecture)"
+  # Una sola linea, sin continuacion con barra invertida: al pegar el script en una terminal web ese salto se puede perder
+  LINEA_REPO="deb [arch=${ARQUITECTURA} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu ${VERSION_CODENAME} stable"
+  echo "$LINEA_REPO" > /etc/apt/sources.list.d/docker.list
+  grep -q 'download.docker.com' /etc/apt/sources.list.d/docker.list || { echo "ERROR: no se pudo escribir /etc/apt/sources.list.d/docker.list"; exit 1; }
   apt-get update -y
+  # awk lee toda la salida; "grep -q" cerraria la tuberia antes y, con pipefail, daria un falso error por SIGPIPE
+  CANDIDATO="$(apt-cache policy docker-ce | awk '/Candidate:/ {print $2}')"
+  { [ -n "$CANDIDATO" ] && [ "$CANDIDATO" != "(none)" ]; } || { echo "ERROR: apt no encuentra docker-ce; revisa /etc/apt/sources.list.d/docker.list"; exit 1; }
   apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 fi
 systemctl enable --now docker
+docker compose version >/dev/null 2>&1 || { echo "ERROR: este Docker no incluye el plugin 'docker compose' (v2). Instala docker-compose-plugin o usa el Docker oficial."; exit 1; }
 
 echo "== Usuario de despliegue: $USUARIO"
 id "$USUARIO" >/dev/null 2>&1 || adduser --disabled-password --gecos "" "$USUARIO"
