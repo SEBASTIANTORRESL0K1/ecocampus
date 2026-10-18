@@ -16,7 +16,7 @@ const Mapa = () => {
   const { ref: mapRef, isVisible: mapVisible } = useScrollReveal();
 
   return (
-    <PageLayout>
+    <PageLayout navTransparent>
       <main>
         {/* ── Hero compacto ── */}
         <section

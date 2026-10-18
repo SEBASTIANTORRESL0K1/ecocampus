@@ -13,7 +13,7 @@ const GuiaReciclaje = () => {
   const { ref: infografiaRef, isVisible: infografiaVisible } = useScrollReveal();
 
   return (
-    <PageLayout>
+    <PageLayout navTransparent>
       <main>
         <HeroSection />
 

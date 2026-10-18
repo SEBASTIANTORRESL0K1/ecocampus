@@ -18,7 +18,7 @@ const Comunidad = () => {
   const { ref: gridRef, isVisible: gridVisible } = useScrollReveal();
 
   return (
-    <PageLayout>
+    <PageLayout navTransparent>
       <main>
         {/* ── Hero ── */}
         <div
