@@ -14,6 +14,8 @@ import {
   guardarProgreso,
   tieneRespuestas,
 } from "./progresoGuardado";
+import useScrollReveal from "../../hooks/useScrollReveal";
+import "../../styles/scroll-animations.css";
 
 const SECCIONES = ["alimentos", "transporte", "energia", "forestal"];
 const GRUPOS_25 = ["Televisor", "Computadora", "DVD", "Estéreo"];
@@ -172,27 +174,36 @@ const Calculadora = () => {
     setPasoActual(pasos.length - 1);
   };
 
+  const { ref: progressRef, isVisible: progressVisible } = useScrollReveal();
+  const { ref: cardRef, isVisible: cardVisible } = useScrollReveal();
+  const { ref: resultRef, isVisible: resultVisible } = useScrollReveal();
+
   return (
     <PageLayout className="bg-[#f7f9f4]">
       {/* Barra de progreso */}
       {!verResultado && (
         <>
-          <div className="w-full h-2 bg-gray-200">
-            <div
-              className="h-full bg-[#4a7c59] transition-all duration-300"
-              style={{ width: `${((pasoActual + 1) / pasos.length) * 100}%` }}
-            ></div>
+          <div ref={progressRef} className={`reveal-load${progressVisible ? " is-visible" : ""}`}>
+            <div className="w-full h-2 bg-gray-200">
+              <div
+                className="h-full bg-[#4a7c59] transition-all duration-300"
+                style={{ width: `${((pasoActual + 1) / pasos.length) * 100}%` }}
+              ></div>
+            </div>
+            <p className="text-center text-sm text-gray-600 mt-1">
+              {paso.seccionTitulo} · Pregunta {pasoActual + 1} de {pasos.length}
+            </p>
           </div>
-          <p className="text-center text-sm text-gray-600 mt-1">
-            {paso.seccionTitulo} · Pregunta {pasoActual + 1} de {pasos.length}
-          </p>
         </>
       )}
 
       {/* Contenido principal */}
       {!verResultado && (
         <div className="flex-grow flex flex-col items-center justify-center p-6">
-          <div className="bg-white p-8 rounded-[12px] shadow-[0_4px_16px_rgba(34,85,44,0.1)] w-full max-w-md">
+          <div
+            ref={cardRef}
+            className={`reveal bg-white p-8 rounded-[12px] shadow-[0_4px_16px_rgba(34,85,44,0.1)] w-full max-w-md${cardVisible ? " is-visible" : ""}`}
+          >
             <ImagenTema key={pasoActual} {...imagenPaso} />
 
             {/* --- Pregunta de una sola opción --- */}
@@ -400,7 +411,10 @@ const Calculadora = () => {
       {/* Pantalla de resultado final */}
       {verResultado && resultado && (
         <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-6">
-          <div className="bg-white p-6 sm:p-12 rounded-[12px] shadow-[0_4px_16px_rgba(34,85,44,0.1)] w-full max-w-2xl text-center">
+          <div
+            ref={resultRef}
+            className={`reveal bg-white p-6 sm:p-12 rounded-[12px] shadow-[0_4px_16px_rgba(34,85,44,0.1)] w-full max-w-2xl text-center${resultVisible ? " is-visible" : ""}`}
+          >
             <h2 className="text-2xl sm:text-4xl font-bold mb-6 text-gray-800">¡Tu resultado!</h2>
 
             <p className="text-lg sm:text-2xl text-gray-800">
@@ -412,23 +426,38 @@ const Calculadora = () => {
             </p>
 
             <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-left text-gray-700 max-w-md mx-auto">
-              <div className="flex justify-between border-b pb-1">
+              <div
+                className={`reveal-card flex justify-between border-b pb-1${resultVisible ? " is-visible" : ""}`}
+                style={{ '--reveal-delay': '0ms' }}
+              >
                 <span>Alimentos</span>
                 <span className="font-semibold">{Math.round(resultado.totalAlimentos).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between border-b pb-1">
+              <div
+                className={`reveal-card flex justify-between border-b pb-1${resultVisible ? " is-visible" : ""}`}
+                style={{ '--reveal-delay': '80ms' }}
+              >
                 <span>Transporte</span>
                 <span className="font-semibold">{Math.round(resultado.totalTransporte).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between border-b pb-1">
+              <div
+                className={`reveal-card flex justify-between border-b pb-1${resultVisible ? " is-visible" : ""}`}
+                style={{ '--reveal-delay': '160ms' }}
+              >
                 <span>Energía</span>
                 <span className="font-semibold">{Math.round(resultado.totalEnergia).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between border-b pb-1">
+              <div
+                className={`reveal-card flex justify-between border-b pb-1${resultVisible ? " is-visible" : ""}`}
+                style={{ '--reveal-delay': '240ms' }}
+              >
                 <span>Forestal</span>
                 <span className="font-semibold">{Math.round(resultado.totalForestal).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between border-b pb-1 sm:col-span-2">
+              <div
+                className={`reveal-card flex justify-between border-b pb-1 sm:col-span-2${resultVisible ? " is-visible" : ""}`}
+                style={{ '--reveal-delay': '320ms' }}
+              >
                 <span>Infraestructura</span>
                 <span className="font-semibold">{resultado.infraestructura.toLocaleString()}</span>
               </div>
