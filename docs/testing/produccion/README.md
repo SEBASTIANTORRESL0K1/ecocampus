@@ -13,6 +13,7 @@ Reporte de las pruebas aplicadas al sitio desplegado en Lightsail, donde si hay 
 | Prueba | Herramienta | Resultado | Seccion |
 | :--- | :--- | :--- | :--- |
 | Rendimiento del cliente | Lighthouse 13.5.0 (3 corridas por pagina, movil y escritorio) | `resultados/lighthouse-resumen.md` y los JSON en `resultados/lighthouse/` | [Lighthouse](#rendimiento-del-cliente-lighthouse) |
+| Rendimiento del cliente (segunda herramienta) | WebPageTest, inicio en escritorio y movil, 1 corrida cada uno | [webpagetest.md](./webpagetest.md) | [WebPageTest](#webpagetest) |
 | Peticiones de red del navegador | Playwright (5 corridas en frio por pagina) | `resultados/red-resumen.md`, datos en `resultados/red.json` | [Red](#peticiones-de-red-del-navegador) |
 | Compatibilidad en navegadores y dispositivos | Playwright (5 perfiles) | `resultados/compatibilidad.json` | [Compatibilidad](#compatibilidad) |
 | Carga concurrente sobre el servidor (lectura y escritura) | k6 | `resultados/produccion-ligero.json`, `produccion-medio.json`, `produccion-escritura-ligero.json`, `produccion-escritura-medio.json` | [Carga](#carga-concurrente) |
@@ -20,7 +21,7 @@ Reporte de las pruebas aplicadas al sitio desplegado en Lightsail, donde si hay 
 | Hardware, uso de recursos y logs del servidor | `recolectar-servidor.sh` (se ejecuta en el servidor) | `resultados/servidor.txt` | [Servidor](#servidor-hardware-logs-y-tiempos-del-backend) |
 | Georreferenciacion de los contenedores | `validar-georreferencia.mjs` | `resultados/georreferencia-validacion.md` | [Georreferenciacion](#georreferenciacion-de-los-contenedores) |
 
-No se uso WebPageTest: es un servicio externo que no se ejecuto desde este equipo. Lighthouse cubre el rendimiento del cliente; si el asesor pide WebPageTest, se corre sobre la misma URL y se agrega aqui.
+WebPageTest es un servicio externo: lo ejecuto la tesista desde su cuenta y aqui se documenta el resultado (ver [WebPageTest](#webpagetest)).
 
 ## Como repetirlas
 
@@ -63,13 +64,31 @@ Mediana de 3 corridas por combinacion. Detalle completo en `resultados/lighthous
 
 Hallazgos (datos de los reportes de Lighthouse):
 
-- **Peso de las imagenes.** Inicio transfiere unos 4 MB y el mapa unos 3 MB; Lighthouse estima ahorros de hasta 3.5 MB en entrega de imagenes. Las fotografias de los contenedores pesan alrededor de 1.5 MB cada una. Es la causa principal del LCP de 16.8 s en el mapa en movil.
+- **Peso de las imagenes.** Inicio transfiere unos 4 MB y el mapa unos 3 MB; Lighthouse estima ahorros de hasta 3.5 MB en entrega de imagenes. En la pagina de inicio, WebPageTest muestra que el peso son dos fotos externas de Pexels y Unsplash descargadas a 3000 px o mas (2.3 MB y 0.95 MB) para mostrarse a unos 222 px en escritorio; en movil no se descargan y la pagina pesa 531 KB (ver [webpagetest.md](./webpagetest.md)). Las fotografias de los contenedores del mapa pesan alrededor de 1.5 MB cada una. Es la causa principal del LCP de 16.8 s en el mapa en movil.
 - **Sin HTTPS.** "Buenas practicas" baja (52 a 78) por 15 a 17 peticiones inseguras y por no redirigir HTTP a HTTPS. Se resuelve con un dominio y `SITE_ADDRESS` en Caddy (ver README, seccion Produccion).
-- **Cache.** Lighthouse marca ahorros de 170 a 250 KB con politica de cache: el servidor no envia `Cache-Control` en los archivos estaticos.
+- **Cache.** Los archivos de `/assets/` ya se sirven con `Cache-Control: public, immutable` por un ano (lo confirma WebPageTest); lo que no lleva cache son las imagenes propias (logos, favicon, fotos) y el manifest, y de ahi los 170 a 250 KB de ahorro que marca Lighthouse.
 - **Redireccion.** Lighthouse detecta una redireccion en la carga que cuesta unos 1.1 s en movil (no se identifico cual; probablemente la de `/ecocampus` a `/ecocampus/`).
 - **Cookies de terceros.** Lighthouse detecta 2 o 3 en las paginas (no se identifico su origen).
 - Accesibilidad y SEO son altas (94 a 100 y 100).
 - Desplazamiento de diseno (CLS) de 0.176 en la calculadora en movil, por encima del umbral recomendado de 0.1.
+
+### WebPageTest
+
+Una corrida de la pagina de inicio por perfil (Chrome 152; escritorio 1024x681 y movil 393x659; solo primera visita). Detalle y conclusiones en [webpagetest.md](./webpagetest.md).
+
+| Metrica | Escritorio | Movil |
+| :--- | ---: | ---: |
+| TTFB | 37 ms | 143 ms |
+| FCP | 858 ms | 1103 ms |
+| LCP | 1055 ms | 1300 ms |
+| Speed Index | 1384 ms | 1688 ms |
+| TBT | 0 ms | 0 ms |
+| CLS | 0 | 0 |
+| Carga completa | 1423 ms | 1270 ms |
+| Peticiones | 26 | 23 |
+| Bytes recibidos | 4.27 MB | 0.54 MB |
+
+Los Core Web Vitals quedan en rango bueno en ambos perfiles. En escritorio el peso (3.94 MB de imagenes) viene de dos fotos externas de Pexels y Unsplash que se muestran a unos 222 px; en movil esas fotos no se descargan durante la carga. Las cifras de movil son mejores que las de Lighthouse porque WebPageTest no aplico su limitacion de CPU y de red. Quedan pendientes las 3 corridas y las paginas de calculadora y mapa.
 
 ## Peticiones de red del navegador
 
@@ -204,9 +223,9 @@ Validacion automatica (`validar-georreferencia.mjs`, tabla completa en `resultad
 
 | Prioridad | Hallazgo | Accion |
 | :--- | :--- | :--- |
-| Alta | Fotos de 1.5 MB cada una; inicio y mapa pesan 3 a 4 MB y el mapa en movil tiene LCP de 16.8 s | Redimensionar y comprimir (WebP, ancho maximo 800 px) y cargar las imagenes con `loading="lazy"` |
+| Alta | Inicio pesa 4 MB en escritorio por dos fotos externas (Pexels y Unsplash) descargadas a 3000 px para mostrarse a 222 px; las fotos de 1.5 MB del mapa; el mapa en movil tiene LCP de 16.8 s | Pedir las fotos externas ya redimensionadas o servirlas desde el proyecto en WebP a unos 600 px; comprimir las fotos del mapa (WebP, ancho maximo de 800 px) |
 | Alta | Sin HTTPS | Dominio y HTTPS con Caddy; mejora "buenas practicas" y es requisito del login federado |
-| Media | Sin `Cache-Control` en los archivos estaticos | Agregar cabeceras de cache largas a `/assets/` (tienen hash en el nombre) |
+| Media | Imagenes propias (logos, favicon, fotos) y manifest sin `Cache-Control`; `/assets/` ya esta bien | Cache larga tambien para `/Logos/`, `/Depositos/` y el favicon |
 | Media | Imagen de `ucol.mx` bloqueada en inicio (10 de 565 peticiones) | Copiarla al proyecto o quitarla |
 | Media | Una redireccion de unos 1.1 s en movil | Identificar cual es (probablemente `/ecocampus` a `/ecocampus/`) y evitarla |
 | Baja | CLS de 0.176 en la calculadora en movil | Reservar el tamano de la imagen de cada pregunta |
