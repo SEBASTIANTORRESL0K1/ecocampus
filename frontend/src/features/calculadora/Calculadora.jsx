@@ -65,6 +65,9 @@ const Calculadora = () => {
   const [tiempoInicio] = useState(() => Date.now());
   const [verCuestionario, setVerCuestionario] = useState(false);
   const [avisoEnvio, setAvisoEnvio] = useState(null);
+  const [inputHabitantes, setInputHabitantes] = useState(
+    String(respuestas.habitantesHogar ?? 1)
+  );
 
   const hayRespuestas = tieneRespuestas(respuestas);
 
@@ -143,8 +146,18 @@ const Calculadora = () => {
     setRespuestas({ ...respuestas, detalle25: detalle, 25: total });
   };
 
-  const actualizarHabitantesHogar = (n) => {
-    setRespuestas({ ...respuestas, habitantesHogar: Math.max(1, Number(n) || 1) });
+  const actualizarHabitantesHogar = (raw) => {
+    setInputHabitantes(raw);
+    const n = parseInt(raw, 10);
+    if (!isNaN(n) && n >= 1) {
+      setRespuestas((prev) => ({ ...prev, habitantesHogar: n }));
+    }
+  };
+
+  const confirmarHabitantesHogar = () => {
+    const n = Math.max(1, parseInt(inputHabitantes, 10) || 1);
+    setInputHabitantes(String(n));
+    setRespuestas((prev) => ({ ...prev, habitantesHogar: n }));
   };
 
   const handleSiguiente = () => {
@@ -176,6 +189,7 @@ const Calculadora = () => {
     setResultado(null);
     setAvisoRecuperado(false);
     setModalBorrarAbierto(false);
+    setInputHabitantes("1");
   };
 
   // Regresa al último paso conservando las respuestas para poder cambiarlas.
@@ -419,8 +433,9 @@ const Calculadora = () => {
                   <input
                     type="number"
                     min="1"
-                    value={respuestas.habitantesHogar ?? 1}
+                    value={inputHabitantes}
                     onChange={(e) => actualizarHabitantesHogar(e.target.value)}
+                    onBlur={confirmarHabitantesHogar}
                     className="w-24 border border-gray-300 rounded-md px-2 py-2 text-center"
                   />
                 </div>
