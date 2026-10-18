@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import GuiaReciclaje from './GuiaReciclaje';
 
+vi.mock('../../hooks/useScrollReveal', () => ({
+  default: () => ({ ref: { current: null }, isVisible: true }),
+}));
+
 vi.mock('lucide-react', () => ({
   RefreshCw: () => null,
   Repeat: () => null,
