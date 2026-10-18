@@ -71,7 +71,7 @@ Las fotos de Pexels y Unsplash llevan `loading="lazy"`. En movil, con las tarjet
 - **Terceros.** Google Fonts, `fonts.gstatic.com`, `cdnjs.cloudflare.com` (Font Awesome), Pexels, Unsplash, `encrypted-tbn0.gstatic.com` y `ucol.mx`.
 - **CSS que posiblemente bloquea el renderizado.** WebPageTest marca cinco hojas de estilo (Google Fonts, Font Awesome y tres propias: Leaflet, el indice y las animaciones); aun asi el primer pintado ocurre a los 858 ms en escritorio y a los 1103 ms en movil.
 - **Tiempo del servidor.** En escritorio los archivos propios responden en 4 a 17 ms de TTFB; en movil unos 62 a 66 ms, que equivalen casi por completo al viaje de red. No hay lentitud del lado del servidor.
-- **CPU del navegador.** En movil la utilizacion de CPU se mantiene entre 26 % y 95 % durante toda la carga (en escritorio cae a 5 % despues de la primera mitad de segundo), y el tiempo de CPU de la carga completa es de 3739 ms contra 2299 ms en escritorio.
+- **CPU del navegador.** En movil la utilizacion de CPU se mantiene entre 26 % y 95 % durante toda la carga (en escritorio cae a 5 % a partir de 1.6 s), y el tiempo de CPU de la carga completa es de 3739 ms contra 2299 ms en escritorio.
 
 ## Comparacion con Lighthouse
 
