@@ -1,5 +1,7 @@
 # Pruebas de compatibilidad
 
+> Esta pagina documenta la ejecucion local, contra un servidor de desarrollo en el equipo de la tesista (los navegadores siempre corren en el equipo cliente). La misma bateria contra el servidor de Lightsail, con el acceso por correo y la API, esta en [produccion/README.md](./produccion/README.md#compatibilidad).
+
 Pruebas automatizadas de las vistas publicas en varios navegadores y perfiles de dispositivo. Ultima ejecucion: 17 de octubre de 2026, 30 pruebas, 30 correctas, 1 min 30 s.
 
 ## Herramienta

@@ -4,14 +4,16 @@ Punto de entrada a toda la documentacion de pruebas de EcoCampus y respuesta pun
 
 ## Documentos
 
+Lo que se mide del servidor (rendimiento, carga, CPU y memoria, tiempos del backend, hardware) esta en `produccion/` y en la primera parte de `rendimiento.md`, y corresponde a la VM de Lightsail. Los documentos marcados como locales o historicos describen otros ambientes y se rotulan asi.
+
 | Documento | Contenido |
 | :--- | :--- |
 | [README.md](./README.md) | Filosofia, comandos rapidos y suites de prueba |
 | [vitest-guidelines.md](./vitest-guidelines.md) | Pruebas de componentes con Vitest |
 | [playwright-e2e.md](./playwright-e2e.md) | Pruebas E2E con Playwright |
-| [compatibilidad.md](./compatibilidad.md) | Compatibilidad en entorno local (5 perfiles) |
-| [rendimiento.md](./rendimiento.md) | Carga con k6 en el entorno aislado y resumen de produccion |
-| [performance.md](./performance.md) | Notas de la herramienta de rendimiento (k6) |
+| [compatibilidad.md](./compatibilidad.md) | Compatibilidad en entorno local (5 perfiles); la de produccion esta en `produccion/` |
+| [rendimiento.md](./rendimiento.md) | Carga con k6: primero el servidor de produccion (VM de Lightsail) y despues el entorno aislado local |
+| [performance.md](./performance.md) | Historico: prueba anterior del sitio estatico en otro equipo; no es la VM |
 | [produccion/README.md](./produccion/README.md) | **Reporte completo de las pruebas sobre el servidor de produccion (Lightsail)** |
 | [produccion/webpagetest.md](./produccion/webpagetest.md) | Resultados de WebPageTest (inicio, escritorio y movil) |
 
