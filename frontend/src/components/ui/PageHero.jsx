@@ -2,6 +2,7 @@ import React from "react";
 
 const PageHero = ({
   backgroundSeed,
+  backgroundImageUrl,
   eyebrow,
   title,
   description,
@@ -13,7 +14,7 @@ const PageHero = ({
   <section style={{ position: "relative", overflow: "hidden" }}>
     {/* img instead of CSS background-image so browsers discover and preload it early */}
     <img
-      src={`https://picsum.photos/seed/${backgroundSeed}/1920/600`}
+      src={backgroundImageUrl ?? `https://picsum.photos/seed/${backgroundSeed}/1920/600`}
       alt=""
       aria-hidden="true"
       fetchPriority="high"
