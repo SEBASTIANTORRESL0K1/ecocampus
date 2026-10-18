@@ -4,6 +4,7 @@ import CtaButton from "../../components/ui/CtaButton";
 
 const HeroSection = () => (
   <PageHero
+    backgroundImageUrl="https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cmVjaWNsYXJ8ZW58MHx8MHx8fDA%3D"
     backgroundSeed="reciclaje"
     eyebrow="Plataforma ambiental universitaria"
     title="Guía de Reciclaje"

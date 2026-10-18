@@ -27,6 +27,7 @@ const Comunidad = () => {
           style={{ "--reveal-delay": "0ms" }}
         >
           <PageHero
+            backgroundImageUrl="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cmVjaWNsYXJ8ZW58MHx8MHx8fDA%3D"
             backgroundSeed="comunidad"
             eyebrow="Noticias y eventos ambientales"
             title="Comunidad EcoCampus"
