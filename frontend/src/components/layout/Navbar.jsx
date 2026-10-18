@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const Navbar = ({ transparent = false }) => {
@@ -6,9 +6,66 @@ const Navbar = ({ transparent = false }) => {
   const cerrarMenu = () => setMenuAbierto(false);
   const { pathname } = useLocation();
 
-  const navBase = transparent
-    ? "absolute top-0 left-0 right-0 z-50 bg-transparent"
-    : "relative bg-lime-600 z-50";
+  const [visible, setVisible] = useState(true);
+  const [atTop, setAtTop] = useState(true);
+  const lastScrollY = useRef(0);
+  const autoHideTimer = useRef(null);
+
+  const clearAutoHideTimer = () => {
+    if (autoHideTimer.current) {
+      clearTimeout(autoHideTimer.current);
+      autoHideTimer.current = null;
+    }
+  };
+
+  const resetAutoHideTimer = () => {
+    clearAutoHideTimer();
+    autoHideTimer.current = setTimeout(() => {
+      if (window.scrollY >= 80) {
+        setVisible(false);
+      }
+    }, 3000);
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const isAtTop = scrollY < 80;
+      setAtTop(isAtTop);
+
+      if (isAtTop) {
+        setVisible(true);
+        clearAutoHideTimer();
+        lastScrollY.current = scrollY;
+        return;
+      }
+
+      const scrollingDown = scrollY > lastScrollY.current;
+      lastScrollY.current = scrollY;
+
+      if (scrollingDown) {
+        setVisible(false);
+        clearAutoHideTimer();
+      } else {
+        setVisible(true);
+        resetAutoHideTimer();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearAutoHideTimer();
+    };
+  }, []);
+
+  const bgClass = transparent
+    ? atTop
+      ? "bg-transparent"
+      : "bg-lime-600"
+    : "bg-lime-600";
+
+  const visibilityClass = visible ? "translate-y-0" : "-translate-y-full";
 
   const linkClass = (to) => {
     const isActive = pathname === to;
@@ -29,9 +86,8 @@ const Navbar = ({ transparent = false }) => {
     : "bg-lime-700";
 
   return (
-    <nav className={`${navBase} text-white px-8 h-16`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 ${bgClass} ${visibilityClass} transition-transform duration-300 ease-in-out text-white px-8 h-16`}>
       <div className="flex justify-between items-center h-full">
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0" onClick={cerrarMenu}>
           <span className="bg-white rounded-full h-9 w-9 flex items-center justify-center shrink-0">
             <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="Logo EcoCampus" className="h-7 w-7" />
@@ -39,7 +95,6 @@ const Navbar = ({ transparent = false }) => {
           <span className="text-2xl font-bold">EcoCampus</span>
         </Link>
 
-        {/* Botón hamburguesa: solo en móvil */}
         <button
           className="sm:hidden flex flex-col justify-center gap-1.5 p-2 min-h-[44px] min-w-[44px] rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           onClick={() => setMenuAbierto(!menuAbierto)}
@@ -58,7 +113,6 @@ const Navbar = ({ transparent = false }) => {
           ></span>
         </button>
 
-        {/* Menú escritorio */}
         <ul className="hidden sm:flex items-center space-x-6">
           <li><Link to="/" className={linkClass("/")}>Inicio</Link></li>
           <li><Link to="/calculadora" className={linkClass("/calculadora")}>Calculadora</Link></li>
@@ -68,7 +122,6 @@ const Navbar = ({ transparent = false }) => {
         </ul>
       </div>
 
-      {/* Menú móvil desplegable */}
       {menuAbierto && (
         <ul
           id="nav-menu-mobile"
