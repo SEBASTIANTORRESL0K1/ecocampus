@@ -1,0 +1,17 @@
+# Entorno aislado para pruebas de carga, sobre el compose base (sin dev ni prod):
+#   docker compose --env-file .env.loadtest -p ecocampus-loadtest -f docker-compose.yml -f docker-compose.loadtest.yml up -d --build
+# El proyecto "ecocampus-loadtest" crea su propio volumen de MySQL, asi que no toca los datos del estudio.
+# En .env.loadtest, REQUIERE_LOGIN=false usa el acceso por correo: k6 abre una sesion por cada envio (no hace falta SAML).
+# No publica puertos: k6 corre dentro de la red del proyecto (ver docs/testing/rendimiento.md).
+# Sin valores por defecto: las variables salen del archivo de entorno (plantilla: .env.loadtest.example).
+services:
+  backend:
+    volumes:
+      # Certificados SAML de desarrollo (el backend los lee al arrancar)
+      - ./backend/cert:/app/cert:ro
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${API_URL:?define API_URL en .env.loadtest}
+        VITE_EXPERIMENTO_ACTIVO: ${EXPERIMENTO_ACTIVO:?define EXPERIMENTO_ACTIVO en .env.loadtest}

@@ -32,6 +32,34 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
   contrast:
     runs-on: ubuntu-latest
     defaults:
@@ -76,8 +104,9 @@ jobs:
       - name: Install Playwright browsers
         run: node_modules/.bin/playwright install --with-deps chromium
 
+      # Solo la calculadora y solo Chromium; la compatibilidad multinavegador va en el job `compatibilidad`
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: npm run test:e2e -- --project=chromium e2e/calculadora.spec.js
 
       - name: Upload Playwright report
         if: failure()
@@ -95,7 +124,7 @@ jobs:
           path: frontend/test-results/
           retention-days: 7
 
-  performance:
+  compatibilidad:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -114,17 +143,25 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Build
-        run: npm run build
+      # Chromium (escritorio y Pixel 7), Firefox y WebKit (escritorio e iPhone 14)
+      - name: Install Playwright browsers
+        run: node_modules/.bin/playwright install --with-deps chromium firefox webkit
 
-      - name: Start preview server
-        run: npm run preview &
+      - name: Run compatibility tests
+        run: npm run test:e2e -- e2e/compatibilidad.spec.js
 
-      - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12
+      - name: Upload compatibility results
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          urls: |
-            http://localhost:4173/ecocampus/
-          serverPort: 4173
-          uploadArtifacts: true
-          configPath: ./.lighthouserc.json
+          name: compatibilidad-resultados
+          path: frontend/test-results/compatibilidad.json
+          retention-days: 30
+
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compatibilidad-traces
+          path: frontend/test-results/
+          retention-days: 7

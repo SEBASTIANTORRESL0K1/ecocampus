@@ -1,0 +1,66 @@
+# Base comun a todos los entornos. No se usa sola: se combina con un archivo de entorno.
+# Este archivo NO define valores por defecto: toda variable se carga del .env y, si falta,
+# docker compose se detiene con un mensaje claro (ver .env.dev.example y .env.prod.example).
+#   Desarrollo:  docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#   Produccion:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# (o define COMPOSE_FILE en .env)
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?define MYSQL_ROOT_PASSWORD en .env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?define MYSQL_DATABASE en .env}
+      MYSQL_USER: ${MYSQL_USER:?define MYSQL_USER en .env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?define MYSQL_PASSWORD en .env}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:?define NODE_ENV en .env}
+      DB_HOST: ${DB_HOST:?define DB_HOST en .env}
+      DB_PORT: ${DB_PORT:?define DB_PORT en .env}
+      DB_NAME: ${MYSQL_DATABASE:?define MYSQL_DATABASE en .env}
+      DB_USER: ${MYSQL_USER:?define MYSQL_USER en .env}
+      DB_PASSWORD: ${MYSQL_PASSWORD:?define MYSQL_PASSWORD en .env}
+      SESSION_SECRET: ${SESSION_SECRET:?define SESSION_SECRET en .env}
+      ID_SALT: ${ID_SALT:?define ID_SALT en .env}
+      REQUIERE_LOGIN: ${REQUIERE_LOGIN:?define REQUIERE_LOGIN en .env}
+      CORREO_DOMINIOS_PERMITIDOS: ${CORREO_DOMINIOS_PERMITIDOS:?define CORREO_DOMINIOS_PERMITIDOS en .env}
+      FRONTEND_URL: ${FRONTEND_URL:?define FRONTEND_URL en .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:?define COOKIE_SECURE en .env}
+      TRUST_PROXY: ${TRUST_PROXY:?define TRUST_PROXY en .env}
+      SAML_ISSUER: ${SAML_ISSUER:?define SAML_ISSUER en .env}
+      SAML_CALLBACK_URL: ${SAML_CALLBACK_URL:?define SAML_CALLBACK_URL en .env}
+      SAML_LOGOUT_CALLBACK_URL: ${SAML_LOGOUT_CALLBACK_URL:?define SAML_LOGOUT_CALLBACK_URL en .env}
+      SAML_ENTRY_POINT: ${SAML_ENTRY_POINT:?define SAML_ENTRY_POINT en .env}
+      SAML_LOGOUT_URL: ${SAML_LOGOUT_URL:?define SAML_LOGOUT_URL en .env}
+      SAML_CLOCK_SKEW_MS: ${SAML_CLOCK_SKEW_MS:?define SAML_CLOCK_SKEW_MS en .env}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4006/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  frontend:
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+volumes:
+  db_data:

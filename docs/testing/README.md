@@ -27,9 +27,12 @@ npm run test:watch
 
 # Ejecutar pruebas E2E (Playwright)
 npm run test:e2e
+
+# Solo compatibilidad (5 navegadores/dispositivos)
+npx playwright test e2e/compatibilidad.spec.js
 ```
 
-Todos los comandos se ejecutan desde el directorio `frontend/`.
+Los comandos anteriores se ejecutan desde el directorio `frontend/`. Las pruebas del backend (validacion de respuestas) se ejecutan con `npm test` desde `backend/`. Las pruebas de carga se describen en [rendimiento.md](./rendimiento.md).
 
 ---
 
@@ -56,7 +59,23 @@ Archivos existentes:
 
 | Archivo | Que cubre |
 |---------|-----------|
-| `frontend/e2e/calculadora.spec.js` | Navegacion, flujos completos y validaciones de la calculadora |
+| `frontend/e2e/calculadora.spec.js` | Navegacion, flujos completos y validaciones de la calculadora (solo en `chromium`) |
+| `frontend/e2e/compatibilidad.spec.js` | Vistas publicas en Chromium, Firefox, WebKit, Pixel 7 y iPhone 14; ver [compatibilidad.md](./compatibilidad.md) |
+
+### Pruebas del backend
+
+| Archivo | Que cubre |
+|---------|-----------|
+| `backend/src/validacion/respuestas.test.ts` | Validacion de las respuestas del cuestionario con Zod (rangos, opciones, textos, identidad tomada de la sesion) |
+| `backend/src/config/cargar.test.ts` | Configuracion tipada: conversion de variables, valores invalidos y secretos obligatorios en produccion |
+| `backend/src/openapi/especificacion.test.ts` | La especificacion OpenAPI coincide con el codigo: todas las rutas de Express documentadas, obligatorios iguales a los del esquema Zod, ejemplo valido, `docs/openapi.json` al dia y rutas `/openapi.json` y `/docs` (esta ultima solo fuera de produccion) |
+| `backend/src/app.test.ts` | Rutas HTTP con una base de datos simulada: sesion, 401/400/409/500, CORS, metadatos SAML y salud |
+
+Se ejecutan con `npm test` desde `backend/` (corren TypeScript con `tsx`, sin MySQL ni el IdP) y en el CI (job `backend`, junto con `npm run typecheck` y `npm run build`).
+
+### Pruebas de carga
+
+Script `loadtest/k6.js` (k6) sobre un entorno Docker aislado: `docker-compose.loadtest.yml`. Resultados y metodologia en [rendimiento.md](./rendimiento.md).
 
 ---
 
@@ -72,3 +91,5 @@ Archivos existentes:
 
 - [Guia de pruebas de componentes con Vitest](./vitest-guidelines.md)
 - [Guia de pruebas E2E con Playwright](./playwright-e2e.md)
+- [Pruebas de rendimiento (k6)](./rendimiento.md)
+- [Pruebas de compatibilidad (navegadores y dispositivos)](./compatibilidad.md)

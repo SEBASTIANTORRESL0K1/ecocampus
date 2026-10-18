@@ -1,0 +1,91 @@
+# Produccion: imagenes construidas (sin codigo montado), MySQL sin puertos publicados y un unico
+# punto de entrada (Caddy) que reparte el trafico al frontend y al backend.
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Herramientas de base de datos (solo 127.0.0.1, acceder por tunel SSH):
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile tools up -d
+# Sin valores por defecto: las variables salen del .env (plantilla: .env.prod.example).
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  backend:
+    build:
+      context: ./backend
+      target: prod
+    logging: *logging
+    volumes:
+      # Certificados SAML del servidor, fuera del repositorio
+      - ${SAML_CERT_HOST_DIR:?define SAML_CERT_HOST_DIR en .env}:/app/cert:ro
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # La API se llama por el mismo origen del sitio (Caddy la reenvia al backend)
+        VITE_API_URL: ${API_URL:?define API_URL en .env}
+        VITE_EXPERIMENTO_ACTIVO: ${EXPERIMENTO_ACTIVO:?define EXPERIMENTO_ACTIVO en .env}
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?define SITE_ADDRESS en .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "${HTTP_PORT:?define HTTP_PORT en .env}:80"
+      - "${HTTPS_PORT:?define HTTPS_PORT en .env}:443"
+    logging: *logging
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  adminer:
+    image: adminer:4
+    profiles: ["tools"]
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: ${DB_HOST:?define DB_HOST en .env}
+    ports:
+      - "127.0.0.1:8081:8080"
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    profiles: ["tools"]
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: ${DB_HOST:?define DB_HOST en .env}
+      PMA_PORT: ${DB_PORT:?define DB_PORT en .env}
+    ports:
+      - "127.0.0.1:8082:80"
+
+volumes:
+  caddy_data:
+  caddy_config:

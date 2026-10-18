@@ -1,0 +1,55 @@
+# Desarrollo: recarga en vivo, puertos abiertos hacia tu maquina y herramientas de base de datos.
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+# Sin valores por defecto: las variables salen del .env (plantilla: .env.dev.example).
+services:
+  db:
+    ports:
+      - "127.0.0.1:3307:3306"
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    volumes:
+      # Codigo y certificados de desarrollo montados; node_modules queda el de la imagen (Linux).
+      # Al cambiar dependencias: docker compose up -d --build -V (renueva ese volumen anonimo)
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "4006:4006"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      VITE_API_URL: ${API_URL:?define API_URL en .env}
+      VITE_EXPERIMENTO_ACTIVO: ${EXPERIMENTO_ACTIVO:?define EXPERIMENTO_ACTIVO en .env}
+      VITE_USE_POLLING: ${VITE_USE_POLLING:?define VITE_USE_POLLING en .env}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+
+  adminer:
+    image: adminer:4
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: ${DB_HOST:?define DB_HOST en .env}
+    ports:
+      - "127.0.0.1:8081:8080"
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: ${DB_HOST:?define DB_HOST en .env}
+      PMA_PORT: ${DB_PORT:?define DB_PORT en .env}
+      UPLOAD_LIMIT: ${PMA_UPLOAD_LIMIT:?define PMA_UPLOAD_LIMIT en .env}
+    ports:
+      - "127.0.0.1:8082:80"

@@ -93,3 +93,13 @@ Las fotografias estan almacenadas en `public/Depositos/` y se referencian median
 - Mapa con bordes redondeados (`rounded-lg`) y sombra (`shadow-lg`).
 - Alto fijo de `500px` para garantizar visibilidad sin desplazamiento vertical excesivo.
 - Ancho del `91.67%` del contenedor (`w-11/12`) con maxima responsividad.
+
+---
+
+## Georreferenciacion de los puntos
+
+- **Sistema de referencia:** coordenadas geograficas en grados decimales, WGS84 (el que usan OpenStreetMap y Leaflet), con el orden `[latitud, longitud]`.
+- **Cobertura:** 21 puntos dentro del Campus Central de la Universidad de Colima, cada uno con nombre, coordenadas y fotografia del deposito (`puntosReciclaje.js` y `public/Depositos/`).
+- **Visualizacion:** mapa base de OpenStreetMap (zoom 17, centrado en `[19.249437, -103.698893]`); cada punto es un marcador cuyo popup muestra el nombre y la fotografia.
+- **Precision de los datos:** los primeros puntos tienen 6 decimales (aprox. 0.1 m de resolucion) y los demas hasta 15. La resolucion de las cifras no es la exactitud del dato: esta depende del metodo de captura (un GPS de celular suele dar entre 3 y 5 m; un punto marcado sobre imagen satelital, entre 1 y 2 m).
+- **Metodo de captura y verificacion:** pendiente de documentar por el autor. El repositorio no registra como se obtuvieron las coordenadas ni como se verificaron en campo; antes de citar este procedimiento en un reporte debe completarse aqui (instrumento o servicio usado, fecha del recorrido y comprobacion contra las fotografias o el mapa base).

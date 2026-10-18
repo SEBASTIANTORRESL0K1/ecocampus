@@ -7,6 +7,8 @@ import ImagenTema from "./ImagenTema";
 import ToastAviso from "./ToastAviso";
 import ModalConfirmacion from "./ModalConfirmacion";
 import { pasoRespondido } from "./pasoRespondido";
+import CuestionarioExperimento from "./CuestionarioExperimento";
+import { API_URL, EXPERIMENTO_ACTIVO } from "../../config/experiment";
 import {
   RESPUESTAS_INICIALES,
   borrarProgreso,
@@ -60,6 +62,9 @@ const Calculadora = () => {
     () => progresoInicial !== null && tieneRespuestas(progresoInicial.respuestas)
   );
   const [modalBorrarAbierto, setModalBorrarAbierto] = useState(false);
+  const [tiempoInicio] = useState(() => Date.now());
+  const [verCuestionario, setVerCuestionario] = useState(false);
+  const [avisoEnvio, setAvisoEnvio] = useState(null);
 
   const hayRespuestas = tieneRespuestas(respuestas);
 
@@ -147,8 +152,13 @@ const Calculadora = () => {
     if (pasoActual < pasos.length - 1) {
       setPasoActual(pasoActual + 1);
     } else {
-      setResultado(calcularHuellaEcologica(respuestas));
-      setVerResultado(true);
+      const resultadoCalculado = calcularHuellaEcologica(respuestas);
+      setResultado(resultadoCalculado);
+      if (EXPERIMENTO_ACTIVO) {
+        setVerCuestionario(true);
+      } else {
+        setVerResultado(true);
+      }
     }
   };
 
@@ -162,6 +172,7 @@ const Calculadora = () => {
     setPasoActual(0);
     setRespuestas({ ...RESPUESTAS_INICIALES });
     setVerResultado(false);
+    setVerCuestionario(false);
     setResultado(null);
     setAvisoRecuperado(false);
     setModalBorrarAbierto(false);
@@ -181,7 +192,7 @@ const Calculadora = () => {
   return (
     <PageLayout className="bg-[#f7f9f4]">
       {/* Barra de progreso */}
-      {!verResultado && (
+      {!verResultado && !verCuestionario && (
         <>
           <div ref={progressRef} className={`reveal-load${progressVisible ? " is-visible" : ""}`}>
             <div className="w-full h-2 bg-gray-200">
@@ -198,7 +209,7 @@ const Calculadora = () => {
       )}
 
       {/* Contenido principal */}
-      {!verResultado && (
+      {!verResultado && !verCuestionario && (
         <div className="flex-grow flex flex-col items-center justify-center p-6">
           <div
             ref={cardRef}
@@ -408,6 +419,17 @@ const Calculadora = () => {
         </div>
       )}
 
+      {/* Cuestionario del experimento */}
+      {verCuestionario && resultado && (
+        <div className="flex-grow flex flex-col items-center justify-center p-6">
+          <CuestionarioExperimento
+            respuestasCalculadora={respuestas}
+            tiempoTranscurrido={Math.round((Date.now() - tiempoInicio) / 1000 / 60)}
+            onCompletar={manejarCuestionarioCompleto}
+          />
+        </div>
+      )}
+
       {/* Pantalla de resultado final */}
       {verResultado && resultado && (
         <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-6">
@@ -512,7 +534,7 @@ const Calculadora = () => {
         </div>
       )}
       {/* Aviso flotante cuando se restauró progreso guardado */}
-      {avisoRecuperado && (
+      {avisoRecuperado && !verCuestionario && (
         <ToastAviso
           mensaje="Recuperamos tus respuestas guardadas."
           textoAccion="Borrar respuestas y empezar de nuevo"
@@ -522,14 +544,18 @@ const Calculadora = () => {
         />
       )}
 
-      <ModalConfirmacion
-        abierto={modalBorrarAbierto}
-        titulo="¿Borrar tus respuestas?"
-        descripcion="Se perderán todas las respuestas guardadas en este navegador y el cuestionario volverá a empezar desde la pregunta 1."
-        textoConfirmar="Sí, borrar respuestas"
-        onConfirmar={reiniciarCuestionario}
-        onCancelar={() => setModalBorrarAbierto(false)}
-      />
+      {avisoEnvio && <ToastAviso mensaje={avisoEnvio} duracion={9000} onCerrar={() => setAvisoEnvio(null)} />}
+
+      {!verCuestionario && (
+        <ModalConfirmacion
+          abierto={modalBorrarAbierto}
+          titulo="¿Borrar tus respuestas?"
+          descripcion="Se perderán todas las respuestas guardadas en este navegador y el cuestionario volverá a empezar desde la pregunta 1."
+          textoConfirmar="Sí, borrar respuestas"
+          onConfirmar={reiniciarCuestionario}
+          onCancelar={() => setModalBorrarAbierto(false)}
+        />
+      )}
     </PageLayout>
   );
 };

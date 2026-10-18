@@ -2,7 +2,7 @@
 
 ## Stack y configuracion
 
-- **Playwright** con proyecto `chromium` unicamente.
+- **Playwright** con cinco proyectos: `chromium`, `firefox`, `webkit`, `movil-android-chrome` (Pixel 7) y `movil-ios-safari` (iPhone 14). `calculadora.spec.js` corre solo en `chromium`; `compatibilidad.spec.js` corre en todos.
 - **1 worker** (ejecucion secuencial).
 - **0 retries** — los fallos no se reintentan automaticamente.
 - Configuracion en `frontend/playwright.config.js`.
@@ -10,13 +10,15 @@
 
 ### Servidor de desarrollo
 
-Playwright inicia `npm run dev` automaticamente antes de los tests. Espera a que `http://localhost:5173/ecocampus/` responda antes de correr cualquier prueba. Fuera de CI, si ya hay un servidor corriendo en ese puerto, lo reutiliza (no lo mata ni reinicia).
+Playwright inicia su propio servidor de desarrollo en el puerto **5174** (`npm run dev -- --port 5174 --strictPort`) y espera a que `http://localhost:5174/ecocampus/` responda. No reutiliza el servidor normal de desarrollo (puerto 5173): asi las variables de entorno de las pruebas siempre aplican. Estas variables son `VITE_API_URL` vacia (sin login) y `VITE_EXPERIMENTO_ACTIVO=false` (sin el cuestionario del experimento), de modo que la calculadora muestra "Tu resultado" al finalizar.
+
+El reporte JSON se escribe en `frontend/test-results/compatibilidad.json`.
 
 ---
 
 ## El problema de la ruta base
 
-La aplicacion esta montada bajo el base path `/ecocampus/`. La `baseURL` configurada es `http://localhost:5173`, por lo que navegar a `/` no lleva a la aplicacion.
+La aplicacion esta montada bajo el base path `/ecocampus/`. La `baseURL` configurada es `http://localhost:5174`, por lo que navegar a `/` no lleva a la aplicacion.
 
 **Regla:** nunca usar `page.goto('/')` ni rutas sin el prefijo `/ecocampus/`. Usar siempre los helpers de navegacion definidos en el archivo de prueba.
 
