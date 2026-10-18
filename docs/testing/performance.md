@@ -1,5 +1,7 @@
 # Pruebas de rendimiento — EcoCampus
 
+> **Documento historico: no corresponde al servidor de Lightsail.** Describe una prueba anterior del sitio estatico (servidor `vite preview` por loopback en otro equipo, con otro procesador), de cuando el proyecto solo se publicaba en GitHub Pages. Las pruebas vigentes del servidor de produccion estan en [produccion/README.md](./produccion/README.md) y la carga en [rendimiento.md](./rendimiento.md).
+
 ## Herramienta empleada
 
 **k6 v2.2.0** (Grafana Labs, Apache 2.0)

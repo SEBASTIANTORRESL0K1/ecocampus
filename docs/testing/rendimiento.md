@@ -1,8 +1,52 @@
 # Pruebas de rendimiento
 
-Resultados medidos el 16 de octubre de 2026 sobre el stack Docker (frontend nginx, backend Node.js, MySQL 8). Las cifras son validas para el ambiente descrito abajo; deben repetirse en el servidor definitivo.
+Este documento reune dos mediciones de carga con k6, en dos ambientes distintos que no deben confundirse:
 
-## Resumen
+| | Entorno aislado local | Servidor de produccion |
+| :--- | :--- | :--- |
+| Donde corre el sistema | Docker Desktop en el equipo de la tesista (Windows 11, 15.3 GB de RAM) | VM de AWS Lightsail (2 vCPU, 1.9 GB de RAM) |
+| Donde corre k6 | En el mismo equipo y la misma red Docker que el sistema | En el equipo de la tesista, por internet |
+| Fecha | 16 de octubre de 2026 | 18 de octubre de 2026 |
+| Usuarios maximos | 100 (carga) y 300 (estres) | 100 |
+| Seccion | [Resumen](#resumen-entorno-aislado-local) y siguientes | [Resultados en el servidor de produccion](#resultados-en-el-servidor-de-produccion-lightsail) |
+
+Las secciones desde "Resumen" hasta "Lectura de los resultados" describen el entorno aislado local (stack Docker con frontend nginx, backend Node.js y MySQL 8) y sus cifras valen solo para ese ambiente. La CPU y la memoria del servidor real se midieron en la VM y estan en la seccion de produccion.
+
+## Resultados en el servidor de produccion (Lightsail)
+
+Ademas del entorno aislado, la carga se midio sobre el servidor real, con el acceso por correo activo. Reporte completo, metodo y datos crudos en [produccion/README.md](./produccion/README.md).
+
+### Ambiente de hardware y red (produccion)
+
+| Elemento | Valor |
+| :--- | :--- |
+| Servidor (donde se miden CPU y memoria) | VM de AWS Lightsail en `us-east-2` (Ohio): Ubuntu 24.04, 2 vCPU Intel Xeon Platinum 8259CL a 2.5 GHz, 1906 MB de RAM sin swap, disco de 58 GB |
+| Contenedores | Docker 29.9.1 y Compose v5.6.0: MySQL 8.0 (limite 1 GiB), backend (512 MiB), proxy Caddy y frontend nginx (128 MiB cada uno) |
+| Generador de carga | k6 en Docker Desktop en el equipo de la tesista (AMD Ryzen 5 5500U, Windows 11, 15.3 GB de RAM); no comparte maquina con el servidor |
+| Red | Internet real: de Colima, Mexico, a Ohio; latencia minima de unos 60 ms por peticion; HTTP sin cifrar, sin dominio |
+| Medicion de CPU y memoria | `muestrear-recursos.sh` ejecutado dentro de la VM, cada ~3 s |
+
+Los 15.3 GB de RAM y los 12 CPU del equipo local no son del servidor de produccion; el generador de carga los usa, pero no se registro su consumo. Las cifras de CPU y memoria de esta seccion son todas de la VM de 1.9 GB.
+
+| Prueba | Perfil | Usuarios (max) | Peticiones | Por segundo | Fallos | p95 (ms) | Maximo (ms) |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Lectura (inicio, calculadora, mapa, JS, CSS, `/api/me`) | ligero | 10 | 1741 | 21.5 | 0.00 % | 205 | 334 |
+| Lectura | medio | 30 | 7363 | 66.7 | 0.00 % | 197 | 845 |
+| Escritura (acceso por correo y `POST /api/respuestas`) | ligero | 10 | 732 (366 respuestas) | 9.1 | 0.00 % | 153 / 117 | 201 / 140 |
+| Escritura | medio | 30 | 3222 (1611 respuestas) | 29.2 | 0.00 % | 125 / 102 | 230 / 183 |
+| Lectura | cien | 100 | 51 499 | 300.6 | 0.00 % | 195 | 638 |
+| Escritura | cien | 100 | 21 978 (10 989 respuestas) | 128.8 | 0.00 % | 212 / 193 | 479 / 236 |
+
+- En escritura el p95 se da como acceso / envio. Todas las respuestas se guardaron (201) y el backend no registro errores 5xx.
+- Con 100 usuarios la CPU del servidor (2 vCPU) llego como maximo a 48.1 %, la CPU robada fue de 0.8 % o menos y la memoria usada subio unos 46 MB (maximo de 1150 MB, siempre con al menos 756 MB disponibles); graficas en [produccion/README.md](./produccion/README.md#cpu-y-memoria-durante-100-usuarios-simultaneos).
+- Desde un cliente remoto la latencia minima de cualquier peticion es de unos 60 ms (red hasta Ohio); el backend atiende las lecturas en 1 a 2 ms.
+- Las cifras del entorno aislado local (mas abajo; mediciones anteriores al acceso por correo) siguen siendo una referencia de capacidad maxima; las de produccion reflejan el sistema actual con red real.
+
+## Entorno aislado local (no es la VM de Lightsail)
+
+Todo lo que sigue hasta "Lectura de los resultados" se midio **en el equipo de la tesista**, con el sistema y k6 corriendo juntos en Docker Desktop, y **no corresponde a la VM de Lightsail**. Sirve como referencia de capacidad maxima sin red real (hasta 300 usuarios) y como comparacion entre versiones del backend. Las cifras del servidor real estan arriba.
+
+## Resumen (entorno aislado local)
 
 | | Carga | Estres |
 | :--- | :--- | :--- |
@@ -32,7 +76,9 @@ Umbrales definidos (todos cumplidos): tasa de fallos menor a 1 % y p95 menor a 1
 - **Perfil de carga:** rampa a 25 usuarios (30 s), a 50 (30 s), 50 sostenidos (60 s), rampa a 100 (30 s), 100 sostenidos (30 s) y descenso (20 s).
 - **Perfil de estres:** rampa a 100 (30 s), a 200 (30 s), a 300 (30 s), 300 sostenidos (60 s) y descenso (20 s).
 
-## Ambiente de hardware y red
+## Ambiente de hardware y red (entorno aislado local)
+
+Este es el equipo donde se corrio el sistema y k6 en la medicion local; no es el servidor de produccion (ver su ambiente mas abajo).
 
 | Elemento | Valor |
 | :--- | :--- |
@@ -96,7 +142,7 @@ El perfil de carga se corrio con una version previa del script que solo desglosa
 
 ## Comparacion tras migrar el backend a TypeScript
 
-El 18 de octubre de 2026 se repitio el perfil de carga (100 usuarios virtuales, 3 min 21 s) contra el backend compilado de TypeScript (Node.js 22 y validacion con Zod), en el mismo equipo y con el mismo entorno aislado.
+El 18 de octubre de 2026 se repitio el perfil de carga (100 usuarios virtuales, 3 min 21 s) contra el backend compilado de TypeScript (Node.js 22 y validacion con Zod), en el equipo de la tesista y con el mismo entorno aislado local (no la VM de Lightsail).
 
 | Metrica | Antes (JavaScript, Node 20) | Despues (TypeScript, Node 22) |
 | :--- | :--- | :--- |
@@ -119,35 +165,18 @@ Si en una repeticion aparecen fallos, el script cuenta cada error por endpoint y
 - El cuello de botella es el proceso Node.js del backend: llego a 92.7 % de CPU, es decir, casi un nucleo completo (Node ejecuta JavaScript en un solo hilo). Por eso `health` (p95 40 ms) y `api_me` (p95 26 ms), que hacen casi nada, son mas lentos que los estaticos: esperan turno en el ciclo de eventos.
 - Escribir una respuesta tarda 15 ms de mediana y 62 ms en p95 con 300 usuarios simultaneos. El estudio no espera esa concurrencia: aun asi, el sistema la absorbio sin errores.
 
-## Resultados en el servidor de produccion (Lightsail)
-
-Ademas del entorno aislado, la carga se midio sobre el servidor real (2 vCPU, 1.9 GB de RAM, `us-east-2`), con el acceso por correo activo. Reporte completo, metodo y datos crudos en [produccion/README.md](./produccion/README.md).
-
-| Prueba | Perfil | Usuarios (max) | Peticiones | Por segundo | Fallos | p95 (ms) | Maximo (ms) |
-| :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Lectura (inicio, calculadora, mapa, JS, CSS, `/api/me`) | ligero | 10 | 1741 | 21.5 | 0.00 % | 205 | 334 |
-| Lectura | medio | 30 | 7363 | 66.7 | 0.00 % | 197 | 845 |
-| Escritura (acceso por correo y `POST /api/respuestas`) | ligero | 10 | 732 (366 respuestas) | 9.1 | 0.00 % | 153 / 117 | 201 / 140 |
-| Escritura | medio | 30 | 3222 (1611 respuestas) | 29.2 | 0.00 % | 125 / 102 | 230 / 183 |
-| Lectura | cien | 100 | 51 499 | 300.6 | 0.00 % | 195 | 638 |
-| Escritura | cien | 100 | 21 978 (10 989 respuestas) | 128.8 | 0.00 % | 212 / 193 | 479 / 236 |
-
-- En escritura el p95 se da como acceso / envio. Todas las respuestas se guardaron (201) y el backend no registro errores 5xx.
-- Con 100 usuarios la CPU del servidor (2 vCPU) llego como maximo a 48.1 %, la CPU robada fue de 0.8 % o menos y la memoria usada subio unos 46 MB (maximo de 1150 MB, siempre con al menos 756 MB disponibles); graficas en [produccion/README.md](./produccion/README.md#cpu-y-memoria-durante-100-usuarios-simultaneos).
-- Desde un cliente remoto la latencia minima de cualquier peticion es de unos 60 ms (red hasta Ohio); el backend atiende las lecturas en 1 a 2 ms.
-- Las cifras del entorno aislado de arriba (mediciones anteriores al acceso por correo) siguen siendo una referencia de capacidad maxima; las de produccion reflejan el sistema actual con red real.
-
 ## Limitaciones
 
-- Servidor y generador de carga comparten maquina, por lo que los resultados son conservadores en CPU y optimistas en red.
-- La red es el bridge de Docker (sin latencia ni limite de ancho de banda). En un servidor real el ancho de banda pesara mas: cada visita descarga unos 435 KB de JavaScript.
+- Entorno aislado local: servidor y generador de carga comparten maquina, por lo que los resultados son conservadores en CPU y optimistas en red.
+- Produccion: el generador de carga es un solo equipo domestico y no se midio su consumo ni el de su conexion; como la CPU de la VM quedo en 48 % como maximo y los tiempos no crecieron, no parece haber sido el limite, pero no esta comprobado.
+- En el entorno aislado la red es el bridge de Docker (sin latencia ni limite de ancho de banda); en produccion se midio con red real.
 - `/api/me` se midio sin sesion; con sesion consulta MySQL y seria algo mas lento.
 - Las mediciones del entorno aislado son anteriores al acceso por correo: el `POST` se midio sin sesion. Desde entonces `loadtest/k6.js` abre una sesion con `POST /api/acceso/correo` (endpoint `acceso_correo`, un correo unico por envio) antes de cada `POST /api/respuestas`; repite esa prueba para actualizar las cifras locales. Las cifras con sesion ya estan en la seccion de produccion.
 - Pruebas de pocos minutos: no miden degradacion a largo plazo.
 
-## Como reproducir
+## Como reproducir (entorno aislado local)
 
-El entorno de prueba usa un proyecto de compose aparte (volumen y base propios, sin puertos publicados), asi que no toca los datos del estudio. Conviene detener antes el stack principal para liberar memoria.
+La carga contra el servidor de produccion se repite con los comandos de [produccion/README.md](./produccion/README.md#como-repetirlas). El entorno aislado local usa un proyecto de compose aparte (volumen y base propios, sin puertos publicados), asi que no toca los datos del estudio. Conviene detener antes el stack principal para liberar memoria.
 
 ```bash
 cp .env.loadtest.example .env.loadtest      # solo la primera vez
@@ -167,4 +196,5 @@ En Linux o macOS se usa `$(pwd)` en lugar de `$(pwd -W)` y no hace falta `MSYS_N
 
 ## Pendiente
 
-Repetir ambos perfiles en el servidor de despliegue (la VM) y registrar su hardware y la red real entre el generador de carga y el servidor.
+- La repeticion en la VM ya se hizo (ver la seccion de produccion). Falta repetir en el entorno aislado local el perfil de carga con el acceso por correo, para actualizar las cifras locales.
+- Medir en produccion una carga sostenida durante mas tiempo y registrar el consumo del equipo generador de carga.

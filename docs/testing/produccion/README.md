@@ -127,7 +127,7 @@ Durante esta ejecucion se detecto que el titulo del mapa cambio a "Mapa de Recic
 
 ## Carga concurrente
 
-k6 desde el mismo equipo, `loadtest/k6-produccion.js`, **solo lecturas** (`GET`) para no gastar la cuota de transferencia. No pide las fotos de los contenedores. Cada usuario virtual repite: inicio, calculadora, mapa, JS, CSS y `/api/me`, con 1 s de pausa.
+k6 desde el equipo de la tesista (no comparte maquina con la VM), `loadtest/k6-produccion.js`, **solo lecturas** (`GET`) para no gastar la cuota de transferencia. No pide las fotos de los contenedores. Cada usuario virtual repite: inicio, calculadora, mapa, JS, CSS y `/api/me`, con 1 s de pausa.
 
 | Perfil | Usuarios virtuales (maximo) | Duracion | Peticiones | Por segundo | Fallos | Media (ms) | p95 (ms) | p99 (ms) | Maximo (ms) | Datos recibidos |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
