@@ -10,6 +10,10 @@ import Calculadora from "./Calculadora";
 import { pasoRespondido } from "./pasoRespondido";
 import { CLAVE_PROGRESO } from "./progresoGuardado";
 
+vi.mock('../../hooks/useScrollReveal', () => ({
+	default: () => ({ ref: { current: null }, isVisible: true }),
+}));
+
 const renderCalculadora = () =>
 	render(
 		<MemoryRouter>
