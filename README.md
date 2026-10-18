@@ -111,29 +111,96 @@ La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `b
 
 ## Ejecucion con Docker (experimento)
 
-Requiere Docker Desktop (o Docker Engine con el plugin compose).
+Requiere Docker Desktop (o Docker Engine con el plugin compose). La configuracion esta dividida en un archivo base y un archivo por entorno:
+
+| Archivo | Para que sirve |
+| :--- | :--- |
+| `docker-compose.yml` | Base comun: MySQL 8, backend y frontend (sin puertos ni build del frontend) |
+| `docker-compose.dev.yml` | Desarrollo: recarga en vivo, puertos abiertos, Adminer y phpMyAdmin |
+| `docker-compose.prod.yml` | Produccion: imagenes construidas, solo el proxy publica puertos, limites, rotacion de logs |
+| `docker-compose.loadtest.yml` | Entorno aislado para pruebas de carga (ver `docs/testing/rendimiento.md`) |
+| `.env.dev.example`, `.env.prod.example`, `.env.loadtest.example` | Plantillas con TODAS las variables de cada entorno |
+
+**Los compose no tienen valores por defecto:** toda variable se carga del `.env` y, si falta o esta vacia, `docker compose` se detiene con un mensaje como `required variable SAML_ISSUER is missing a value`. Al agregar una variable nueva, anadela a las tres plantillas. Solo quedan fijos en los compose lo que no es configuracion de entorno (imagenes, puertos internos, rutas de volumenes, limites de memoria y healthchecks).
+
+### Desarrollo
 
 ```
-cp .env.example .env      # completa las contrasenas y secretos
-docker compose up --build
+cp .env.dev.example .env
+docker compose up --build        # .env ya indica COMPOSE_FILE (base + dev)
 ```
 
 | Servicio | URL |
 | :--- | :--- |
-| Frontend | http://localhost:8080/ecocampus/ |
-| Backend | http://localhost:4006 (`/health`, `/Metadata`) |
+| Frontend (Vite, recarga en vivo) | http://localhost:5173/ecocampus/ |
+| Backend (TypeScript con nodemon, reinicia al guardar) | http://localhost:4006 (`/health`, `/Metadata`) |
 | Adminer (consulta y exporta a CSV) | http://localhost:8081, servidor `db`, usuario `ecocampus`, base `ecocampus` |
 | phpMyAdmin | http://localhost:8082, usuario `ecocampus` y la contrasena `MYSQL_PASSWORD` de tu `.env` (el usuario `root` usa `MYSQL_ROOT_PASSWORD`) |
+| MySQL desde tu equipo | 127.0.0.1:3307 |
 
-- `backend/cert/` debe contener `cert.pem`, `idp.crt` y `key.pem` (de desarrollo, tomados de https://github.com/Universidad-de-Colima/login-federado-node); se montan como volumen; estan versionados en el repo con autorizacion del asesor (son credenciales de desarrollo, no de produccion).
+- El codigo de `backend/` y `frontend/` se monta como volumen: editar un archivo recarga el servicio (se usa polling porque los volumenes montados desde Windows no emiten eventos de archivos).
+- `backend/cert/` contiene `cert.pem`, `idp.crt` y `key.pem` (de desarrollo, tomados de https://github.com/Universidad-de-Colima/login-federado-node); estan versionados en el repo con autorizacion del asesor (son credenciales de desarrollo, no de produccion).
 - Los datos viven en el volumen `db_data`; `docker compose down` los conserva y `docker compose down -v` los borra.
 - El esquema esta en `db/schema.sql` y solo se aplica al crear el volumen por primera vez.
 - Pruebas del backend: `cd backend && npm test`.
 
-### Despliegue en EC2
+### Backend (TypeScript)
 
-1. Instancia con Docker y el plugin compose; abre en el grupo de seguridad solo los puertos 80 y 443 (el 8081 de Adminer, el 8082 de phpMyAdmin y el 3307 (MySQL) quedan en 127.0.0.1; usa un tunel SSH para entrar a ellos).
-2. En `.env` define `FRONTEND_URL` y `API_URL` con tu dominio, `COOKIE_SECURE=true` y `TRUST_PROXY=true`, y genera `SESSION_SECRET` e `ID_SALT` con `openssl rand -hex 32`.
-3. Pon un proxy con HTTPS (nginx o un balanceador) delante del frontend y del backend.
-4. El login SAML en un servidor publico requiere EntityID, certificados y URL de callback propios, que se tramitan con sistemas@ucol.mx. Las credenciales de desarrollo solo funcionan con `localhost:4006`.
-5. Respalda el volumen de MySQL (por ejemplo con `mysqldump` programado) antes de iniciar el estudio.
+El backend esta escrito en TypeScript estricto (`strict` y `noUncheckedIndexedAccess`) y se compila a `backend/dist/`.
+
+```
+backend/src/
+  server.ts            punto de entrada: carga la configuracion, espera a MySQL y escucha
+  app.ts               arma la aplicacion de Express (crearApp), sin escuchar; se usa tambien en las pruebas
+  config/              variables de entorno validadas con Zod (falla al arrancar con un mensaje claro)
+  auth/                estrategia SAML, perfil de la UCOL y derivacion del participante
+  routes/              auth, respuestas y salud
+  validacion/          esquema Zod de las respuestas: valida y genera el tipo de la fila a insertar
+  db.ts, logger.ts
+```
+
+| Comando (desde `backend/`) | Para que sirve |
+| :--- | :--- |
+| `npm run dev` | Recarga en vivo con nodemon y tsx (lo usa el contenedor de desarrollo) |
+| `npm run typecheck` | Comprueba los tipos sin generar archivos |
+| `npm test` | Pruebas unitarias y de rutas (no necesitan MySQL) |
+| `npm run build` | Compila a `dist/` |
+| `npm start` | Ejecuta el JavaScript compilado (lo que corre produccion) |
+
+- Si cambias `package.json` o `package-lock.json`, recrea el contenedor de desarrollo con `docker compose up -d --build -V`: el `-V` renueva el volumen anonimo de `node_modules`; sin el, el contenedor sigue con las dependencias anteriores.
+- La imagen de produccion contiene solo `dist/` y las dependencias de ejecucion (sin TypeScript, tsx ni nodemon) y corre como usuario `node`.
+- En produccion (`NODE_ENV=production`) el backend exige `SESSION_SECRET` (minimo 16 caracteres), `ID_SALT` y `DB_PASSWORD`, y no arranca sin ellos.
+
+### Produccion
+
+```
+cp .env.prod.example .env        # completa TODAS las variables
+docker compose up -d --build     # .env ya indica COMPOSE_FILE (base + prod)
+```
+
+Sin un `.env` con `COMPOSE_FILE`, usa los archivos de forma explicita: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`.
+
+- **Un solo punto de entrada:** el contenedor `proxy` (Caddy) es el unico que publica puertos (80 y 443). Reenvia `/api`, `/login`, `/logout` y `/Metadata` al backend y todo lo demas al frontend. MySQL, backend y frontend no se publican.
+- **Sin dominio todavia:** deja `SITE_ADDRESS=:80` y usa `http://IP-DEL-SERVIDOR` en `API_URL`, `FRONTEND_URL` (con `/ecocampus/calculadora`) y los callbacks SAML; el sitio se sirve por HTTP. Con dominio, pon `SITE_ADDRESS=tu.dominio`, esas URLs con `https://tu.dominio` y `COOKIE_SECURE=true`: Caddy obtiene y renueva el certificado HTTPS solo (el dominio debe apuntar al servidor y los puertos 80 y 443 deben estar abiertos).
+- **Login SAML:** sin `SAML_ISSUER` ni certificados propios se usan los de desarrollo, que solo funcionan con callback en `localhost:4006` y no sirven para usuarios remotos (el backend lo avisa en sus logs). Los valores propios los tramita sistemas@ucol.mx; se configuran con `SAML_ISSUER`, `SAML_CALLBACK_URL`, `SAML_LOGOUT_CALLBACK_URL` y `SAML_CERT_HOST_DIR` (carpeta del servidor, fuera del repositorio, con `cert.pem`, `idp.crt` y `key.pem`). Todas las variables `SAML_*` y `SAML_CERT_HOST_DIR` son obligatorias en el `.env`.
+- **Herramientas de base de datos:** no arrancan por defecto. Para usarlas: `docker compose --profile tools up -d` y entra por un tunel SSH a `127.0.0.1:8081` (Adminer) o `127.0.0.1:8082` (phpMyAdmin).
+- **Operacion:** `restart: unless-stopped`, limites de memoria (MySQL 1 GB, backend 512 MB, el resto 128 MB) y rotacion de logs (3 archivos de 10 MB por servicio).
+
+### Despliegue en una maquina virtual (EC2, Azure u otra)
+
+1. Instancia Linux con Docker y el plugin compose; en el grupo de seguridad abre solo los puertos 22 (limitado a tu IP), 80 y 443.
+2. `git clone` del repositorio, rama a desplegar, y `cp .env.prod.example .env` con todos los valores (genera secretos con `openssl rand -hex 32`).
+3. `docker compose up -d --build`. Para actualizar: `git pull` y el mismo comando.
+4. Prueba `http://IP/ecocampus/`, `http://IP/api/me` y registra una respuesta de prueba (con `REQUIERE_LOGIN=false` temporal) antes de abrir el estudio; borra esa fila despues.
+
+### Respaldo y restauracion de MySQL (manual)
+
+```
+# respaldo (guardalo fuera del servidor)
+docker compose exec -T db sh -c 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --single-transaction ecocampus' > respaldo_$(date +%F).sql
+
+# restauracion
+docker compose exec -T db sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" ecocampus' < respaldo_AAAA-MM-DD.sql
+```
+
+Haz un respaldo antes de iniciar el estudio y de forma periodica durante el; si se pierde el volumen `db_data`, se pierden las respuestas.

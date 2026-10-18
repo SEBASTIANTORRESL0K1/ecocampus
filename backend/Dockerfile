@@ -1,13 +1,28 @@
-FROM node:20-alpine
+FROM node:22-alpine AS base
 WORKDIR /app
-ENV NODE_ENV=production
-
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
 
-COPY app.js db.js validacion.js ./
+# Desarrollo: el codigo (src/) se monta como volumen y nodemon reinicia al guardar. -L usa polling,
+# necesario con volumenes montados desde Windows. Se usa con: build.target = dev.
+FROM base AS dev
+ENV NODE_ENV=development
+RUN npm ci --ignore-scripts
+EXPOSE 4006
+CMD ["npm", "run", "dev"]
 
-# cert/ se monta como volumen (docker-compose.yml); la llave privada no va en la imagen.
+# Compilacion: TypeScript -> dist/ (con todas las dependencias, incluidas las de desarrollo).
+FROM base AS build
+RUN npm ci --ignore-scripts
+COPY tsconfig.json tsconfig.build.json ./
+COPY src ./src
+RUN npm run build
+
+# Produccion (etapa por defecto): solo dependencias de ejecucion y el JavaScript compilado.
+# cert/ se monta como volumen; las llaves no van en la imagen.
+FROM base AS prod
+ENV NODE_ENV=production
+RUN npm ci --omit=dev --ignore-scripts
+COPY --from=build /app/dist ./dist
 USER node
 EXPOSE 4006
-CMD ["node", "app.js"]
+CMD ["node", "--enable-source-maps", "dist/server.js"]

@@ -92,22 +92,35 @@ El login usa la configuracion y los certificados de desarrollo que proporciono e
 - Solo participan estudiantes: el backend exige `uTipo = Estudiante`.
 - El navegador nunca recibe correo, nombre ni numero de cuenta. El backend lee la identidad de la sesion SAML y guarda un id pseudonimo (hash con `ID_SALT`) y el correo en MySQL.
 - Una respuesta por participante y por correo (indices `UNIQUE` en `db/schema.sql`).
-- Las listas de opciones (sexo, carrera, semestre, planetas) deben coincidir entre `frontend/src/config/experiment.js` y `backend/validacion.js`.
+- Las listas de opciones (sexo, carrera, semestre, planetas) deben coincidir entre `frontend/src/config/experiment.js` y `backend/src/validacion/respuestas.ts`.
 - Los secretos de `.env` no se versionan ni se muestran en respuestas. La llave `key.pem` de desarrollo si se versiona (autorizado por el asesor); una llave propia de produccion no debe versionarse.
+
+### Backend en TypeScript
+
+- El backend esta en `backend/src/` (TypeScript estricto, Zod) y se compila a `dist/`; no hay JavaScript en la raiz de `backend/`. Estructura y comandos en la seccion "Backend (TypeScript)" del `README.md`.
+- Comandos desde `backend/`: `npm run typecheck`, `npm test` (28+ pruebas, sin MySQL ni IdP), `npm run build`, `npm run dev`. El CI tiene un job `backend` con typecheck, pruebas y build.
+- La configuracion se valida en `src/config/cargar.ts`; una variable nueva se agrega ahi y tambien al compose y a las tres plantillas `.env.*.example`. La identidad del participante se deriva en el servidor (`src/auth/participante.ts`); el correo nunca sale hacia el navegador.
+- El esquema de las respuestas (`src/validacion/respuestas.ts`) define a la vez la validacion y el tipo de la fila de MySQL; si cambia `db/schema.sql`, cambian ambos y la lista `COLUMNAS`.
+- Tras cambiar dependencias, recrear el contenedor de desarrollo con `docker compose up -d --build -V` (renueva el volumen de `node_modules`).
+- Node 22 en las imagenes y en el CI.
 
 ### Stack con Docker
 
-`docker compose up --build` levanta MySQL 8, backend, frontend (nginx) y Adminer. Se necesita un `.env` en la raiz copiado de `.env.example`.
+Esta dividido en `docker-compose.yml` (base comun), `docker-compose.dev.yml` y `docker-compose.prod.yml`; se eligen con `COMPOSE_FILE` en el `.env` (plantillas `.env.dev.example` y `.env.prod.example`) o con `-f`. `docker compose up --build` en desarrollo levanta MySQL 8, backend (nodemon), frontend (Vite) y las herramientas de base de datos. El `.env` de la raiz no se versiona.
 
-| Servicio | URL / puerto |
+| Servicio (desarrollo) | URL / puerto |
 | :--- | :--- |
-| Frontend | `http://localhost:8080/ecocampus/` |
+| Frontend (Vite) | `http://localhost:5173/ecocampus/` |
 | Backend | `http://localhost:4006` |
 | Adminer | `http://127.0.0.1:8081` (servidor `db`) |
 | phpMyAdmin | `http://127.0.0.1:8082` (usuario `ecocampus`, contrasena `MYSQL_PASSWORD` del `.env`) |
 | MySQL en el host | `127.0.0.1:3307` (el 3306 esta reservado en la maquina del usuario) |
 
+- Los compose NO tienen valores por defecto ni literales de entorno: toda variable sale del `.env` con `${VAR:?mensaje}` y, si falta o esta vacia, `docker compose` falla. Al agregar una variable, ponerla en `.env.dev.example`, `.env.prod.example` y `.env.loadtest.example`. Las pruebas de carga usan `--env-file .env.loadtest`.
+- Produccion: solo el contenedor `proxy` (Caddy) publica puertos; MySQL, backend y frontend quedan internos; Adminer y phpMyAdmin solo con `--profile tools`. Sin dominio se sirve por HTTP (`SITE_ADDRESS=:80`).
+- Los valores SAML de arriba son los de **desarrollo** (viven en `.env.dev.example`); `backend/src/config/cargar.ts` los lee de `SAML_ISSUER`, `SAML_CALLBACK_URL`, `SAML_LOGOUT_CALLBACK_URL`, `SAML_ENTRY_POINT`, `SAML_LOGOUT_URL`, `SAML_CERT_DIR` y `SAML_CLOCK_SKEW_MS` para poder usar credenciales propias en produccion sin tocar el codigo.
+- El flujo de ramas es `main -> experiment/survey-questions` (traer cambios de main a la rama del experimento). No fusionar `survey` en `main` hasta publicar el experimento; ver el historial de `49a704e`.
 - Pruebas del backend: `cd backend && npm test`. Pruebas del frontend: `cd frontend && npx vitest run`.
 - Dos pruebas de imagen de `Calculadora.test.jsx` fallan tambien en `main`; no son regresiones.
 - E2E y compatibilidad (Playwright): `cd frontend && npx playwright test`. Usa su propio servidor en el puerto 5174 con `VITE_API_URL` vacia y `VITE_EXPERIMENTO_ACTIVO=false`.
-- Carga (k6): `loadtest/k6.js` con `docker-compose.loadtest.yml`; el procedimiento esta en `docs/testing/rendimiento.md`. El equipo del usuario tiene poca RAM libre: detener el stack principal antes y no ejecutar a la vez pruebas pesadas.
+- Carga (k6): `loadtest/k6.js` con `docker-compose.loadtest.yml`; el procedimiento esta en `docs/testing/rendimiento.md`. El equipo del usuario tiene poca RAM libre: detener el stack de desarrollo (`docker compose stop`) antes y no ejecutar a la vez pruebas pesadas.
