@@ -58,13 +58,14 @@ ecocampus/
 ├── .env.dev.example, .env.prod.example, .env.loadtest.example   # plantillas con TODAS las variables
 ├── .github/workflows/
 │   ├── test.yml                 # CI: jobs unit, backend, contrast, e2e y compatibilidad
-│   └── deploy.yml               # despliegue a GitHub Pages
+│   ├── deploy.yml               # despliegue a GitHub Pages
+│   └── deploy-lightsail.yml     # despliegue por SSH a AWS Lightsail (con aprobación y regreso automático)
 ├── backend/                     # API en TypeScript (ver "Backend (TypeScript)")
 │   ├── src/                     # server.ts, app.ts, config/, auth/, routes/, validacion/, db.ts, logger.ts
 │   ├── cert/                    # certificados SAML de desarrollo
 │   └── Dockerfile               # etapas dev, build y prod
 ├── db/schema.sql                # tabla de respuestas (se aplica al crear el volumen)
-├── deploy/Caddyfile             # proxy de producción
+├── deploy/                      # Caddyfile (proxy), desplegar.sh y preparar-servidor.sh (despliegue en Lightsail)
 ├── loadtest/                    # k6.js y results/ (resultados medidos)
 ├── docs/
 │   ├── README.md                # documentación general
@@ -220,6 +221,10 @@ docker compose up -d --build     # el .env ya indica COMPOSE_FILE (base + prod)
 3. `docker compose up -d --build`. Para actualizar: `git pull` y el mismo comando.
 4. Prueba `http://IP/ecocampus/` y `http://IP/api/me`. Registra una respuesta de prueba (con `REQUIERE_LOGIN=false` temporal) antes de abrir el estudio y borra esa fila después.
 
+### Despliegue automático en AWS Lightsail
+
+El workflow `.github/workflows/deploy-lightsail.yml` despliega por SSH cada push a `experiment/survey-questions`: corre las pruebas del backend, espera tu aprobación (Environment `production`), actualiza el servidor con `docker compose up -d --build` y verifica que quede sano; si falla, **vuelve solo a la versión anterior**. Necesita una instancia preparada con `deploy/preparar-servidor.sh` y cuatro secrets en GitHub. Guía paso a paso, avisos y solución de problemas: [docs/despliegue-lightsail.md](docs/despliegue-lightsail.md).
+
 ### Respaldo y restauración de MySQL (manual)
 
 ```bash
@@ -283,4 +288,5 @@ La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `b
 
 - [docs/README.md](docs/README.md) — documentación general del proyecto
 - Una guía por vista: [Inicio](docs/vista_1_inicio.md), [Calculadora](docs/vista_2_calculadora.md), [Mapa](docs/vista_3_mapa.md), [Comunidad](docs/vista_4_comunidad.md), [Guía de reciclaje](docs/vista_5_guia_reciclaje.md)
+- [Despliegue automático en AWS Lightsail](docs/despliegue-lightsail.md)
 - Pruebas: [docs/testing/](docs/testing/README.md), con [rendimiento](docs/testing/rendimiento.md) y [compatibilidad](docs/testing/compatibilidad.md)
