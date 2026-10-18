@@ -131,7 +131,7 @@ Acceso por correo (`REQUIERE_LOGIN=false`):
 docker compose exec -T db sh -c 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE"' < db/migraciones/001_metodo_acceso.sql
 ```
 
-Las filas anteriores quedan como `saml`. Si la columna ya existe, MySQL responde `Duplicate column name` y no cambia nada. Las bases nuevas ya la traen. En un servidor existente, agrega también `CORREO_DOMINIOS_PERMITIDOS=ucol.mx` a su `.env`: los compose no tienen valores por defecto y no arrancan sin ella.
+Las filas anteriores quedan como `saml`. Si ya se había aplicado, MySQL responde `Duplicate check constraint name` y no cambia nada. Las bases nuevas ya la traen. En un servidor existente, agrega también `CORREO_DOMINIOS_PERMITIDOS=ucol.mx` a su `.env`: los compose no tienen valores por defecto y no arrancan sin ella.
 
 ## Entornos
 
