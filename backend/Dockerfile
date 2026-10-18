@@ -1,21 +1,28 @@
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 WORKDIR /app
 COPY package.json package-lock.json ./
 
-# Desarrollo: el codigo se monta como volumen y nodemon reinicia al guardar (-L usa polling,
-# necesario con volumenes montados desde Windows). Se usa con: build.target = dev.
+# Desarrollo: el codigo (src/) se monta como volumen y nodemon reinicia al guardar. -L usa polling,
+# necesario con volumenes montados desde Windows. Se usa con: build.target = dev.
 FROM base AS dev
 ENV NODE_ENV=development
 RUN npm ci
 EXPOSE 4006
-CMD ["npx", "nodemon", "-L", "--ext", "js,json", "--ignore", "node_modules", "app.js"]
+CMD ["npm", "run", "dev"]
 
-# Produccion (etapa por defecto): solo dependencias de ejecucion y el codigo copiado en la imagen.
+# Compilacion: TypeScript -> dist/ (con todas las dependencias, incluidas las de desarrollo).
+FROM base AS build
+RUN npm ci
+COPY tsconfig.json tsconfig.build.json ./
+COPY src ./src
+RUN npm run build
+
+# Produccion (etapa por defecto): solo dependencias de ejecucion y el JavaScript compilado.
 # cert/ se monta como volumen; las llaves no van en la imagen.
 FROM base AS prod
 ENV NODE_ENV=production
 RUN npm ci --omit=dev
-COPY app.js db.js validacion.js ./
+COPY --from=build /app/dist ./dist
 USER node
 EXPOSE 4006
-CMD ["node", "app.js"]
+CMD ["node", "--enable-source-maps", "dist/server.js"]

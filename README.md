@@ -133,7 +133,7 @@ docker compose up --build        # .env ya indica COMPOSE_FILE (base + dev)
 | Servicio | URL |
 | :--- | :--- |
 | Frontend (Vite, recarga en vivo) | http://localhost:5173/ecocampus/ |
-| Backend (nodemon, reinicia al guardar) | http://localhost:4006 (`/health`, `/Metadata`) |
+| Backend (TypeScript con nodemon, reinicia al guardar) | http://localhost:4006 (`/health`, `/Metadata`) |
 | Adminer (consulta y exporta a CSV) | http://localhost:8081, servidor `db`, usuario `ecocampus`, base `ecocampus` |
 | phpMyAdmin | http://localhost:8082, usuario `ecocampus` y la contrasena `MYSQL_PASSWORD` de tu `.env` (el usuario `root` usa `MYSQL_ROOT_PASSWORD`) |
 | MySQL desde tu equipo | 127.0.0.1:3307 |
@@ -143,6 +143,33 @@ docker compose up --build        # .env ya indica COMPOSE_FILE (base + dev)
 - Los datos viven en el volumen `db_data`; `docker compose down` los conserva y `docker compose down -v` los borra.
 - El esquema esta en `db/schema.sql` y solo se aplica al crear el volumen por primera vez.
 - Pruebas del backend: `cd backend && npm test`.
+
+### Backend (TypeScript)
+
+El backend esta escrito en TypeScript estricto (`strict` y `noUncheckedIndexedAccess`) y se compila a `backend/dist/`.
+
+```
+backend/src/
+  server.ts            punto de entrada: carga la configuracion, espera a MySQL y escucha
+  app.ts               arma la aplicacion de Express (crearApp), sin escuchar; se usa tambien en las pruebas
+  config/              variables de entorno validadas con Zod (falla al arrancar con un mensaje claro)
+  auth/                estrategia SAML, perfil de la UCOL y derivacion del participante
+  routes/              auth, respuestas y salud
+  validacion/          esquema Zod de las respuestas: valida y genera el tipo de la fila a insertar
+  db.ts, logger.ts
+```
+
+| Comando (desde `backend/`) | Para que sirve |
+| :--- | :--- |
+| `npm run dev` | Recarga en vivo con nodemon y tsx (lo usa el contenedor de desarrollo) |
+| `npm run typecheck` | Comprueba los tipos sin generar archivos |
+| `npm test` | Pruebas unitarias y de rutas (no necesitan MySQL) |
+| `npm run build` | Compila a `dist/` |
+| `npm start` | Ejecuta el JavaScript compilado (lo que corre produccion) |
+
+- Si cambias `package.json` o `package-lock.json`, recrea el contenedor de desarrollo con `docker compose up -d --build -V`: el `-V` renueva el volumen anonimo de `node_modules`; sin el, el contenedor sigue con las dependencias anteriores.
+- La imagen de produccion contiene solo `dist/` y las dependencias de ejecucion (sin TypeScript, tsx ni nodemon) y corre como usuario `node`.
+- En produccion (`NODE_ENV=production`) el backend exige `SESSION_SECRET` (minimo 16 caracteres), `ID_SALT` y `DB_PASSWORD`, y no arranca sin ellos.
 
 ### Produccion
 

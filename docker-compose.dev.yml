@@ -11,7 +11,8 @@ services:
       context: ./backend
       target: dev
     volumes:
-      # Codigo y certificados de desarrollo montados; node_modules queda el de la imagen (Linux)
+      # Codigo y certificados de desarrollo montados; node_modules queda el de la imagen (Linux).
+      # Al cambiar dependencias: docker compose up -d --build -V (renueva ese volumen anonimo)
       - ./backend:/app
       - /app/node_modules
     ports:

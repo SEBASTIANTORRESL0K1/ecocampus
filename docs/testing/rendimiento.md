@@ -94,6 +94,19 @@ El perfil de carga se corrio con una version previa del script que solo desglosa
 | db (MySQL 8) | 18.4 % / 389.7 MiB | 21.5 % / 393.6 MiB |
 | frontend (nginx) | 11.1 % / 12.1 MiB | 30.0 % / 12.0 MiB |
 
+## Comparacion tras migrar el backend a TypeScript
+
+El 18 de octubre de 2026 se repitio el perfil de carga (100 usuarios virtuales, 3 min 21 s) contra el backend compilado de TypeScript (Node.js 22 y validacion con Zod), en el mismo equipo y con el mismo entorno aislado.
+
+| Metrica | Antes (JavaScript, Node 20) | Despues (TypeScript, Node 22) |
+| :--- | :--- | :--- |
+| Solicitudes totales / fallidas | 33,388 / 0 | 33,303 / 0 |
+| Global: mediana / p95 / p99 | 1.08 / 5.69 / 14.83 ms | 1.30 / 6.22 / 18.36 ms |
+| Global: maximo | 464.61 ms | 259.53 ms |
+| `POST /api/respuestas`: mediana / p95 / p99 | 12.11 / 25.97 / 72.10 ms | 14.00 / 34.36 / 52.80 ms |
+
+Sin solicitudes fallidas en ninguna de las dos. Los tiempos quedaron algo mas altos en mediana y p95 (menos de 1 ms en el global y unos 8 ms en el p95 del `POST`), mientras que el p99 del `POST` y el maximo fueron mejores. Es una sola corrida en una laptop con poca memoria libre, asi que la diferencia esta dentro del margen de variacion entre corridas y no permite concluir que haya una regresion. El unico costo de ejecucion que agrega la migracion es la validacion con Zod, de microsegundos por solicitud.
+
 ## Causa de las solicitudes fallidas
 
 No hubo solicitudes fallidas en ninguno de los dos perfiles (0 de 33,388 y 0 de 106,416), por lo que no hay causas de error que reportar. El backend registro solo tres avisos, todos del arranque mientras MySQL terminaba de iniciar (reintentos de conexion), no de la carga.

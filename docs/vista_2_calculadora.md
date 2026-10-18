@@ -291,4 +291,4 @@ Al finalizar el cuestionario se envia `POST {VITE_API_URL}/api/respuestas` con `
 
 ### Tipos de pregunta del cuestionario
 
-`opcion_unica`, `select`, `numero` (con `min` y `max`), `texto_corto`, `texto_largo` y `escala_likert` (1 a 5). Las listas de opciones deben coincidir con `backend/validacion.js`.
+`opcion_unica`, `select`, `numero` (con `min` y `max`), `texto_corto`, `texto_largo` y `escala_likert` (1 a 5). Las listas de opciones deben coincidir con `backend/src/validacion/respuestas.ts`.

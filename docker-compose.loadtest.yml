@@ -5,6 +5,10 @@
 # No publica puertos: k6 corre dentro de la red del proyecto (ver docs/testing/rendimiento.md).
 # Sin valores por defecto: las variables salen del archivo de entorno (plantilla: .env.loadtest.example).
 services:
+  backend:
+    volumes:
+      # Certificados SAML de desarrollo (el backend los lee al arrancar)
+      - ./backend/cert:/app/cert:ro
   frontend:
     build:
       context: ./frontend
