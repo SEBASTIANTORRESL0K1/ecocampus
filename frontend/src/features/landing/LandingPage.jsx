@@ -8,6 +8,8 @@ import SectionWrapper from "../../components/ui/SectionWrapper";
 import SectionHeading from "../../components/ui/SectionHeading";
 import FeatureCard from "../../components/ui/FeatureCard";
 import IconCircle from "../../components/ui/IconCircle";
+import useScrollReveal from "../../hooks/useScrollReveal";
+import "../../styles/scroll-animations.css";
 
 const tools = [
   {
@@ -37,24 +39,52 @@ const tools = [
 ];
 
 const LandingPage = () => {
+  /* ── About section refs ── */
+  const { ref: aboutTextRef, isVisible: aboutTextVisible } = useScrollReveal();
+  const { ref: aboutRightRef, isVisible: aboutRightVisible } = useScrollReveal();
+  const { ref: stat0Ref, isVisible: stat0Visible } = useScrollReveal();
+  const { ref: stat1Ref, isVisible: stat1Visible } = useScrollReveal();
+
+  /* ── Tools section refs ── */
+  const { ref: toolsHeadingRef, isVisible: toolsHeadingVisible } = useScrollReveal();
+  const { ref: card0Ref, isVisible: card0Visible } = useScrollReveal();
+  const { ref: card1Ref, isVisible: card1Visible } = useScrollReveal();
+  const { ref: card2Ref, isVisible: card2Visible } = useScrollReveal();
+  const { ref: card3Ref, isVisible: card3Visible } = useScrollReveal();
+
+  /* Map card refs so we can index into them during render */
+  const cardReveal = [
+    { ref: card0Ref, visible: card0Visible },
+    { ref: card1Ref, visible: card1Visible },
+    { ref: card2Ref, visible: card2Visible },
+    { ref: card3Ref, visible: card3Visible },
+  ];
+
   return (
     <PageLayout>
       <main>
-        {/* ── Hero ── */}
-        <PageHero
-          backgroundSeed="ecocampus"
-          eyebrow="Plataforma ambiental universitaria"
-          title="Calcula tu huella ecológica"
-          description="Conoce tu impacto ambiental y actúa hoy"
-          minHeight="100dvh"
-          cta={
-            <Link to="/calculadora">
-              <CtaButton>Comenzar cálculo</CtaButton>
-            </Link>
-          }
-        />
+        {/* ── Hero — load-time animation (not scroll-triggered) ── */}
+        {/*
+          PageHero is a shared component and must not be modified.
+          We wrap it with reveal-load so the entire hero fades in on mount.
+          Individual element stagger would require changes inside PageHero.
+        */}
+        <div className="reveal-load" style={{ '--reveal-delay': '0ms' }}>
+          <PageHero
+            backgroundSeed="ecocampus"
+            eyebrow="Plataforma ambiental universitaria"
+            title="Calcula tu huella ecológica"
+            description="Conoce tu impacto ambiental y actúa hoy"
+            minHeight="100dvh"
+            cta={
+              <Link to="/calculadora">
+                <CtaButton>Comenzar cálculo</CtaButton>
+              </Link>
+            }
+          />
+        </div>
 
-        {/* ── Welcome / About ── */}
+        {/* ── About — 2-column scroll reveal with staggered stats ── */}
         <section
           style={{
             background: "#ffffff",
@@ -72,71 +102,77 @@ const LandingPage = () => {
             }}
             className="landing-about-grid"
           >
-            {/* Left: text */}
+            {/* Left: text content block — reveals first */}
             <div>
-              <p
-                style={{
-                  fontStyle: "italic",
-                  color: "#4a7c59",
-                  fontSize: "1.05rem",
-                  marginBottom: "0.4rem",
-                }}
-              >
-                Bienvenido a EcoCampus
-              </p>
-              <h2
-                style={{
-                  fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  color: "#1a2e1a",
-                  margin: "0 0 1rem",
-                  textWrap: "balance",
-                  lineHeight: 1.2,
-                }}
-              >
-                ¿Qué es la huella ecológica?
-              </h2>
-              {/* Decorative leaf divider */}
               <div
-                style={{
-                  marginBottom: "1.25rem",
-                  lineHeight: 1,
-                }}
-                aria-hidden="true"
+                ref={aboutTextRef}
+                className={`reveal${aboutTextVisible ? " is-visible" : ""}`}
+                style={{ '--reveal-delay': '0ms' }}
               >
-                <Leaf size={28} color="#4a7c59" />
+                <p
+                  style={{
+                    fontStyle: "italic",
+                    color: "#4a7c59",
+                    fontSize: "1.05rem",
+                    marginBottom: "0.4rem",
+                  }}
+                >
+                  Bienvenido a EcoCampus
+                </p>
+                <h2
+                  style={{
+                    fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    color: "#1a2e1a",
+                    margin: "0 0 1rem",
+                    textWrap: "balance",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  ¿Qué es la huella ecológica?
+                </h2>
+                {/* Decorative leaf divider */}
+                <div
+                  style={{
+                    marginBottom: "1.25rem",
+                    lineHeight: 1,
+                  }}
+                  aria-hidden="true"
+                >
+                  <Leaf size={28} color="#4a7c59" />
+                </div>
+                <p
+                  style={{
+                    color: "#3a4a3a",
+                    lineHeight: 1.75,
+                    marginBottom: "1.25rem",
+                    fontSize: "1rem",
+                  }}
+                >
+                  La huella ecológica es un indicador que mide el impacto de las
+                  actividades humanas en el medio ambiente. Evalúa la cantidad de
+                  tierra y agua necesarias para producir los recursos que
+                  consumimos y absorber los desechos generados.
+                </p>
+                <p
+                  style={{
+                    color: "#3a4a3a",
+                    lineHeight: 1.75,
+                    fontSize: "1rem",
+                  }}
+                >
+                  México tiene una huella ecológica de aproximadamente{" "}
+                  <strong style={{ color: "#2d6a2d" }}>3.1 hectáreas globales</strong>{" "}
+                  por persona, según datos del WWF. Además, México ocupa el lugar
+                  26 en el ranking de concentración anual de PM2.5, con un
+                  promedio de{" "}
+                  <strong style={{ color: "#2d6a2d" }}>20.1 µg/m³</strong>.
+                </p>
               </div>
-              <p
-                style={{
-                  color: "#3a4a3a",
-                  lineHeight: 1.75,
-                  marginBottom: "1.25rem",
-                  fontSize: "1rem",
-                }}
-              >
-                La huella ecológica es un indicador que mide el impacto de las
-                actividades humanas en el medio ambiente. Evalúa la cantidad de
-                tierra y agua necesarias para producir los recursos que
-                consumimos y absorber los desechos generados.
-              </p>
-              <p
-                style={{
-                  color: "#3a4a3a",
-                  lineHeight: 1.75,
-                  fontSize: "1rem",
-                }}
-              >
-                México tiene una huella ecológica de aproximadamente{" "}
-                <strong style={{ color: "#2d6a2d" }}>3.1 hectáreas globales</strong>{" "}
-                por persona, según datos del WWF. Además, México ocupa el lugar
-                26 en el ranking de concentración anual de PM2.5, con un
-                promedio de{" "}
-                <strong style={{ color: "#2d6a2d" }}>20.1 µg/m³</strong>.
-              </p>
 
-              {/* Stats row */}
+              {/* Stats row — each stat reveals with 80ms stagger */}
               <div
                 style={{
                   display: "flex",
@@ -144,7 +180,11 @@ const LandingPage = () => {
                   marginTop: "2rem",
                 }}
               >
-                <div>
+                <div
+                  ref={stat0Ref}
+                  className={`reveal${stat0Visible ? " is-visible" : ""}`}
+                  style={{ '--reveal-delay': '0ms' }}
+                >
                   <p
                     style={{
                       fontSize: "2rem",
@@ -168,6 +208,7 @@ const LandingPage = () => {
                     ha globales / persona
                   </p>
                 </div>
+
                 <div
                   style={{
                     width: "1px",
@@ -176,7 +217,12 @@ const LandingPage = () => {
                   }}
                   aria-hidden="true"
                 />
-                <div>
+
+                <div
+                  ref={stat1Ref}
+                  className={`reveal${stat1Visible ? " is-visible" : ""}`}
+                  style={{ '--reveal-delay': '80ms' }}
+                >
                   <p
                     style={{
                       fontSize: "2rem",
@@ -203,9 +249,12 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Right: image */}
+            {/* Right: image — reveals 150ms after left column */}
             <div
+              ref={aboutRightRef}
+              className={`reveal${aboutRightVisible ? " is-visible" : ""}`}
               style={{
+                '--reveal-delay': '150ms',
                 borderRadius: "8px",
                 overflow: "hidden",
                 boxShadow: "0 16px 40px rgba(34,85,44,0.15)",
@@ -228,11 +277,18 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* ── Services ── */}
+        {/* ── Herramientas — heading then staggered cards ── */}
         <SectionWrapper background="var(--color-section-alt)">
-          <SectionHeading eyebrow="Todo lo que necesitas" title="Nuestras herramientas" />
+          {/* Section heading reveals first */}
+          <div
+            ref={toolsHeadingRef}
+            className={`reveal${toolsHeadingVisible ? " is-visible" : ""}`}
+            style={{ '--reveal-delay': '0ms' }}
+          >
+            <SectionHeading eyebrow="Todo lo que necesitas" title="Nuestras herramientas" />
+          </div>
 
-          {/* Cards grid */}
+          {/* Cards grid — each card staggered 80ms apart */}
           <div
             style={{
               display: "grid",
@@ -240,37 +296,43 @@ const LandingPage = () => {
               gap: "1.5rem",
             }}
           >
-            {tools.map((tool) => (
-              <Link
+            {tools.map((tool, index) => (
+              <div
                 key={tool.to}
-                to={tool.to}
-                style={{ textDecoration: "none" }}
+                ref={cardReveal[index].ref}
+                className={`reveal-card${cardReveal[index].visible ? " is-visible" : ""}`}
+                style={{ '--reveal-delay': `${index * 80}ms` }}
               >
-                <FeatureCard cursor="pointer">
-                  <IconCircle Icon={tool.Icon} />
-                  <h3
-                    style={{
-                      fontSize: "1.05rem",
-                      fontWeight: 600,
-                      color: "#1a2e1a",
-                      margin: "0 0 0.5rem",
-                      letterSpacing: "0.02em",
-                    }}
-                  >
-                    {tool.name}
-                  </h3>
-                  <p
-                    style={{
-                      fontSize: "0.88rem",
-                      color: "#5a7a5a",
-                      margin: 0,
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {tool.description}
-                  </p>
-                </FeatureCard>
-              </Link>
+                <Link
+                  to={tool.to}
+                  style={{ textDecoration: "none" }}
+                >
+                  <FeatureCard cursor="pointer">
+                    <IconCircle Icon={tool.Icon} />
+                    <h3
+                      style={{
+                        fontSize: "1.05rem",
+                        fontWeight: 600,
+                        color: "#1a2e1a",
+                        margin: "0 0 0.5rem",
+                        letterSpacing: "0.02em",
+                      }}
+                    >
+                      {tool.name}
+                    </h3>
+                    <p
+                      style={{
+                        fontSize: "0.88rem",
+                        color: "#5a7a5a",
+                        margin: 0,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {tool.description}
+                    </p>
+                  </FeatureCard>
+                </Link>
+              </div>
             ))}
           </div>
         </SectionWrapper>
