@@ -8,47 +8,85 @@ Proyecto de tesis — Universidad de Colima.
 
 ## Tecnologías
 
+**Frontend**
 - [React](https://react.dev/) 19 con [Vite](https://vite.dev/) 8 (`@vitejs/plugin-react`)
 - [React Router](https://reactrouter.com/) 7 (`BrowserRouter` con `basename="/ecocampus"`)
 - [Tailwind CSS](https://tailwindcss.com/) 4 mediante el plugin `@tailwindcss/vite`
 - [Leaflet](https://leafletjs.com/) 1.9 / [react-leaflet](https://react-leaflet.js.org/) 5 para el mapa de puntos de reciclaje
 - Font Awesome cargado desde CDN en `index.html`
-- Pruebas: [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) y [Playwright](https://playwright.dev/) para E2E
+
+**Backend (modo experimento)**
+- Node.js 22 con [Express](https://expressjs.com/) 4 y [TypeScript](https://www.typescriptlang.org/) estricto
+- [Zod](https://zod.dev/) para validar la configuración y las respuestas del cuestionario
+- [Passport](https://www.passportjs.org/) con `@node-saml/passport-saml`: login federado de la Universidad de Colima (SAML)
+- `mysql2` y `express-session` con las sesiones guardadas en MySQL
+
+**Datos e infraestructura**
+- MySQL 8; Adminer y phpMyAdmin para consultar la base
+- Docker Compose (un archivo base más uno por entorno), nginx para servir el frontend y Caddy como proxy de entrada en producción
+
+**Pruebas**
+- [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) (frontend) y `node:test` con `tsx` (backend)
+- [Playwright](https://playwright.dev/) para E2E y compatibilidad de navegadores, y [k6](https://k6.io/) para pruebas de carga
 
 ## Arquitectura
 
-- SPA que corre solo en el cliente; no hay backend ni API.
-- El código se organiza por funcionalidad: cada página vive en su carpeta dentro de `src/features/`.
+El proyecto funciona de dos maneras:
+
+- **Sitio público (GitHub Pages):** SPA que corre solo en el cliente, sin backend ni API. Es lo que se publica en cada push a `main`.
+- **Modo experimento (Docker):** la misma SPA más un backend, una base MySQL y el login institucional. Al terminar la calculadora, los participantes (solo estudiantes de la UCOL) responden un cuestionario que se guarda en MySQL. Se activa con `VITE_EXPERIMENTO_ACTIVO=true`; sin esa variable la calculadora funciona normal.
+
+En el modo experimento:
+- El navegador nunca recibe el correo, el nombre ni el número de cuenta: el backend los lee de la sesión SAML y guarda un identificador pseudónimo y el correo en MySQL.
+- Hay un solo registro por participante y por correo (índices `UNIQUE` en `db/schema.sql`).
+
+Sobre el código:
+- Cada página vive en su carpeta dentro de `frontend/src/features/`.
 - El contenido (preguntas de la calculadora, puntos de reciclaje, noticias y eventos) vive en módulos JS estáticos dentro de cada feature.
 - `Navbar`, `Footer` y `PageLayout` en `src/components/layout/` son compartidos por todas las páginas.
-- El único estado persistente es el progreso de la calculadora, guardado en `localStorage` bajo la clave `ecocampus:calculadora:v1`.
+- El progreso de la calculadora se guarda en `localStorage` bajo la clave `ecocampus:calculadora:v1`.
 
 ## Estructura del proyecto
 
 ```
 ecocampus/
 ├── README.md, CLAUDE.md, SECURITY.md
+├── docker-compose.yml           # base común: MySQL, backend, frontend
+├── docker-compose.dev.yml       # desarrollo
+├── docker-compose.prod.yml      # producción
+├── docker-compose.loadtest.yml  # pruebas de carga
+├── .env.dev.example, .env.prod.example, .env.loadtest.example   # plantillas con TODAS las variables
 ├── .github/workflows/
-│   ├── test.yml                 # CI: pruebas unitarias + E2E
+│   ├── test.yml                 # CI: jobs unit, backend, contrast, e2e y compatibilidad
 │   └── deploy.yml               # despliegue a GitHub Pages
+├── backend/                     # API en TypeScript (ver "Backend (TypeScript)")
+│   ├── src/                     # server.ts, app.ts, config/, auth/, routes/, validacion/, db.ts, logger.ts
+│   ├── cert/                    # certificados SAML de desarrollo
+│   └── Dockerfile               # etapas dev, build y prod
+├── db/schema.sql                # tabla de respuestas (se aplica al crear el volumen)
+├── deploy/Caddyfile             # proxy de producción
+├── loadtest/                    # k6.js y results/ (resultados medidos)
 ├── docs/
 │   ├── README.md                # documentación general
 │   ├── vista_1_inicio.md ... vista_5_guia_reciclaje.md   # una por vista
-│   └── testing/                 # README.md, vitest-guidelines.md, playwright-e2e.md
+│   └── testing/                 # guías de pruebas, rendimiento.md y compatibilidad.md
 └── frontend/
     ├── index.html               # entrada de Vite (carga /src/index.jsx)
-    ├── vite.config.js           # plugins de Vite y Tailwind, base /ecocampus/, config de Vitest
-    ├── playwright.config.js
-    ├── e2e/                     # specs de Playwright (calculadora.spec.js)
+    ├── vite.config.js           # plugins, base /ecocampus/ y configuración de Vitest
+    ├── playwright.config.js     # 5 proyectos: Chromium, Firefox, WebKit, Pixel 7 e iPhone 14
+    ├── Dockerfile, Dockerfile.dev, nginx.conf
+    ├── e2e/                     # calculadora.spec.js y compatibilidad.spec.js
     ├── public/                  # assets estáticos: Depositos/, Logos/, favicons, manifest,
     │                            # infografia_guia.jpeg, 404.html (redirección SPA)
     └── src/
         ├── index.jsx, App.jsx (rutas), setupTests.js
         ├── components/layout/   # Navbar, Footer, PageLayout
+        ├── config/              # experiment.js (modo experimento y cuestionario)
         ├── features/
+        │   ├── auth/            # LoginGate (login institucional en el modo experimento)
         │   ├── landing/         # LandingPage
-        │   ├── calculadora/     # Calculadora, preguntas.js, ImagenTema, ModalConfirmacion (<dialog> nativo),
-        │   │                    # ToastAviso, pasoRespondido.js, progresoGuardado.js (localStorage)
+        │   ├── calculadora/     # Calculadora, CuestionarioExperimento, preguntas.js, ImagenTema,
+        │   │                    # ModalConfirmacion, ToastAviso, pasoRespondido.js, progresoGuardado.js
         │   ├── mapa/            # Mapa, puntosReciclaje.js, customIcon.js
         │   ├── comunidad/       # Comunidad, noticiasEventos.js
         │   └── guiaReciclaje/   # GuiaReciclaje
@@ -60,74 +98,33 @@ ecocampus/
 | Ruta               | Descripción                                                        |
 |---------------------|---------------------------------------------------------------------|
 | `/`                 | Landing page con información sobre la huella ecológica              |
-| `/calculadora`      | Cuestionario para calcular la huella ecológica personal              |
+| `/calculadora`      | Cuestionario para calcular la huella ecológica personal (en el modo experimento pide login y termina con el cuestionario de evaluación) |
 | `/mapa`              | Mapa interactivo con los puntos de reciclaje del campus              |
 | `/comunidad`         | Noticias y eventos ambientales                                       |
 | `/guia-reciclaje`    | Guía con los principios y beneficios del reciclaje                   |
 
-## Cómo correr el proyecto localmente
+## Entornos
+
+| Entorno | Para qué sirve | Archivos de compose | Variables | Cómo se levanta |
+| :--- | :--- | :--- | :--- | :--- |
+| [Desarrollo](#desarrollo) | Trabajar con recarga en vivo, base de datos y herramientas a mano | `docker-compose.yml` + `docker-compose.dev.yml` | `.env.dev.example` | `docker compose up --build` |
+| [Producción](#producción) | Servidor real (VM) con un solo punto de entrada | `docker-compose.yml` + `docker-compose.prod.yml` | `.env.prod.example` | `docker compose up -d --build` |
+| [Pruebas de carga](#pruebas-de-carga) | Medir el rendimiento en un entorno aislado | `docker-compose.yml` + `docker-compose.loadtest.yml` | `.env.loadtest.example` | ver la sección |
+| [Sitio público](#sitio-público-github-pages) | Publicar solo el frontend | no usa Docker | ninguna | automático al hacer push a `main` |
+
+### Configuración común
+
+- Se necesita Docker Desktop, o Docker Engine con el plugin de compose.
+- **Los compose no tienen valores por defecto:** toda variable se carga del `.env` y, si falta o está vacía, `docker compose` se detiene con un mensaje como `required variable SAML_ISSUER is missing a value`. Al agregar una variable nueva, añádela a las tres plantillas. Lo único fijo en los compose es lo que no es configuración de entorno: imágenes, puertos internos, rutas de volúmenes, límites de memoria y healthchecks.
+- El `.env` de la raíz **no se versiona**. La plantilla de cada entorno trae `COMPOSE_FILE`, que le dice a `docker compose` qué archivos combinar. Sin él se pasan con `-f`: `docker compose -f docker-compose.yml -f docker-compose.dev.yml ...`.
+- `backend/cert/` contiene `cert.pem`, `idp.crt` y `key.pem`, las credenciales SAML de desarrollo tomadas de [login-federado-node](https://github.com/Universidad-de-Colima/login-federado-node). Están versionadas con autorización del asesor y no sirven para producción.
+- El esquema de la base está en `db/schema.sql` y solo se aplica al crear el volumen por primera vez. Los datos viven en el volumen `db_data`: `docker compose down` los conserva y `docker compose down -v` los borra.
+
+## Desarrollo
 
 ```bash
-cd frontend
-npm install
-npm run dev
-```
-
-La app queda disponible en [http://localhost:5173/ecocampus/](http://localhost:5173/ecocampus/).
-
-Otros scripts disponibles dentro de `frontend/`:
-
-- `npm run build` — genera el build de producción en `frontend/dist/`
-- `npm run preview` — sirve localmente el build de producción
-- `npm test` — corre las pruebas unitarias y de componentes una vez
-- `npm run test:watch` — corre Vitest en modo observación
-- `npm run test:e2e` — corre las pruebas E2E con Playwright (levanta el servidor de desarrollo automáticamente)
-
-## Pruebas
-
-- Las pruebas de componentes y unitarias usan Vitest (jsdom, globals, setup en `src/setupTests.js`) y se ubican junto al código que prueban (`*.test.jsx` / `*.test.js`).
-- Las pruebas E2E están en `frontend/e2e/` y corren en Chromium. Antes de la primera ejecución hay que instalar el navegador:
-
-  ```bash
-  npx playwright install chromium
-  ```
-
-- `react-leaflet` es ESM puro, por lo que las pruebas que renderizan `App` mockean el mapa con `vi.mock('./features/mapa/Mapa', () => ({ default: () => null }))`.
-- Guías: [docs/testing/README.md](docs/testing/README.md), [docs/testing/vitest-guidelines.md](docs/testing/vitest-guidelines.md) y [docs/testing/playwright-e2e.md](docs/testing/playwright-e2e.md).
-
-El workflow `.github/workflows/test.yml` corre en cada push o pull request a `main` y `dev`, con dos jobs: `unit` (`npm test`) y `e2e` (Playwright en Chromium; sube el reporte y los traces si falla).
-
-## Despliegue
-
-El despliegue a GitHub Pages es automático mediante `.github/workflows/deploy.yml` en cada push a `main`: usa Node 20, ejecuta `npm ci` y `npm run build`, y publica `frontend/dist`.
-
-La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `basename` del Router. Para que las rutas de la SPA funcionen en GitHub Pages se usa la técnica de [spa-github-pages](https://github.com/rafgraph/spa-github-pages): `public/404.html` redirige a la raíz y un script en `frontend/index.html` restaura la ruta original.
-
-## Documentación
-
-- [docs/README.md](docs/README.md) — documentación general del proyecto
-- Una guía por vista: [Inicio](docs/vista_1_inicio.md), [Calculadora](docs/vista_2_calculadora.md), [Mapa](docs/vista_3_mapa.md), [Comunidad](docs/vista_4_comunidad.md), [Guía de reciclaje](docs/vista_5_guia_reciclaje.md)
-- Pruebas: [docs/testing/](docs/testing/README.md)
-
-## Ejecucion con Docker (experimento)
-
-Requiere Docker Desktop (o Docker Engine con el plugin compose). La configuracion esta dividida en un archivo base y un archivo por entorno:
-
-| Archivo | Para que sirve |
-| :--- | :--- |
-| `docker-compose.yml` | Base comun: MySQL 8, backend y frontend (sin puertos ni build del frontend) |
-| `docker-compose.dev.yml` | Desarrollo: recarga en vivo, puertos abiertos, Adminer y phpMyAdmin |
-| `docker-compose.prod.yml` | Produccion: imagenes construidas, solo el proxy publica puertos, limites, rotacion de logs |
-| `docker-compose.loadtest.yml` | Entorno aislado para pruebas de carga (ver `docs/testing/rendimiento.md`) |
-| `.env.dev.example`, `.env.prod.example`, `.env.loadtest.example` | Plantillas con TODAS las variables de cada entorno |
-
-**Los compose no tienen valores por defecto:** toda variable se carga del `.env` y, si falta o esta vacia, `docker compose` se detiene con un mensaje como `required variable SAML_ISSUER is missing a value`. Al agregar una variable nueva, anadela a las tres plantillas. Solo quedan fijos en los compose lo que no es configuracion de entorno (imagenes, puertos internos, rutas de volumenes, limites de memoria y healthchecks).
-
-### Desarrollo
-
-```
 cp .env.dev.example .env
-docker compose up --build        # .env ya indica COMPOSE_FILE (base + dev)
+docker compose up --build        # el .env ya indica COMPOSE_FILE (base + dev)
 ```
 
 | Servicio | URL |
@@ -135,72 +132,138 @@ docker compose up --build        # .env ya indica COMPOSE_FILE (base + dev)
 | Frontend (Vite, recarga en vivo) | http://localhost:5173/ecocampus/ |
 | Backend (TypeScript con nodemon, reinicia al guardar) | http://localhost:4006 (`/health`, `/Metadata`) |
 | Adminer (consulta y exporta a CSV) | http://localhost:8081, servidor `db`, usuario `ecocampus`, base `ecocampus` |
-| phpMyAdmin | http://localhost:8082, usuario `ecocampus` y la contrasena `MYSQL_PASSWORD` de tu `.env` (el usuario `root` usa `MYSQL_ROOT_PASSWORD`) |
+| phpMyAdmin | http://localhost:8082, usuario `ecocampus` y la `MYSQL_PASSWORD` de tu `.env` (`root` usa `MYSQL_ROOT_PASSWORD`) |
 | MySQL desde tu equipo | 127.0.0.1:3307 |
 
-- El codigo de `backend/` y `frontend/` se monta como volumen: editar un archivo recarga el servicio (se usa polling porque los volumenes montados desde Windows no emiten eventos de archivos).
-- `backend/cert/` contiene `cert.pem`, `idp.crt` y `key.pem` (de desarrollo, tomados de https://github.com/Universidad-de-Colima/login-federado-node); estan versionados en el repo con autorizacion del asesor (son credenciales de desarrollo, no de produccion).
-- Los datos viven en el volumen `db_data`; `docker compose down` los conserva y `docker compose down -v` los borra.
-- El esquema esta en `db/schema.sql` y solo se aplica al crear el volumen por primera vez.
-- Pruebas del backend: `cd backend && npm test`.
+- El código de `backend/` y `frontend/` se monta como volumen: guardar un archivo recarga el servicio. Se usa polling porque los volúmenes montados desde Windows no emiten eventos de archivos.
+- Si cambias `package.json` o `package-lock.json`, recrea con `docker compose up -d --build -V`. El `-V` renueva el volumen anónimo de `node_modules`; sin él, el contenedor sigue con las dependencias anteriores.
+- El login usa las credenciales de desarrollo, cuyo callback es `localhost:4006`: funciona en el navegador de la misma máquina que corre el backend.
+
+### Frontend sin Docker
+
+Para trabajar solo en las vistas, sin backend ni base de datos:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+La app queda en [http://localhost:5173/ecocampus/](http://localhost:5173/ecocampus/). Sin `VITE_API_URL` y `VITE_EXPERIMENTO_ACTIVO=true` el modo experimento queda apagado. Scripts dentro de `frontend/`:
+
+- `npm run build` — genera el build de producción en `frontend/dist/`
+- `npm run preview` — sirve localmente el build de producción
+- `npm test` — pruebas unitarias y de componentes una vez
+- `npm run test:watch` — Vitest en modo observación
+- `npm run test:e2e` — pruebas E2E con Playwright (levanta su propio servidor)
 
 ### Backend (TypeScript)
 
-El backend esta escrito en TypeScript estricto (`strict` y `noUncheckedIndexedAccess`) y se compila a `backend/dist/`.
+Está escrito en TypeScript estricto (`strict` y `noUncheckedIndexedAccess`) y se compila a `backend/dist/`.
 
 ```
 backend/src/
-  server.ts            punto de entrada: carga la configuracion, espera a MySQL y escucha
-  app.ts               arma la aplicacion de Express (crearApp), sin escuchar; se usa tambien en las pruebas
+  server.ts            punto de entrada: carga la configuración, espera a MySQL y escucha
+  app.ts               arma la aplicación de Express (crearApp), sin escuchar; también la usan las pruebas
   config/              variables de entorno validadas con Zod (falla al arrancar con un mensaje claro)
-  auth/                estrategia SAML, perfil de la UCOL y derivacion del participante
+  auth/                estrategia SAML, perfil de la UCOL y derivación del participante
   routes/              auth, respuestas y salud
   validacion/          esquema Zod de las respuestas: valida y genera el tipo de la fila a insertar
   db.ts, logger.ts
 ```
 
-| Comando (desde `backend/`) | Para que sirve |
+| Comando (desde `backend/`) | Para qué sirve |
 | :--- | :--- |
 | `npm run dev` | Recarga en vivo con nodemon y tsx (lo usa el contenedor de desarrollo) |
 | `npm run typecheck` | Comprueba los tipos sin generar archivos |
-| `npm test` | Pruebas unitarias y de rutas (no necesitan MySQL) |
+| `npm test` | Pruebas unitarias y de rutas (no necesitan MySQL ni el IdP) |
 | `npm run build` | Compila a `dist/` |
-| `npm start` | Ejecuta el JavaScript compilado (lo que corre produccion) |
+| `npm start` | Ejecuta el JavaScript compilado (lo que corre producción) |
 
-- Si cambias `package.json` o `package-lock.json`, recrea el contenedor de desarrollo con `docker compose up -d --build -V`: el `-V` renueva el volumen anonimo de `node_modules`; sin el, el contenedor sigue con las dependencias anteriores.
-- La imagen de produccion contiene solo `dist/` y las dependencias de ejecucion (sin TypeScript, tsx ni nodemon) y corre como usuario `node`.
-- En produccion (`NODE_ENV=production`) el backend exige `SESSION_SECRET` (minimo 16 caracteres), `ID_SALT` y `DB_PASSWORD`, y no arranca sin ellos.
+## Producción
 
-### Produccion
-
-```
+```bash
 cp .env.prod.example .env        # completa TODAS las variables
-docker compose up -d --build     # .env ya indica COMPOSE_FILE (base + prod)
+docker compose up -d --build     # el .env ya indica COMPOSE_FILE (base + prod)
 ```
 
-Sin un `.env` con `COMPOSE_FILE`, usa los archivos de forma explicita: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`.
+- **Un solo punto de entrada:** el contenedor `proxy` (Caddy) es el único que publica puertos (80 y 443). Reenvía `/api`, `/login`, `/logout` y `/Metadata` al backend y todo lo demás al frontend. MySQL, backend y frontend no se publican.
+- **Sin dominio todavía:** deja `SITE_ADDRESS=:80` y usa `http://IP-DEL-SERVIDOR` en `API_URL`, en `FRONTEND_URL` (con `/ecocampus/calculadora`) y en los callbacks SAML; el sitio se sirve por HTTP.
+- **Con dominio:** pon `SITE_ADDRESS=tu.dominio`, esas URLs con `https://tu.dominio` y `COOKIE_SECURE=true`. Caddy obtiene y renueva el certificado HTTPS solo (el dominio debe apuntar al servidor y los puertos 80 y 443 deben estar abiertos).
+- **Login SAML:** las credenciales de desarrollo solo funcionan con callback en `localhost:4006` y no sirven para usuarios remotos (el backend lo avisa en sus logs). Los valores propios se tramitan con sistemas@ucol.mx y se configuran con `SAML_ISSUER`, `SAML_CALLBACK_URL`, `SAML_LOGOUT_CALLBACK_URL` y `SAML_CERT_HOST_DIR` (carpeta del servidor, fuera del repositorio, con `cert.pem`, `idp.crt` y `key.pem`). Todas las variables `SAML_*` son obligatorias en el `.env`.
+- **Secretos obligatorios:** con `NODE_ENV=production` el backend exige `SESSION_SECRET` (mínimo 16 caracteres), `ID_SALT` y `DB_PASSWORD`, y no arranca sin ellos. Genéralos con `openssl rand -hex 32`.
+- **Imagen:** la del backend contiene solo `dist/` y las dependencias de ejecución (sin TypeScript, tsx ni nodemon) y corre como usuario `node`.
+- **Operación:** `restart: unless-stopped`, límites de memoria (MySQL 1 GB, backend 512 MB, el resto 128 MB) y rotación de logs (3 archivos de 10 MB por servicio).
+- **Herramientas de base de datos:** no arrancan por defecto. Para usarlas: `docker compose --profile tools up -d` y entra por un túnel SSH a `127.0.0.1:8081` (Adminer) o `127.0.0.1:8082` (phpMyAdmin).
 
-- **Un solo punto de entrada:** el contenedor `proxy` (Caddy) es el unico que publica puertos (80 y 443). Reenvia `/api`, `/login`, `/logout` y `/Metadata` al backend y todo lo demas al frontend. MySQL, backend y frontend no se publican.
-- **Sin dominio todavia:** deja `SITE_ADDRESS=:80` y usa `http://IP-DEL-SERVIDOR` en `API_URL`, `FRONTEND_URL` (con `/ecocampus/calculadora`) y los callbacks SAML; el sitio se sirve por HTTP. Con dominio, pon `SITE_ADDRESS=tu.dominio`, esas URLs con `https://tu.dominio` y `COOKIE_SECURE=true`: Caddy obtiene y renueva el certificado HTTPS solo (el dominio debe apuntar al servidor y los puertos 80 y 443 deben estar abiertos).
-- **Login SAML:** sin `SAML_ISSUER` ni certificados propios se usan los de desarrollo, que solo funcionan con callback en `localhost:4006` y no sirven para usuarios remotos (el backend lo avisa en sus logs). Los valores propios los tramita sistemas@ucol.mx; se configuran con `SAML_ISSUER`, `SAML_CALLBACK_URL`, `SAML_LOGOUT_CALLBACK_URL` y `SAML_CERT_HOST_DIR` (carpeta del servidor, fuera del repositorio, con `cert.pem`, `idp.crt` y `key.pem`). Todas las variables `SAML_*` y `SAML_CERT_HOST_DIR` son obligatorias en el `.env`.
-- **Herramientas de base de datos:** no arrancan por defecto. Para usarlas: `docker compose --profile tools up -d` y entra por un tunel SSH a `127.0.0.1:8081` (Adminer) o `127.0.0.1:8082` (phpMyAdmin).
-- **Operacion:** `restart: unless-stopped`, limites de memoria (MySQL 1 GB, backend 512 MB, el resto 128 MB) y rotacion de logs (3 archivos de 10 MB por servicio).
+### Despliegue en una máquina virtual (EC2, Azure u otra)
 
-### Despliegue en una maquina virtual (EC2, Azure u otra)
-
-1. Instancia Linux con Docker y el plugin compose; en el grupo de seguridad abre solo los puertos 22 (limitado a tu IP), 80 y 443.
-2. `git clone` del repositorio, rama a desplegar, y `cp .env.prod.example .env` con todos los valores (genera secretos con `openssl rand -hex 32`).
+1. Instancia Linux con Docker y el plugin de compose. En el grupo de seguridad abre solo los puertos 22 (limitado a tu IP), 80 y 443.
+2. `git clone` del repositorio, la rama a desplegar, y `cp .env.prod.example .env` con todos los valores.
 3. `docker compose up -d --build`. Para actualizar: `git pull` y el mismo comando.
-4. Prueba `http://IP/ecocampus/`, `http://IP/api/me` y registra una respuesta de prueba (con `REQUIERE_LOGIN=false` temporal) antes de abrir el estudio; borra esa fila despues.
+4. Prueba `http://IP/ecocampus/` y `http://IP/api/me`. Registra una respuesta de prueba (con `REQUIERE_LOGIN=false` temporal) antes de abrir el estudio y borra esa fila después.
 
-### Respaldo y restauracion de MySQL (manual)
+### Respaldo y restauración de MySQL (manual)
 
-```
-# respaldo (guardalo fuera del servidor)
+```bash
+# respaldo (guárdalo fuera del servidor)
 docker compose exec -T db sh -c 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --single-transaction ecocampus' > respaldo_$(date +%F).sql
 
-# restauracion
+# restauración
 docker compose exec -T db sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" ecocampus' < respaldo_AAAA-MM-DD.sql
 ```
 
-Haz un respaldo antes de iniciar el estudio y de forma periodica durante el; si se pierde el volumen `db_data`, se pierden las respuestas.
+Haz un respaldo antes de iniciar el estudio y de forma periódica durante él. Si se pierde el volumen `db_data`, se pierden las respuestas.
+
+## Pruebas de carga
+
+Se miden en un entorno aislado: un proyecto de compose aparte (`ecocampus-loadtest`) con su propio volumen de MySQL y sin puertos publicados, así que no toca los datos del estudio. El backend corre con `REQUIERE_LOGIN=false` para poder medir `POST /api/respuestas` sin una sesión SAML.
+
+```bash
+cp .env.loadtest.example .env.loadtest      # solo la primera vez
+docker compose stop                         # libera memoria si el desarrollo está corriendo
+
+docker compose --env-file .env.loadtest -p ecocampus-loadtest \
+  -f docker-compose.yml -f docker-compose.loadtest.yml up -d --build
+
+# perfil de carga (PERFIL=estres para el de estrés)
+MSYS_NO_PATHCONV=1 docker run --rm --network ecocampus-loadtest_default \
+  -e PERFIL=carga -v "$(pwd -W)/loadtest:/scripts" grafana/k6 run \
+  --summary-export=/scripts/results/resumen.json /scripts/k6.js
+
+docker compose --env-file .env.loadtest -p ecocampus-loadtest \
+  -f docker-compose.yml -f docker-compose.loadtest.yml down -v
+docker compose start
+```
+
+- En Linux o macOS se usa `$(pwd)` en lugar de `$(pwd -W)` y no hace falta `MSYS_NO_PATHCONV`.
+- Perfiles: `carga` (hasta 100 usuarios virtuales, 3 min 21 s) y `estres` (hasta 300).
+- El script es `loadtest/k6.js`. Los resultados medidos están en `loadtest/results/` y su análisis (ambiente, distribución de tiempos, recursos y limitaciones) en [docs/testing/rendimiento.md](docs/testing/rendimiento.md).
+- `.env.loadtest` no se versiona. Las pruebas de carga corren contra el backend compilado (etapa `prod` del Dockerfile).
+
+## Sitio público (GitHub Pages)
+
+El despliegue es automático mediante `.github/workflows/deploy.yml` en cada push a `main`: usa Node 20, ejecuta `npm ci --ignore-scripts` y `npm run build`, y publica `frontend/dist`. No define variables de entorno, así que el modo experimento queda apagado y el sitio es solo el frontend.
+
+La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `basename` del Router. Para que las rutas de la SPA funcionen en GitHub Pages se usa la técnica de [spa-github-pages](https://github.com/rafgraph/spa-github-pages): `public/404.html` redirige a la raíz y un script en `frontend/index.html` restaura la ruta original.
+
+## Pruebas
+
+| Qué | Dónde y cómo |
+| :--- | :--- |
+| Frontend: componentes y unitarias | Vitest (jsdom, globals, setup en `src/setupTests.js`), junto al código (`*.test.jsx` / `*.test.js`). `npm test` en `frontend/` |
+| Backend: validación, configuración y rutas | `node:test` con `tsx` en `backend/src/**/*.test.ts`. `npm test` en `backend/` (no necesita MySQL ni el IdP) |
+| E2E de la calculadora | Playwright en Chromium: `frontend/e2e/calculadora.spec.js` |
+| Compatibilidad | Playwright en Chromium, Firefox, WebKit, Pixel 7 e iPhone 14: `frontend/e2e/compatibilidad.spec.js` (resultados en [docs/testing/compatibilidad.md](docs/testing/compatibilidad.md)) |
+| Carga | k6, ver [Pruebas de carga](#pruebas-de-carga) |
+
+- Antes de la primera ejecución de Playwright hay que instalar los navegadores: `npx playwright install chromium firefox webkit`.
+- Playwright levanta su propio servidor de desarrollo en el puerto 5174 con el modo experimento apagado, para que la calculadora muestre su resultado al finalizar.
+- `react-leaflet` es ESM puro, por lo que las pruebas que renderizan `App` mockean el mapa con `vi.mock('./features/mapa/Mapa', () => ({ default: () => null }))`.
+- El workflow `.github/workflows/test.yml` corre en cada push o pull request a `main` y `dev`, con cinco jobs: `unit` (frontend), `backend` (typecheck, pruebas y build), `contrast` (contraste WCAG de la landing), `e2e` (la calculadora en Chromium; sube el reporte y los traces si falla) y `compatibilidad` (los 5 perfiles de navegador y dispositivo; instala Chromium, Firefox y WebKit y sube `compatibilidad.json` con las versiones probadas).
+
+## Documentación
+
+- [docs/README.md](docs/README.md) — documentación general del proyecto
+- Una guía por vista: [Inicio](docs/vista_1_inicio.md), [Calculadora](docs/vista_2_calculadora.md), [Mapa](docs/vista_3_mapa.md), [Comunidad](docs/vista_4_comunidad.md), [Guía de reciclaje](docs/vista_5_guia_reciclaje.md)
+- Pruebas: [docs/testing/](docs/testing/README.md), con [rendimiento](docs/testing/rendimiento.md) y [compatibilidad](docs/testing/compatibilidad.md)
