@@ -28,6 +28,14 @@ const Navbar = ({ transparent = false }) => {
   };
 
   useEffect(() => {
+    const currentScrollY = window.scrollY;
+    setVisible(true);
+    setAtTop(currentScrollY < 80);
+    lastScrollY.current = currentScrollY;
+    clearAutoHideTimer();
+  }, [pathname]);
+
+  useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const isAtTop = scrollY < 80;
@@ -59,10 +67,10 @@ const Navbar = ({ transparent = false }) => {
     };
   }, []);
 
-  const bgClass = transparent
-    ? atTop
+  const bgClass = atTop
+    ? transparent
       ? "bg-transparent"
-      : "bg-lime-600"
+      : "bg-lime-600/80 backdrop-blur-sm"
     : "bg-lime-600";
 
   const visibilityClass = visible ? "translate-y-0" : "-translate-y-full";
