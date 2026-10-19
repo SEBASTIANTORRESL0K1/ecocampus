@@ -14,27 +14,20 @@ const badgeIcon = (tipo) => {
 };
 
 const Comunidad = () => {
-  const { ref: heroRef, isVisible: heroVisible } = useScrollReveal();
   const { ref: gridRef, isVisible: gridVisible } = useScrollReveal();
 
   return (
     <PageLayout navTransparent>
       <main>
         {/* ── Hero ── */}
-        <div
-          ref={heroRef}
-          className={`reveal${heroVisible ? " is-visible" : ""}`}
-          style={{ "--reveal-delay": "0ms" }}
-        >
-          <PageHero
-            backgroundImageUrl="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cmVjaWNsYXJ8ZW58MHx8MHx8fDA%3D"
-            backgroundSeed="comunidad"
-            eyebrow="Noticias y eventos ambientales"
-            title="Comunidad EcoCampus"
-            description="Mantente informado sobre eventos y noticias ambientales"
-            minHeight="42vh"
-          />
-        </div>
+        <PageHero
+          backgroundImageUrl="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cmVjaWNsYXJ8ZW58MHx8MHx8fDA%3D"
+          backgroundSeed="comunidad"
+          eyebrow="Noticias y eventos ambientales"
+          title="Comunidad EcoCampus"
+          description="Mantente informado sobre eventos y noticias ambientales"
+          minHeight="42vh"
+        />
 
         {/* ── Cards grid ── */}
         <SectionWrapper background="var(--color-section-alt)" padding="4rem 1.5rem">
@@ -42,7 +35,7 @@ const Comunidad = () => {
             ref={gridRef}
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridTemplateColumns: "repeat(3, 1fr)",
               gap: "1.5rem",
             }}
             className="comunidad-cards-grid"
@@ -51,7 +44,7 @@ const Comunidad = () => {
               <div
                 key={item.id}
                 className={`reveal-card${gridVisible ? " is-visible" : ""}`}
-                style={{ "--reveal-delay": `${index * 80}ms` }}
+                style={{ "--reveal-delay": `${index * 80}ms`, height: "100%" }}
               >
               <FeatureCard padding="1.75rem">
                 {/* Badge */}
@@ -123,7 +116,14 @@ const Comunidad = () => {
       </main>
 
       <style>{`
-        @media (max-width: 640px) {
+        .comunidad-cards-grid .reveal-card {
+          height: 100%;
+        }
+        .comunidad-cards-grid .reveal-card article {
+          height: 100%;
+          box-sizing: border-box;
+        }
+        @media (max-width: 768px) {
           .comunidad-cards-grid {
             grid-template-columns: 1fr !important;
           }

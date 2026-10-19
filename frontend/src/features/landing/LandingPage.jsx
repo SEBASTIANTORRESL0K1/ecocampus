@@ -9,6 +9,7 @@ import SectionHeading from "../../components/ui/SectionHeading";
 import FeatureCard from "../../components/ui/FeatureCard";
 import IconCircle from "../../components/ui/IconCircle";
 import useScrollReveal from "../../hooks/useScrollReveal";
+import { cardHoverLink } from "../../utils/cardHover";
 import "../../styles/scroll-animations.css";
 
 const tools = [
@@ -67,27 +68,20 @@ const LandingPage = () => {
   return (
     <PageLayout navTransparent>
       <main>
-        {/* ── Hero — load-time animation (not scroll-triggered) ── */}
-        {/*
-          PageHero is a shared component and must not be modified.
-          We wrap it with reveal-load so the entire hero fades in on mount.
-          Individual element stagger would require changes inside PageHero.
-        */}
-        <div className="reveal-load" style={{ '--reveal-delay': '0ms' }}>
-          <PageHero
-            backgroundImageUrl="https://www.ucol.mx/content/portal/banner_733551615849.jpg"
-            backgroundSeed="ecocampus"
-            eyebrow="Plataforma ambiental universitaria"
-            title="Calcula tu huella ecológica"
-            description="Conoce tu impacto ambiental y actúa hoy"
-            minHeight="100dvh"
-            cta={
-              <Link to="/calculadora">
-                <CtaButton>Comenzar cálculo</CtaButton>
-              </Link>
-            }
-          />
-        </div>
+        {/* ── Hero — load-time animation via PageHero animateOnLoad ── */}
+        <PageHero
+          backgroundImageUrl="https://www.ucol.mx/content/portal/banner_733551615849.jpg"
+          backgroundSeed="ecocampus"
+          eyebrow="Plataforma ambiental universitaria"
+          title="Calcula tu huella ecológica"
+          description="Conoce tu impacto ambiental y actúa hoy"
+          minHeight="100dvh"
+          cta={
+            <Link to="/calculadora">
+              <CtaButton>Comenzar cálculo</CtaButton>
+            </Link>
+          }
+        />
 
         {/* ── About — 2-column scroll reveal with staggered stats ── */}
         <section
@@ -315,6 +309,8 @@ const LandingPage = () => {
                 >
                   {tool.bgImage ? (
                     <article
+                      onMouseEnter={cardHoverLink.enter}
+                      onMouseLeave={cardHoverLink.leave}
                       style={{
                         position: "relative",
                         overflow: "hidden",
@@ -323,6 +319,7 @@ const LandingPage = () => {
                         cursor: "pointer",
                         height: "100%",
                         minHeight: "220px",
+                        transition: "transform 200ms ease, box-shadow 200ms ease",
                       }}
                     >
                       <img

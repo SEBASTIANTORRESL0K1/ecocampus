@@ -81,7 +81,7 @@ En Q21, "Ninguno de estos" desmarca todos los electrodomesticos y deja `respuest
 
 ### Imagen ilustrativa
 
-Cada pregunta en `preguntas.js` tiene un campo `imagen`. Puede ser una ruta local como `/img/q1.webp` (archivo ubicado en `public/img/`) o una palabra clave en ingles del tema (por ejemplo `fruit`, `bread`, `subway`, `lightbulb`, `notebook`); el paso `habitantesHogar` usa `family`. Las rutas locales se muestran directamente y las palabras clave se convierten en una imagen de **LoremFlickr** (gratuito, sin API key):
+Cada pregunta en `preguntas.js` tiene un campo `imagen`. Puede ser una ruta local como `/img/q1.webp` (archivo ubicado en `public/img/`) o una palabra clave en ingles del tema; el paso `habitantesHogar` usa `/img/QFAM.webp`. Las rutas locales se muestran directamente y las palabras clave se convierten en una imagen de **LoremFlickr** (gratuito, sin API key):
 
 ```
 https://loremflickr.com/640/320/{palabraClave}?lock={id}
