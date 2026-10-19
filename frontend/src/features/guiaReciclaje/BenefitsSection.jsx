@@ -21,6 +21,13 @@ const BenefitsSection = () => {
 
   return (
     <SectionWrapper background="var(--color-section-alt)">
+      <style>{`
+        @media (max-width: 768px) {
+          .benefits-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
       <div
         ref={headingRef}
         className={`reveal${headingVisible ? " is-visible" : ""}`}
@@ -32,9 +39,10 @@ const BenefitsSection = () => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gridTemplateColumns: "repeat(3, 1fr)",
           gap: "1.5rem",
         }}
+        className="benefits-grid"
       >
         {benefits.map((b, index) => (
           <div

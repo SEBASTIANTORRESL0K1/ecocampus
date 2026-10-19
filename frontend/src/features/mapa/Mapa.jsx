@@ -11,7 +11,6 @@ import "../../styles/scroll-animations.css";
 const Mapa = () => {
   const posicionCampus = [19.249437, -103.698893];
 
-  const { ref: heroRef, isVisible: heroVisible } = useScrollReveal();
   const { ref: counterRef, isVisible: counterVisible } = useScrollReveal();
   const { ref: mapRef, isVisible: mapVisible } = useScrollReveal();
 
@@ -20,7 +19,9 @@ const Mapa = () => {
       <main>
         {/* ── Hero compacto ── */}
         <section
+          className="reveal-load"
           style={{
+            '--reveal-delay': '0ms',
             backgroundImage:
               "url('https://images.pexels.com/photos/19507080/pexels-photo-19507080.jpeg?cs=srgb&dl=pexels-rndiid-19507080.jpg&fm=jpg')",
             backgroundSize: "cover",
@@ -32,8 +33,6 @@ const Mapa = () => {
           }}
         >
           <div
-            ref={heroRef}
-            className={`reveal${heroVisible ? " is-visible" : ""}`}
             style={{
               background: "rgba(34,85,44,0.7)",
               width: "100%",
