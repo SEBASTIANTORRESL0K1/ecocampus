@@ -425,6 +425,15 @@ describe("Calculadora - paso habitantesHogar", () => {
 		).not.toBeInTheDocument();
 	});
 
+	test("muestra la imagen ilustrativa del paso con src y alt esperados", () => {
+		irAHabitantes();
+		const imagen = screen.getByRole("img", {
+			name: "Imagen ilustrativa: personas que viven en el hogar",
+		});
+		expect(imagen).toHaveAttribute("src", "/ecocampus/img/QFAM.webp");
+		expect(imagen).toHaveAttribute("loading", "lazy");
+	});
+
 	test("limpiar el campo no resetea al valor 1 mientras se escribe", () => {
 		irAHabitantes();
 		const input = screen.getByRole("spinbutton");

@@ -29,7 +29,7 @@ function construirPasos() {
     const seccion = preguntasHuellaEcologica[clave];
     seccion.preguntas.forEach((pregunta) => {
       if (pregunta.id === 21) {
-        pasos.push({ tipo: "habitantesHogar", imagen: "family", seccionTitulo: seccion.titulo });
+        pasos.push({ tipo: "habitantesHogar", imagen: "/img/QFAM.webp", seccionTitulo: seccion.titulo });
       }
       let tipo = "unica";
       if (pregunta.id === 11) tipo = "multipleCantidad";
