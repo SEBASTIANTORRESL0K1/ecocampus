@@ -3,7 +3,7 @@ import markpointIcon from "../../assets/markpointMap.svg";
 
 export const customIcon = new L.Icon({
   iconUrl: markpointIcon,
-  iconSize: [18, 18], // Tamaño del ícono
-  iconAnchor: [16, 32], // Punto de anclaje (centro inferior)
-  popupAnchor: [0, -32] // Ajustar posición del popup
+  iconSize: [34, 44],
+  iconAnchor: [17, 44],
+  popupAnchor: [0, -46]
 });

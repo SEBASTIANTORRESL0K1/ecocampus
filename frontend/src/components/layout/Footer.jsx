@@ -19,7 +19,7 @@ const Footer = () => {
             aria-label="Facebook de Universidad de Colima"
             className="min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
-            <i className="fab fa-facebook hover:text-lime-400"></i>
+            <i className="fab fa-facebook hover:text-[#046E3B]"></i>
           </a>
           <a
             href="https://www.instagram.com/udec.oficial?igsh=MWxnc2ZvYzRsN2ZnYg=="
@@ -28,7 +28,7 @@ const Footer = () => {
             aria-label="Instagram de Universidad de Colima"
             className="min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
-            <i className="fab fa-instagram hover:text-lime-400"></i>
+            <i className="fab fa-instagram hover:text-[#046E3B]"></i>
           </a>
           <a
             href="https://youtube.com/@universidaddecolimatv?si=kqP73Ld1sn6y2DmS"
@@ -37,7 +37,7 @@ const Footer = () => {
             aria-label="YouTube de Universidad de Colima"
             className="min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
-            <i className="fab fa-youtube hover:text-lime-400"></i>
+            <i className="fab fa-youtube hover:text-[#046E3B]"></i>
           </a>
         </div>
 

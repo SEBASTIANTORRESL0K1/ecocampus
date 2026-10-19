@@ -18,24 +18,28 @@ const tools = [
     name: "Calculadora",
     description: "Mide tu huella ecológica personal",
     to: "/calculadora",
+    bgImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDuHhA7Tq-lPpA3Islk-iNypGt2qKXdCxK3o7pLCxU9g0EH3hn5AiJY8-g&s=10",
   },
   {
     Icon: Map,
     name: "Mapa interactivo",
-    description: "Visualiza el impacto ambiental en tu zona",
+    description: "Localiza puntos de reciclaje en tu zona",
     to: "/mapa",
+    bgImage: "https://images.pexels.com/photos/19507080/pexels-photo-19507080.jpeg?cs=srgb&dl=pexels-rndiid-19507080.jpg&fm=jpg",
   },
   {
     Icon: Users,
     name: "Comunidad",
     description: "Comparte y aprende con otros usuarios",
     to: "/comunidad",
+    bgImage: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cmVjaWNsYXJ8ZW58MHx8MHx8fDA%3D",
   },
   {
     Icon: Recycle,
     name: "Guía de reciclaje",
     description: "Aprende a reducir y gestionar tus residuos",
     to: "/guia-reciclaje",
+    bgImage: "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cmVjaWNsYXJ8ZW58MHx8MHx8fDA%3D",
   },
 ];
 
@@ -66,6 +70,7 @@ const LandingPage = () => {
       <main>
         {/* ── Hero — load-time animation via PageHero animateOnLoad ── */}
         <PageHero
+          backgroundImageUrl="https://www.ucol.mx/content/portal/banner_733551615849.jpg"
           backgroundSeed="ecocampus"
           eyebrow="Plataforma ambiental universitaria"
           title="Calcula tu huella ecológica"
@@ -255,8 +260,8 @@ const LandingPage = () => {
               }}
             >
               <img
-                src="https://picsum.photos/seed/campo/800/600"
-                alt="Campo natural con vegetación"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDuHhA7Tq-lPpA3Islk-iNypGt2qKXdCxK3o7pLCxU9g0EH3hn5AiJY8-g&s=10"
+                alt="Huella ecológica"
                 loading="lazy"
                 width="800"
                 height="600"
@@ -288,6 +293,7 @@ const LandingPage = () => {
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
               gap: "1.5rem",
+              alignItems: "stretch",
             }}
           >
             {tools.map((tool, index) => (
@@ -295,40 +301,106 @@ const LandingPage = () => {
                 key={tool.to}
                 ref={cardReveal[index].ref}
                 className={`reveal-card${cardReveal[index].visible ? " is-visible" : ""}`}
-                style={{ '--reveal-delay': `${index * 80}ms` }}
+                style={{ '--reveal-delay': `${index * 80}ms`, height: "100%" }}
               >
                 <Link
                   to={tool.to}
-                  style={{ textDecoration: "none" }}
+                  style={{ textDecoration: "none", display: "block", height: "100%" }}
                 >
-                  <FeatureCard
-                    cursor="pointer"
-                    onMouseEnter={cardHoverLink.enter}
-                    onMouseLeave={cardHoverLink.leave}
-                  >
-                    <IconCircle Icon={tool.Icon} />
-                    <h3
+                  {tool.bgImage ? (
+                    <article
                       style={{
-                        fontSize: "1.05rem",
-                        fontWeight: 600,
-                        color: "#1a2e1a",
-                        margin: "0 0 0.5rem",
-                        letterSpacing: "0.02em",
+                        position: "relative",
+                        overflow: "hidden",
+                        borderRadius: "var(--radius-card)",
+                        boxShadow: "var(--shadow-card)",
+                        cursor: "pointer",
+                        height: "100%",
+                        minHeight: "220px",
                       }}
                     >
-                      {tool.name}
-                    </h3>
-                    <p
-                      style={{
-                        fontSize: "0.88rem",
-                        color: "#5a7a5a",
-                        margin: 0,
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      {tool.description}
-                    </p>
-                  </FeatureCard>
+                      <img
+                        src={tool.bgImage}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          background: "rgba(20,50,20,0.55)",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "relative",
+                          zIndex: 1,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          padding: "2rem 1.5rem",
+                          textAlign: "center",
+                        }}
+                      >
+                        <IconCircle Icon={tool.Icon} />
+                        <h3
+                          style={{
+                            fontSize: "1.05rem",
+                            fontWeight: 600,
+                            color: "#fff",
+                            margin: "0 0 0.5rem",
+                            letterSpacing: "0.02em",
+                          }}
+                        >
+                          {tool.name}
+                        </h3>
+                        <p
+                          style={{
+                            fontSize: "0.88rem",
+                            color: "#fff",
+                            margin: 0,
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {tool.description}
+                        </p>
+                      </div>
+                    </article>
+                  ) : (
+                    <FeatureCard cursor="pointer">
+                      <IconCircle Icon={tool.Icon} />
+                      <h3
+                        style={{
+                          fontSize: "1.05rem",
+                          fontWeight: 600,
+                          color: "#1a2e1a",
+                          margin: "0 0 0.5rem",
+                          letterSpacing: "0.02em",
+                        }}
+                      >
+                        {tool.name}
+                      </h3>
+                      <p
+                        style={{
+                          fontSize: "0.88rem",
+                          color: "#5a7a5a",
+                          margin: 0,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {tool.description}
+                      </p>
+                    </FeatureCard>
+                  )}
                 </Link>
               </div>
             ))}

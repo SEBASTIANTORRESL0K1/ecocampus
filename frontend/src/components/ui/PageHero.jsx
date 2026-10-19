@@ -3,6 +3,7 @@ import "../../styles/scroll-animations.css";
 
 const PageHero = ({
   backgroundSeed,
+  backgroundImageUrl,
   eyebrow,
   title,
   description,
@@ -22,10 +23,11 @@ const PageHero = ({
   >
     {/* img instead of CSS background-image so browsers discover and preload it early */}
     <img
-      src={`https://picsum.photos/seed/${backgroundSeed}/1920/600`}
+      src={backgroundImageUrl ?? `https://picsum.photos/seed/${backgroundSeed}/1920/600`}
       alt=""
       aria-hidden="true"
       fetchPriority="high"
+      referrerPolicy="no-referrer"
       width="1920"
       height="600"
       style={{

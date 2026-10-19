@@ -15,7 +15,7 @@ const Mapa = () => {
   const { ref: mapRef, isVisible: mapVisible } = useScrollReveal();
 
   return (
-    <PageLayout>
+    <PageLayout navTransparent>
       <main>
         {/* ── Hero compacto ── */}
         <section
@@ -23,7 +23,7 @@ const Mapa = () => {
           style={{
             '--reveal-delay': '0ms',
             backgroundImage:
-              "url('https://picsum.photos/seed/campusmapa/1920/400')",
+              "url('https://images.pexels.com/photos/19507080/pexels-photo-19507080.jpeg?cs=srgb&dl=pexels-rndiid-19507080.jpg&fm=jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             height: "280px",
