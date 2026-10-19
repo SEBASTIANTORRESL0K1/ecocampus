@@ -34,7 +34,7 @@ Proyecto de tesis — Universidad de Colima.
 El proyecto funciona de dos maneras:
 
 - **Sitio público (GitHub Pages):** SPA que corre solo en el cliente, sin backend ni API. Es lo que se publica en cada push a `main`.
-- **Modo experimento (Docker):** la misma SPA más un backend, una base MySQL y el login institucional. Al terminar la calculadora, los participantes (solo estudiantes de la UCOL) responden un cuestionario que se guarda en MySQL. Se activa con `VITE_EXPERIMENTO_ACTIVO=true`; sin esa variable la calculadora funciona normal.
+- **Modo experimento (Docker):** la misma SPA más un backend, una base MySQL y el login institucional. Al terminar la calculadora, los participantes (solo estudiantes de la UCOL) ven su resultado y despues responden un cuestionario que se guarda en MySQL. Se activa con `VITE_EXPERIMENTO_ACTIVO=true`; sin esa variable la calculadora funciona normal.
 
 En el modo experimento:
 - El acceso se elige con `REQUIERE_LOGIN`: login federado de la UCOL o solo el correo (ver [Acceso al estudio](#acceso-al-estudio)). No hay envíos anónimos.
@@ -100,7 +100,7 @@ ecocampus/
 | Ruta               | Descripción                                                        |
 |---------------------|---------------------------------------------------------------------|
 | `/`                 | Landing page con información sobre la huella ecológica              |
-| `/calculadora`      | Cuestionario para calcular la huella ecológica personal (en el modo experimento pide login y termina con el cuestionario de evaluación) |
+| `/calculadora`      | Cuestionario para calcular la huella ecológica personal (en el modo experimento pide login y muestra el resultado y de ahí se pasa al consentimiento y al cuestionario de evaluación) |
 | `/mapa`              | Mapa interactivo con los puntos de reciclaje del campus              |
 | `/comunidad`         | Noticias y eventos ambientales                                       |
 | `/guia-reciclaje`    | Guía con los principios y beneficios del reciclaje                   |

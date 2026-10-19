@@ -10,6 +10,41 @@ import Calculadora from "./Calculadora";
 import { pasoRespondido } from "./pasoRespondido";
 import { CLAVE_PROGRESO } from "./progresoGuardado";
 
+// El modo experimento se controla por prueba mediante este objeto.
+const configExperimento = vi.hoisted(() => ({ activo: false, apiUrl: "" }));
+
+vi.mock("../../config/experiment", async (importOriginal) => {
+	const original = await importOriginal();
+	return {
+		...original,
+		get EXPERIMENTO_ACTIVO() {
+			return configExperimento.activo;
+		},
+		get API_URL() {
+			return configExperimento.apiUrl;
+		},
+	};
+});
+
+// Cuestionario real mas un boton auxiliar que simula el envio completo.
+vi.mock("./CuestionarioExperimento", async (importOriginal) => {
+	const { default: Real } = await importOriginal();
+	return {
+		default: (props) => (
+			<>
+				<Real {...props} />
+				<button
+					onClick={() =>
+						props.onCompletar({ respuestasExperimento: { consentimiento: "Sí, acepto" } })
+					}
+				>
+					Simular envio
+				</button>
+			</>
+		),
+	};
+});
+
 vi.mock('../../hooks/useScrollReveal', () => ({
 	default: () => ({ ref: { current: null }, isVisible: true }),
 }));
@@ -25,6 +60,8 @@ const leerGuardado = () => JSON.parse(localStorage.getItem(CLAVE_PROGRESO));
 
 beforeEach(() => {
 	localStorage.clear();
+	configExperimento.activo = false;
+	configExperimento.apiUrl = "";
 });
 
 describe("Calculadora", () => {
@@ -399,6 +436,145 @@ describe("Calculadora - persistencia en localStorage", () => {
 			});
 			expect(leerGuardado().respuestas).toMatchObject({ 1: 27 });
 		});
+	});
+});
+
+describe("Calculadora - modo experimento (resultado primero)", () => {
+	// Deja la calculadora en el ultimo paso, ya respondido, lista para Finalizar.
+	const irAFinalizar = () => {
+		localStorage.setItem(
+			CLAVE_PROGRESO,
+			JSON.stringify({
+				version: 1,
+				respuestas: { 1: 27, 30: 0, habitantesHogar: 1 },
+				pasoActual: 30,
+				verResultado: false,
+			}),
+		);
+		renderCalculadora();
+		fireEvent.click(screen.getByRole("button", { name: "Finalizar" }));
+	};
+
+	const botonCuestionario = () =>
+		screen.queryByRole("button", { name: "Continuar con el cuestionario" });
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
+	test("con experimento, Finalizar muestra el resultado y el boton del cuestionario", () => {
+		configExperimento.activo = true;
+		irAFinalizar();
+
+		expect(
+			screen.getByRole("heading", { name: "¡Tu resultado!" }),
+		).toBeInTheDocument();
+		expect(botonCuestionario()).toBeInTheDocument();
+		expect(screen.queryByText("Consentimiento informado")).not.toBeInTheDocument();
+	});
+
+	test("el boton abre el consentimiento", () => {
+		configExperimento.activo = true;
+		irAFinalizar();
+		fireEvent.click(botonCuestionario());
+
+		expect(screen.getByText("Consentimiento informado")).toBeInTheDocument();
+		expect(
+			screen.queryByRole("heading", { name: "¡Tu resultado!" }),
+		).not.toBeInTheDocument();
+	});
+
+	test("rechazar el consentimiento vuelve al resultado sin reiniciar", () => {
+		configExperimento.activo = true;
+		irAFinalizar();
+		fireEvent.click(botonCuestionario());
+
+		fireEvent.click(screen.getByRole("radio", { name: "No, gracias" }));
+		fireEvent.click(screen.getByRole("button", { name: "Siguiente" }));
+
+		expect(
+			screen.getByRole("heading", { name: "¡Tu resultado!" }),
+		).toBeInTheDocument();
+		expect(botonCuestionario()).toBeInTheDocument();
+		expect(localStorage.getItem(CLAVE_PROGRESO)).not.toBeNull();
+	});
+
+	test("al recargar en el resultado el boton sigue disponible", () => {
+		configExperimento.activo = true;
+		localStorage.setItem(
+			CLAVE_PROGRESO,
+			JSON.stringify({
+				version: 1,
+				respuestas: { 1: 27, 30: 0, habitantesHogar: 1 },
+				pasoActual: 30,
+				verResultado: true,
+			}),
+		);
+		renderCalculadora();
+		expect(botonCuestionario()).toBeInTheDocument();
+	});
+
+	test("un envio correcto reemplaza el boton por el agradecimiento", async () => {
+		configExperimento.activo = true;
+		configExperimento.apiUrl = "http://api.test";
+		vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true }));
+		irAFinalizar();
+		fireEvent.click(botonCuestionario());
+		fireEvent.click(screen.getByRole("button", { name: "Simular envio" }));
+
+		expect(
+			await screen.findByText(/Gracias por participar/),
+		).toBeInTheDocument();
+		expect(botonCuestionario()).not.toBeInTheDocument();
+	});
+
+	test("un error distinto de duplicado conserva el boton para reintentar", async () => {
+		configExperimento.activo = true;
+		configExperimento.apiUrl = "http://api.test";
+		vi.stubGlobal(
+			"fetch",
+			vi.fn().mockResolvedValue({
+				ok: false,
+				json: async () => ({ error: "otro" }),
+			}),
+		);
+		irAFinalizar();
+		fireEvent.click(botonCuestionario());
+		fireEvent.click(screen.getByRole("button", { name: "Simular envio" }));
+
+		expect(
+			await screen.findByRole("heading", { name: "¡Tu resultado!" }),
+		).toBeInTheDocument();
+		expect(botonCuestionario()).toBeInTheDocument();
+		expect(screen.queryByText(/Gracias por participar/)).not.toBeInTheDocument();
+	});
+
+	test("un duplicado cuenta como enviado", async () => {
+		configExperimento.activo = true;
+		configExperimento.apiUrl = "http://api.test";
+		vi.stubGlobal(
+			"fetch",
+			vi.fn().mockResolvedValue({
+				ok: false,
+				json: async () => ({ error: "duplicado" }),
+			}),
+		);
+		irAFinalizar();
+		fireEvent.click(botonCuestionario());
+		fireEvent.click(screen.getByRole("button", { name: "Simular envio" }));
+
+		expect(
+			await screen.findByText(/Gracias por participar/),
+		).toBeInTheDocument();
+	});
+
+	test("sin experimento no aparece el boton del cuestionario", () => {
+		irAFinalizar();
+
+		expect(
+			screen.getByRole("heading", { name: "¡Tu resultado!" }),
+		).toBeInTheDocument();
+		expect(botonCuestionario()).not.toBeInTheDocument();
 	});
 });
 

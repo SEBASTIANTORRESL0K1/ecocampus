@@ -164,6 +164,8 @@ Incluye pruebas de persistencia: respuestas que sobreviven a desmontar y montar,
 - Toast: la pausa por cursor se prueba con `fireEvent.mouseEnter` sobre el contenedor flotante (`closest('.fixed')`), no sobre el `role="status"` interno; la pausa por foco enfocando "Cerrar aviso" dentro de `act`.
 - Modal de confirmacion (`<dialog>` nativo, ver la seccion anterior): elemento `DIALOG` con atributo `open`, foco inicial en "Cancelar", bloqueo de scroll, Cancelar, Escape (evento `cancel`), clic en el fondo y clic en el contenido (no cierra), rotacion de foco con Tab / Shift+Tab (`keyDown` sobre el boton enfocado), retorno del foco y que el almacenamiento solo se borra al confirmar.
 
+- Modo experimento (resultado primero): `config/experiment` se mockea con `vi.hoisted` y getters (`EXPERIMENTO_ACTIVO`, `API_URL`) para activarlo por prueba, y `CuestionarioExperimento` se envuelve para anadir un boton auxiliar "Simular envio". Cubre el boton "Continuar con el cuestionario", el rechazo del consentimiento, el agradecimiento tras un envio correcto o `duplicado` y que otros errores conserven el boton.
+
 ### `frontend/src/features/calculadora/progresoGuardado.test.js`
 
 Pruebas unitarias del modulo de persistencia: ida y vuelta guardar/cargar, JSON corrupto o con forma invalida, limites de `pasoActual`, localStorage que lanza errores (con `vi.spyOn(Storage.prototype, ...)`) y equivalencia del calculo con claves numericas convertidas a texto.
