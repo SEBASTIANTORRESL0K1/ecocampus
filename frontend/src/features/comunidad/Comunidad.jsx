@@ -44,7 +44,7 @@ const Comunidad = () => {
               <div
                 key={item.id}
                 className={`reveal-card${gridVisible ? " is-visible" : ""}`}
-                style={{ "--reveal-delay": `${index * 80}ms` }}
+                style={{ "--reveal-delay": `${index * 80}ms`, height: "100%" }}
               >
               <FeatureCard padding="1.75rem">
                 {/* Badge */}
@@ -116,6 +116,13 @@ const Comunidad = () => {
       </main>
 
       <style>{`
+        .comunidad-cards-grid .reveal-card {
+          height: 100%;
+        }
+        .comunidad-cards-grid .reveal-card article {
+          height: 100%;
+          box-sizing: border-box;
+        }
         @media (max-width: 768px) {
           .comunidad-cards-grid {
             grid-template-columns: 1fr !important;
