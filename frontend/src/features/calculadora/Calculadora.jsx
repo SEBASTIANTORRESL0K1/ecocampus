@@ -65,6 +65,8 @@ const Calculadora = () => {
   const [tiempoInicio] = useState(() => Date.now());
   const [verCuestionario, setVerCuestionario] = useState(false);
   const [avisoEnvio, setAvisoEnvio] = useState(null);
+  // No se persiste: indica que el cuestionario del experimento ya se guardó en esta sesión.
+  const [cuestionarioEnviado, setCuestionarioEnviado] = useState(false);
   const [inputHabitantes, setInputHabitantes] = useState(
     String(respuestas.habitantesHogar ?? 1)
   );
@@ -167,11 +169,7 @@ const Calculadora = () => {
     } else {
       const resultadoCalculado = calcularHuellaEcologica(respuestas);
       setResultado(resultadoCalculado);
-      if (EXPERIMENTO_ACTIVO) {
-        setVerCuestionario(true);
-      } else {
-        setVerResultado(true);
-      }
+      setVerResultado(true);
     }
   };
 
@@ -186,6 +184,7 @@ const Calculadora = () => {
     setRespuestas({ ...RESPUESTAS_INICIALES });
     setVerResultado(false);
     setVerCuestionario(false);
+    setCuestionarioEnviado(false);
     setResultado(null);
     setAvisoRecuperado(false);
     setModalBorrarAbierto(false);
@@ -202,8 +201,9 @@ const Calculadora = () => {
   // Fin del cuestionario del experimento: envia las respuestas al backend y muestra el resultado.
   const manejarCuestionarioCompleto = async (datosCuestionario) => {
     if (datosCuestionario === null) {
-      // Usuario rechazo participar
-      reiniciarCuestionario();
+      // Usuario rechazó participar: conserva su resultado.
+      setVerCuestionario(false);
+      setVerResultado(true);
       return;
     }
 
@@ -230,9 +230,12 @@ const Calculadora = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(cuerpo),
         });
-        if (!response.ok) {
+        if (response.ok) {
+          setCuestionarioEnviado(true);
+        } else {
           const error = await response.json().catch(() => ({}));
           setAvisoEnvio(MENSAJES_ENVIO[error.error] ?? MENSAJE_GENERICO);
+          if (error.error === "duplicado") setCuestionarioEnviado(true);
         }
       }
     } catch (error) {
@@ -568,6 +571,31 @@ const Calculadora = () => {
               (Esto es una aproximación basada en tus respuestas, según la metodología de
               Ibarra-Cisneros &amp; Monroy-Ata, 2014.)
             </p>
+
+            {EXPERIMENTO_ACTIVO && (
+              <div className="mt-8 rounded-lg border-2 border-[#4a7c59] bg-[#e8f4ec] p-4 sm:p-6">
+                {cuestionarioEnviado ? (
+                  <p className="text-base sm:text-lg text-gray-800">
+                    Gracias por participar. Tus respuestas se guardaron.
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-base sm:text-lg text-gray-800">
+                      Ayúdanos a mejorar EcoCampus: participa en un breve cuestionario de evaluación.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setVerResultado(false);
+                        setVerCuestionario(true);
+                      }}
+                      className="mt-4 w-full sm:w-auto px-6 py-3 min-h-[44px] bg-[#2d6a2d] text-white text-lg font-semibold rounded hover:bg-[#1e4d1e] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#4a7c59] focus-visible:ring-offset-2"
+                    >
+                      Continuar con el cuestionario
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
             <div className="mt-8 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
               <Link

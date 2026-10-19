@@ -102,11 +102,12 @@ https://loremflickr.com/640/320/{palabraClave}?lock={id}
 3. Se muestra un paso a la vez con barra de progreso en la parte superior.
 4. El usuario puede avanzar ("Siguiente") o retroceder ("Anterior") entre preguntas. Cada cambio se guarda automaticamente.
 5. Mientras haya alguna respuesta, el boton "Borrar respuestas" abre un modal de confirmacion para reiniciar el cuestionario.
-6. En el ultimo paso, el boton cambia a "Finalizar" y ejecuta `calcularHuellaEcologica(respuestas)`.
+6. En el ultimo paso, el boton cambia a "Finalizar", ejecuta `calcularHuellaEcologica(respuestas)` y muestra siempre la pantalla de resultados, con o sin modo experimento.
 7. Se presenta la pantalla de resultados, desde la que se puede:
    - "Volver al Inicio" (el progreso queda guardado).
    - "Contestar de nuevo": borra el progreso y vuelve a la pregunta 1 directamente (sin modal, porque el usuario ya termino).
    - "Revisar mis respuestas": vuelve al ultimo paso conservando las respuestas para cambiarlas.
+   - En modo experimento, "Continuar con el cuestionario" (ver "Modo Experimento").
 
 ---
 
@@ -181,6 +182,7 @@ Implementacion con el elemento nativo `<dialog>`:
 | Volver al Inicio | Enlace a `/`; el progreso sigue guardado |
 | Contestar de nuevo | Borra el progreso y vuelve a la pregunta 1 con el estado inicial |
 | Revisar mis respuestas | `verResultado` a false y `pasoActual` al ultimo paso, conservando las respuestas |
+| Continuar con el cuestionario | Solo con `EXPERIMENTO_ACTIVO` y mientras `cuestionarioEnviado` sea false: `verResultado` a false y `verCuestionario` a true (cuestionario a pantalla completa, su primera seccion es el consentimiento). Boton verde primario con `min-h-[44px]`, dentro de un bloque con un texto breve que invita a participar. Si `cuestionarioEnviado` es true, el bloque muestra "Gracias por participar. Tus respuestas se guardaron." en lugar del boton |
 
 ---
 
@@ -271,7 +273,7 @@ Claves especiales en `respuestas`:
 
 ## Modo Experimento
 
-Es opt-in: se activa solo con `VITE_EXPERIMENTO_ACTIVO=true` (`EXPERIMENTO_ACTIVO` en `src/config/experiment.js`). Sin esa variable, por ejemplo en el despliegue publico de GitHub Pages, la calculadora funciona normal sin login ni cuestionario. Si esta activo, al pulsar "Finalizar" en la ultima pregunta se muestra el cuestionario de evaluacion (`CuestionarioExperimento`) a pantalla completa, y solo despues la pantalla de resultados.
+Es opt-in: se activa solo con `VITE_EXPERIMENTO_ACTIVO=true` (`EXPERIMENTO_ACTIVO` en `src/config/experiment.js`). Sin esa variable, por ejemplo en el despliegue publico de GitHub Pages, la calculadora funciona normal sin login ni cuestionario. Si esta activo, al pulsar "Finalizar" en la ultima pregunta se muestra primero la pantalla de resultados ("¡Tu resultado!"), con un bloque que invita a participar y el boton "Continuar con el cuestionario". Ese boton abre el cuestionario de evaluacion (`CuestionarioExperimento`) a pantalla completa; su primera seccion es el consentimiento. Si el participante responde "No, gracias" (`onCompletar(null)`), vuelve a la pantalla de resultados sin reiniciar nada y conserva su resultado. Al terminar el envio tambien regresa a la pantalla de resultados. Como `verResultado` se persiste, al recargar en el resultado el boton reaparece (mientras no se haya enviado el cuestionario en esa sesion).
 
 ### Acceso (login federado o correo)
 
@@ -284,14 +286,15 @@ En ambos modos el navegador nunca recibe correo, nombre ni numero de cuenta, y n
 
 ### Guardado de respuestas
 
-Al finalizar el cuestionario se envia `POST {VITE_API_URL}/api/respuestas` con `respuestas`, `tiempoMin` y `planetas`. El tiempo y los planetas se calculan solos. El backend toma el id y el correo de la sesion (SAML o correo), valida los datos y los inserta en la tabla `respuestas` de MySQL. Hay un solo registro por participante y por correo; un segundo envio devuelve `duplicado` y la pantalla de resultados muestra un aviso (`avisoEnvio`).
+Al terminar el cuestionario (despues de ver el resultado) se envia `POST {VITE_API_URL}/api/respuestas` con `respuestas`, `tiempoMin` y `planetas`. El tiempo y los planetas se calculan solos. El backend toma el id y el correo de la sesion (SAML o correo), valida los datos y los inserta en la tabla `respuestas` de MySQL. Hay un solo registro por participante y por correo; un segundo envio devuelve `duplicado` y la pantalla de resultados muestra un aviso (`avisoEnvio`). `cuestionarioEnviado` pasa a true solo si la respuesta fue `ok` o el error es `duplicado`; con cualquier otro error el boton "Continuar con el cuestionario" sigue visible para reintentar.
 
 ### Estado adicional
 
 | Variable | Descripcion |
 | :--- | :--- |
 | `verCuestionario` | Muestra el cuestionario del experimento en lugar de la calculadora |
-| `avisoEnvio` | Mensaje del toast cuando el guardado falla o es un duplicado |
+| `avisoEnvio` | Mensaje del toast cuando el guardado falla o es un duplicado; se muestra sobre la pantalla de resultados |
+| `cuestionarioEnviado` | Booleano no persistido; true tras un envio correcto o un `duplicado`, y vuelve a false en `reiniciarCuestionario`. Oculta el boton "Continuar con el cuestionario" y muestra el agradecimiento |
 | `tiempoInicio` | Marca de tiempo al montar; se usa para calcular los minutos |
 
 ### Tipos de pregunta del cuestionario
