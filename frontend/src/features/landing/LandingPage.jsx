@@ -9,6 +9,7 @@ import SectionHeading from "../../components/ui/SectionHeading";
 import FeatureCard from "../../components/ui/FeatureCard";
 import IconCircle from "../../components/ui/IconCircle";
 import useScrollReveal from "../../hooks/useScrollReveal";
+import { cardHoverLink } from "../../utils/cardHover";
 import "../../styles/scroll-animations.css";
 
 const tools = [
@@ -63,26 +64,19 @@ const LandingPage = () => {
   return (
     <PageLayout navTransparent>
       <main>
-        {/* ── Hero — load-time animation (not scroll-triggered) ── */}
-        {/*
-          PageHero is a shared component and must not be modified.
-          We wrap it with reveal-load so the entire hero fades in on mount.
-          Individual element stagger would require changes inside PageHero.
-        */}
-        <div className="reveal-load" style={{ '--reveal-delay': '0ms' }}>
-          <PageHero
-            backgroundSeed="ecocampus"
-            eyebrow="Plataforma ambiental universitaria"
-            title="Calcula tu huella ecológica"
-            description="Conoce tu impacto ambiental y actúa hoy"
-            minHeight="100dvh"
-            cta={
-              <Link to="/calculadora">
-                <CtaButton>Comenzar cálculo</CtaButton>
-              </Link>
-            }
-          />
-        </div>
+        {/* ── Hero — load-time animation via PageHero animateOnLoad ── */}
+        <PageHero
+          backgroundSeed="ecocampus"
+          eyebrow="Plataforma ambiental universitaria"
+          title="Calcula tu huella ecológica"
+          description="Conoce tu impacto ambiental y actúa hoy"
+          minHeight="100dvh"
+          cta={
+            <Link to="/calculadora">
+              <CtaButton>Comenzar cálculo</CtaButton>
+            </Link>
+          }
+        />
 
         {/* ── About — 2-column scroll reveal with staggered stats ── */}
         <section
@@ -307,7 +301,11 @@ const LandingPage = () => {
                   to={tool.to}
                   style={{ textDecoration: "none" }}
                 >
-                  <FeatureCard cursor="pointer">
+                  <FeatureCard
+                    cursor="pointer"
+                    onMouseEnter={cardHoverLink.enter}
+                    onMouseLeave={cardHoverLink.leave}
+                  >
                     <IconCircle Icon={tool.Icon} />
                     <h3
                       style={{

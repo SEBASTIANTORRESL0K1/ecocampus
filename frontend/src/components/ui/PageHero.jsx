@@ -1,4 +1,5 @@
 import React from "react";
+import "../../styles/scroll-animations.css";
 
 const PageHero = ({
   backgroundSeed,
@@ -9,8 +10,16 @@ const PageHero = ({
   minHeight = "42vh",
   overlayOpacity = "0.65",
   textAlign = "center",
+  animateOnLoad = true,
 }) => (
-  <section style={{ position: "relative", overflow: "hidden" }}>
+  <section
+    className={animateOnLoad ? "reveal-load" : undefined}
+    style={{
+      position: "relative",
+      overflow: "hidden",
+      ...(animateOnLoad ? { '--reveal-delay': '0ms' } : {}),
+    }}
+  >
     {/* img instead of CSS background-image so browsers discover and preload it early */}
     <img
       src={`https://picsum.photos/seed/${backgroundSeed}/1920/600`}

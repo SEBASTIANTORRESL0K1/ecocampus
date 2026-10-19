@@ -14,26 +14,19 @@ const badgeIcon = (tipo) => {
 };
 
 const Comunidad = () => {
-  const { ref: heroRef, isVisible: heroVisible } = useScrollReveal();
   const { ref: gridRef, isVisible: gridVisible } = useScrollReveal();
 
   return (
     <PageLayout>
       <main>
         {/* ── Hero ── */}
-        <div
-          ref={heroRef}
-          className={`reveal${heroVisible ? " is-visible" : ""}`}
-          style={{ "--reveal-delay": "0ms" }}
-        >
-          <PageHero
-            backgroundSeed="comunidad"
-            eyebrow="Noticias y eventos ambientales"
-            title="Comunidad EcoCampus"
-            description="Mantente informado sobre eventos y noticias ambientales"
-            minHeight="42vh"
-          />
-        </div>
+        <PageHero
+          backgroundSeed="comunidad"
+          eyebrow="Noticias y eventos ambientales"
+          title="Comunidad EcoCampus"
+          description="Mantente informado sobre eventos y noticias ambientales"
+          minHeight="42vh"
+        />
 
         {/* ── Cards grid ── */}
         <SectionWrapper background="var(--color-section-alt)" padding="4rem 1.5rem">
@@ -41,7 +34,7 @@ const Comunidad = () => {
             ref={gridRef}
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridTemplateColumns: "repeat(3, 1fr)",
               gap: "1.5rem",
             }}
             className="comunidad-cards-grid"
@@ -122,7 +115,7 @@ const Comunidad = () => {
       </main>
 
       <style>{`
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
           .comunidad-cards-grid {
             grid-template-columns: 1fr !important;
           }
