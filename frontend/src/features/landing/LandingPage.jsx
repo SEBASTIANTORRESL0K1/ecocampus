@@ -309,6 +309,8 @@ const LandingPage = () => {
                 >
                   {tool.bgImage ? (
                     <article
+                      onMouseEnter={cardHoverLink.enter}
+                      onMouseLeave={cardHoverLink.leave}
                       style={{
                         position: "relative",
                         overflow: "hidden",
@@ -317,6 +319,7 @@ const LandingPage = () => {
                         cursor: "pointer",
                         height: "100%",
                         minHeight: "220px",
+                        transition: "transform 200ms ease, box-shadow 200ms ease",
                       }}
                     >
                       <img
