@@ -167,3 +167,25 @@ k6 run --out json=results/k6-results.json src/performance/load-test.js
 ```
 
 Requiere k6 instalado: `winget install k6 --source winget`
+
+---
+
+## Nota sobre la afirmacion de "funcionamiento estable"
+
+La afirmacion de "funcionamiento estable" debe interpretarse de forma precisa y no como garantia absoluta de disponibilidad en produccion.
+
+### Lo que si demuestran los resultados
+
+- La SPA responde con HTTP 200 en el 100% de las solicitudes bajo 50 usuarios virtuales concurrentes en un entorno local de prueba (loopback, Vite Preview).
+- El percentil p95 global es de 2.23 ms, muy por debajo del umbral de 500 ms definido en el script.
+- No se registraron errores HTTP, timeouts ni rechazos de conexion en la ejecucion definitiva de la prueba.
+
+### Lo que no demuestran los resultados
+
+- El rendimiento bajo trafico real de red (la prueba es loopback; la latencia de red del usuario final no esta incluida).
+- El comportamiento ante picos de carga superiores a 50 usuarios concurrentes.
+- La estabilidad de funcionalidades dinamicas que dependan de un backend o base de datos (EcoCampus es actualmente una SPA estatica).
+
+### Discrepancia entre versiones del documento
+
+Versiones anteriores del manuscrito mencionaban una tasa de exito HTTP del 98%. Ese valor corresponde a una ejecucion de diagnostico en la que el servidor estaba escuchando unicamente en IPv6 (`[::1]:4173`) mientras k6 intentaba conectar por IPv4 (`127.0.0.1`). Una vez corregida la configuracion del servidor (`--host 0.0.0.0`), la tasa de exito en la prueba definitiva fue del 100% (0 solicitudes fallidas de 1213). El valor correcto a reportar es **100%**.
