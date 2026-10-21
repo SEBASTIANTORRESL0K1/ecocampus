@@ -89,15 +89,16 @@ Todos los tiempos estan en milisegundos (ms). Fuente: salida de k6 al finalizar 
 |-----------|-------------|
 | min       | 0.00        |
 | p50       | 1.09        |
-| p75       | —           |
+| p75       | 1.35 (est.) |
 | p90       | 1.79        |
 | p95       | 2.23        |
-| p99       | —           |
+| p99       | 3.13 (est.) |
 | max       | 7.49        |
 | media     | 1.15        |
 
-> Nota: k6 reporta p50, p90, p95 en la salida de consola. Los valores de p75 y p99 globales
-> no son emitidos directamente en la salida resumida; se incluyen por ruta en la seccion siguiente.
+> Nota: k6 reporta p50, p90, p95 directamente en la salida de consola. Los valores de p75 y p99
+> globales marcados como `(est.)` son estimaciones interpoladas a partir de los percentiles por ruta
+> del archivo `k6-results.json`; no son emitidos directamente en el resumen de k6.
 
 ---
 
