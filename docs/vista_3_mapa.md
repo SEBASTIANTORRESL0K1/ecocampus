@@ -60,6 +60,33 @@ Los 21 puntos cubren las siguientes zonas del campus:
 
 ---
 
+## Fuente de los datos y georreferenciacion
+
+### Origen de los puntos
+
+Los 21 contenedores de reciclaje fueron identificados mediante **recorrido fisico en campo** realizado por el equipo de desarrollo en el Campus Central de la Universidad de Colima durante el semestre agosto-diciembre 2024. No existe una fuente oficial institucional publica que liste los puntos de reciclaje del campus; los datos son resultado de levantamiento propio.
+
+### Procedimiento de georreferenciacion
+
+Las coordenadas geograficas (latitud/longitud) de cada punto fueron obtenidas con los siguientes pasos:
+
+1. Localizacion fisica del contenedor durante el recorrido en campo.
+2. Captura de coordenadas en tiempo real utilizando la funcion de ubicacion de Google Maps (precision tipica: 3-10 m en campus abierto).
+3. Verificacion cruzada de la posicion en OpenStreetMap para confirmar coherencia con la cartografia base.
+4. Registro de una fotografia del contenedor para facilitar su identificacion por parte del usuario final.
+
+### Verificacion
+
+- Todos los puntos fueron visitados y fotografiados de forma presencial.
+- Las fotos reales de cada contenedor estan almacenadas en `public/Depositos/` y se muestran en el popup del mapa como evidencia de verificacion.
+- No se realizo medicion geodesica certificada; la precision es la provista por GPS de consumo (smartphone).
+
+### Limitacion
+
+Los contenedores pueden ser reubicados, retirados o añadidos por la institucion sin notificacion. Se recomienda actualizar el listado al inicio de cada semestre mediante un nuevo recorrido de campo.
+
+---
+
 ## Comportamiento de la Interfaz
 
 - Al cargar la vista, el mapa se renderiza centrado en el campus con todos los marcadores visibles.
