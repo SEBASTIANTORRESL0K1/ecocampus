@@ -203,6 +203,42 @@ La funcion `calcularHuellaEcologica` (definida en `preguntas.js`) recibe el obje
 
 ---
 
+## Metodologia de puntuacion y caracter educativo
+
+### Formula de puntuacion
+
+El resultado final es la suma de todas las secciones mas el valor de infraestructura:
+
+```
+totalGeneral = totalAlimentos + totalTransporte + totalEnergia + totalForestal + infraestructura
+```
+
+Cada pregunta aporta al total el `valor` de la opcion seleccionada, segun la tabla de ponderaciones publicada en Ibarra-Cisneros & Monroy-Ata (2014). Los valores estan definidos directamente en el campo `valor` de cada opcion en `preguntas.js`.
+
+Reglas de calculo especiales:
+
+| Pregunta(s) | Regla |
+| :--- | :--- |
+| Q21, Q22, Q23 (electrodomesticos + focos) | La suma de sus valores se divide entre el numero de habitantes del hogar antes de acumularse |
+| Q24 (celulares) | El valor de la opcion se multiplica por la cantidad de dispositivos ingresada |
+| Infraestructura | Valor fijo de 6,400 puntos que se suma al total independientemente de las respuestas |
+
+### Conversion a hectareas globales (hag)
+
+Los puntos se traducen a hag con la siguiente relacion lineal (derivada de los umbrales del articulo original):
+
+```
+hag = totalGeneral / 10,000
+```
+
+El planeta Tierra dispone de aproximadamente 1.6 hag por persona. El equivalente en planetas se obtiene dividiendo el resultado individual entre 1.6.
+
+### Caracter educativo del instrumento
+
+La calculadora es una herramienta de sensibilizacion basada en puntajes. No constituye una auditoria ambiental oficial ni un inventario de ciclo de vida. Sus resultados son estimaciones educativas que permiten al usuario comparar habitos y reflexionar sobre su impacto, pero no deben interpretarse como medicion formal de huella ecologica certificada. La metodologia de referencia (Ibarra-Cisneros & Monroy-Ata, 2014) fue adaptada al contexto universitario mexicano y no ha sido validada con datos de consumo real de la institucion.
+
+---
+
 ## Estado Interno (`useState`)
 
 | Variable | Descripcion |
