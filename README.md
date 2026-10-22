@@ -12,18 +12,19 @@ Proyecto de tesis -- Universidad de Colima.
 
 | Componente | Tecnologia | Version |
 | :--- | :--- | :--- |
-| Framework frontend | [React](https://react.dev/) | 19 |
-| Bundler | [Vite](https://vite.dev/) | 8 |
-| Estilos | [Tailwind CSS](https://tailwindcss.com/) | 4 |
-| Enrutamiento | [React Router](https://reactrouter.com/) | 7 |
-| Mapas | [Leaflet](https://leafletjs.com/) / [react-leaflet](https://react-leaflet.js.org/) | 1.9 / 5 |
-| Backend | [Express](https://expressjs.com/) + [TypeScript](https://www.typescriptlang.org/) | 4 |
-| Validacion | [Zod](https://zod.dev/) | - |
-| Autenticacion | [Passport](https://www.passportjs.org/) + SAML | - |
+| Framework frontend | [React](https://react.dev/) | 19.0.0 |
+| Bundler | [Vite](https://vite.dev/) | 8.3.0 |
+| Estilos | [Tailwind CSS](https://tailwindcss.com/) | 4.0.9 |
+| Enrutamiento | [React Router](https://reactrouter.com/) | 7.2.0 |
+| Mapas | [Leaflet](https://leafletjs.com/) / [react-leaflet](https://react-leaflet.js.org/) | 1.9.4 / 5.0.0 |
+| Backend | [Express](https://expressjs.com/) + [TypeScript](https://www.typescriptlang.org/) | 4.22.2 / 7.0.2 |
+| Validacion | [Zod](https://zod.dev/) | 4.6.7 |
+| Autenticacion | [Passport](https://www.passportjs.org/) + [passport-saml](https://github.com/node-saml/passport-saml) | 0.5.2 / 5.1.0 |
 | Base de datos | MySQL | 8 |
+| Sesiones | [express-session](https://github.com/expressjs/session) + [mysql2](https://github.com/sidorares/node-mysql2) | 1.19.0 / 3.24.6 |
 | Contenedores | Docker Compose | - |
 | Proxy | Caddy (produccion), nginx (frontend) | - |
-| Pruebas | [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/), [k6](https://k6.io/) | - |
+| Pruebas | [Vitest](https://vitest.dev/) / [Playwright](https://playwright.dev/) / [k6](https://k6.io/) | 5.0.1 / 1.48.0 / - |
 | CI/CD | GitHub Actions | - |
 
 ---
@@ -34,33 +35,39 @@ Proyecto de tesis -- Universidad de Colima.
 
 Introduccion al concepto de huella ecologica y puerta de acceso al cuestionario interactivo.
 
-| Hero | Informacion | Herramientas |
-| :---: | :---: | :---: |
-| ![Hero](docs/img/vista-inicio-hero.jpg) | ![Info](docs/img/vista-inicio-info.jpg) | ![Herramientas](docs/img/vista-inicio-herramientas.jpg) |
+![Hero](docs/img/vista-inicio-hero.webp)
+
+![Informacion](docs/img/vista-inicio-info.webp)
+
+![Herramientas](docs/img/vista-inicio-herramientas.webp)
 
 ### Calculadora de Huella Ecologica
 
 Cuestionario interactivo de 30 preguntas basado en metodologia cientifica mexicana para evaluar y desglosar el impacto ecologico del usuario. En el modo experimento pide login institucional y al finalizar muestra el resultado seguido de un cuestionario de evaluacion.
 
-![Calculadora](docs/img/vista-calculadora.jpg)
+![Calculadora](docs/img/vista-calculadora.png)
 
 ### Mapa de Puntos de Reciclaje
 
 Mapa georreferenciado e interactivo que ubica los 21 contenedores de reciclaje fisicos del campus central, acompanados de fotos reales para su facil identificacion.
 
-![Mapa](docs/img/vista-mapa.jpg)
+![Mapa](docs/img/vista-mapa.webp)
 
 ### Comunidad EcoCampus
 
 Tablon de noticias y eventos ecologicos para mantener conectada a la comunidad universitaria con las acciones ambientales de su entorno.
 
-![Comunidad](docs/img/vista-comunidad.jpg)
+![Comunidad](docs/img/vista-comunidad.webp)
 
 ### Guia de Reciclaje
 
 Seccion informativa y visual sobre las 3 R's de la ecologia, beneficios del reciclaje y enlaces a programas oficiales de la Universidad de Colima.
 
-![Guia de Reciclaje](docs/img/vista-guia-reciclaje.jpg)
+![Guia de Reciclaje](docs/img/vista-guia-hero.png)
+
+![Las 3 R's del Reciclaje](docs/img/vista-guia-3rs.png)
+
+![Beneficios del Reciclaje](docs/img/vista-guia-beneficios.webp)
 
 ---
 
