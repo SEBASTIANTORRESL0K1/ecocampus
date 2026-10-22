@@ -12,18 +12,19 @@ Proyecto de tesis -- Universidad de Colima.
 
 | Componente | Tecnologia | Version |
 | :--- | :--- | :--- |
-| Framework frontend | [React](https://react.dev/) | 19 |
-| Bundler | [Vite](https://vite.dev/) | 8 |
-| Estilos | [Tailwind CSS](https://tailwindcss.com/) | 4 |
-| Enrutamiento | [React Router](https://reactrouter.com/) | 7 |
-| Mapas | [Leaflet](https://leafletjs.com/) / [react-leaflet](https://react-leaflet.js.org/) | 1.9 / 5 |
-| Backend | [Express](https://expressjs.com/) + [TypeScript](https://www.typescriptlang.org/) | 4 |
-| Validacion | [Zod](https://zod.dev/) | - |
-| Autenticacion | [Passport](https://www.passportjs.org/) + SAML | - |
+| Framework frontend | [React](https://react.dev/) | 19.0.0 |
+| Bundler | [Vite](https://vite.dev/) | 8.3.0 |
+| Estilos | [Tailwind CSS](https://tailwindcss.com/) | 4.0.9 |
+| Enrutamiento | [React Router](https://reactrouter.com/) | 7.2.0 |
+| Mapas | [Leaflet](https://leafletjs.com/) / [react-leaflet](https://react-leaflet.js.org/) | 1.9.4 / 5.0.0 |
+| Backend | [Express](https://expressjs.com/) + [TypeScript](https://www.typescriptlang.org/) | 4.22.2 / 7.0.2 |
+| Validacion | [Zod](https://zod.dev/) | 4.6.7 |
+| Autenticacion | [Passport](https://www.passportjs.org/) + [passport-saml](https://github.com/node-saml/passport-saml) | 0.5.2 / 5.1.0 |
 | Base de datos | MySQL | 8 |
+| Sesiones | [express-session](https://github.com/expressjs/session) + [mysql2](https://github.com/sidorares/node-mysql2) | 1.19.0 / 3.24.6 |
 | Contenedores | Docker Compose | - |
 | Proxy | Caddy (produccion), nginx (frontend) | - |
-| Pruebas | [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/), [k6](https://k6.io/) | - |
+| Pruebas | [Vitest](https://vitest.dev/) / [Playwright](https://playwright.dev/) / [k6](https://k6.io/) | 5.0.1 / 1.48.0 / - |
 | CI/CD | GitHub Actions | - |
 
 ---
