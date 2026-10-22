@@ -77,9 +77,10 @@ Seccion informativa y visual sobre las 3 R's de la ecologia, beneficios del reci
 flowchart TB
     Usuario["Usuario (navegador)"]
 
-    subgraph AWS["AWS Lightsail"]
+    subgraph AWS["AWS Lightsail (IP publica)"]
+        IPPublica["http://&lt;IP&gt;/ecocampus/"]
         subgraph Docker["Docker Compose"]
-            Caddy["Caddy (proxy)\npuertos 80/443"]
+            Caddy["Caddy (proxy)\npuertos 80 / 443"]
             Nginx["nginx\nfrontend SPA"]
             Backend["Node.js / Express\nAPI + auth SAML"]
             MySQL["MySQL 8\nrespuestas"]
@@ -87,25 +88,26 @@ flowchart TB
     end
 
     subgraph GitHub["GitHub"]
-        Pages["GitHub Pages\nsitio publico (solo frontend)"]
+        Pages["GitHub Pages\nsitio publico (solo frontend, rama main)"]
         Actions["GitHub Actions\nCI/CD"]
     end
 
-    Usuario -->|HTTP/HTTPS| Caddy
-    Usuario -->|HTTPS| Pages
+    Usuario -->|"http://IP (experimento)"| IPPublica
+    Usuario -->|"HTTPS (sitio publico)"| Pages
 
+    IPPublica --> Caddy
     Caddy -->|"/ *"| Nginx
     Caddy -->|"/api, /login, /logout"| Backend
     Backend -->|"mysql2"| MySQL
 
     Actions -->|"push main"| Pages
-    Actions -->|"push experiment/*\n+ aprobacion"| AWS
+    Actions -->|"push experiment/*\n+ aprobacion manual"| AWS
 ```
 
 El proyecto funciona de dos maneras:
 
-- **Sitio publico (GitHub Pages):** SPA que corre solo en el cliente, sin backend ni API. Se publica automaticamente en cada push a `main`.
-- **Modo experimento (Docker en AWS Lightsail):** la misma SPA mas un backend Express, una base MySQL y login institucional. Al terminar la calculadora, los participantes ven su resultado y responden un cuestionario que se guarda en MySQL. Se activa con `VITE_EXPERIMENTO_ACTIVO=true`.
+- **Modo experimento (Docker en AWS Lightsail):** despliegue principal de esta rama. La SPA mas un backend Express, una base MySQL y login institucional corren en una instancia de Lightsail accesible por IP publica (`http://<IP>/ecocampus/`). Al terminar la calculadora, los participantes ven su resultado y responden un cuestionario que se guarda en MySQL. Se activa con `VITE_EXPERIMENTO_ACTIVO=true`. Ver [docs/despliegue/lightsail.md](docs/despliegue/lightsail.md).
+- **Sitio publico (GitHub Pages):** SPA que corre solo en el cliente, sin backend ni API. Se publica automaticamente en cada push a `main`. No aplica a esta rama.
 
 ---
 

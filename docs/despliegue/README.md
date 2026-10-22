@@ -1,13 +1,15 @@
 # Despliegue y entornos
 
+Esta rama (`experiment/survey-questions`) se despliega en **AWS Lightsail** (IP publica). El acceso al experimento es por `http://<IP>/ecocampus/`. GitHub Pages aplica solo a la rama `main` (sitio publico sin backend).
+
 ## Entornos disponibles
 
 | Entorno | Para que sirve | Archivos de compose | Variables | Como se levanta |
 | :--- | :--- | :--- | :--- | :--- |
 | [Desarrollo](#desarrollo) | Trabajar con recarga en vivo, base de datos y herramientas a mano | `docker-compose.yml` + `docker-compose.dev.yml` | `.env.dev.example` | `docker compose up --build` |
-| [Produccion](#produccion) | Servidor real (VM) con un solo punto de entrada | `docker-compose.yml` + `docker-compose.prod.yml` | `.env.prod.example` | `docker compose up -d --build` |
+| [Produccion (Lightsail)](#produccion) | Servidor real con IP publica; despliegue del experimento | `docker-compose.yml` + `docker-compose.prod.yml` | `.env.prod.example` | `docker compose up -d --build` |
 | [Pruebas de carga](#pruebas-de-carga) | Medir el rendimiento en un entorno aislado | `docker-compose.yml` + `docker-compose.loadtest.yml` | `.env.loadtest.example` | ver la seccion |
-| [Sitio publico](#sitio-publico-github-pages) | Publicar solo el frontend | no usa Docker | ninguna | automatico al hacer push a `main` |
+| [Sitio publico (GitHub Pages)](#sitio-publico-github-pages) | Publicar solo el frontend en rama `main` (sin backend) | no usa Docker | ninguna | automatico al hacer push a `main` |
 
 ## Configuracion comun
 
@@ -112,6 +114,8 @@ docker compose start
 - `.env.loadtest` no se versiona. Las pruebas de carga corren contra el backend compilado (etapa `prod` del Dockerfile).
 
 ## Sitio publico (GitHub Pages)
+
+Aplica unicamente a la rama `main`. No es el despliegue de esta rama (`experiment/survey-questions`): el experimento corre en AWS Lightsail con IP publica (ver [lightsail.md](lightsail.md)).
 
 El despliegue es automatico mediante `.github/workflows/deploy.yml` en cada push a `main`: usa Node 20, ejecuta `npm ci --ignore-scripts` y `npm run build`, y publica `frontend/dist`. No define variables de entorno, asi que el modo experimento queda apagado y el sitio es solo el frontend.
 
