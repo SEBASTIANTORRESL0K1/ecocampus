@@ -34,33 +34,39 @@ Proyecto de tesis -- Universidad de Colima.
 
 Introduccion al concepto de huella ecologica y puerta de acceso al cuestionario interactivo.
 
-| Hero | Informacion | Herramientas |
-| :---: | :---: | :---: |
-| ![Hero](docs/img/vista-inicio-hero.jpg) | ![Info](docs/img/vista-inicio-info.jpg) | ![Herramientas](docs/img/vista-inicio-herramientas.jpg) |
+![Hero](docs/img/vista-inicio-hero.webp)
+
+![Informacion](docs/img/vista-inicio-info.webp)
+
+![Herramientas](docs/img/vista-inicio-herramientas.webp)
 
 ### Calculadora de Huella Ecologica
 
 Cuestionario interactivo de 30 preguntas basado en metodologia cientifica mexicana para evaluar y desglosar el impacto ecologico del usuario. En el modo experimento pide login institucional y al finalizar muestra el resultado seguido de un cuestionario de evaluacion.
 
-![Calculadora](docs/img/vista-calculadora.jpg)
+![Calculadora](docs/img/vista-calculadora.png)
 
 ### Mapa de Puntos de Reciclaje
 
 Mapa georreferenciado e interactivo que ubica los 21 contenedores de reciclaje fisicos del campus central, acompanados de fotos reales para su facil identificacion.
 
-![Mapa](docs/img/vista-mapa.jpg)
+![Mapa](docs/img/vista-mapa.webp)
 
 ### Comunidad EcoCampus
 
 Tablon de noticias y eventos ecologicos para mantener conectada a la comunidad universitaria con las acciones ambientales de su entorno.
 
-![Comunidad](docs/img/vista-comunidad.jpg)
+![Comunidad](docs/img/vista-comunidad.webp)
 
 ### Guia de Reciclaje
 
 Seccion informativa y visual sobre las 3 R's de la ecologia, beneficios del reciclaje y enlaces a programas oficiales de la Universidad de Colima.
 
-![Guia de Reciclaje](docs/img/vista-guia-reciclaje.jpg)
+![Guia de Reciclaje](docs/img/vista-guia-hero.png)
+
+![Las 3 R's del Reciclaje](docs/img/vista-guia-3rs.png)
+
+![Beneficios del Reciclaje](docs/img/vista-guia-beneficios.webp)
 
 ---
 
