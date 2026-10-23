@@ -49,9 +49,15 @@ Archivos existentes:
 | Archivo | Que cubre |
 |---------|-----------|
 | `frontend/src/App.test.jsx` | Montaje de la aplicacion completa |
-| `frontend/src/features/landing/LandingPage.test.jsx` | Contenido y estructura de la pagina de inicio |
+| `frontend/src/features/auth/LoginGate.test.jsx` | Pantalla de acceso en modo SAML y modo correo: sesion ausente, dominio no permitido, correo invalido, sesion activa, error de red |
 | `frontend/src/features/calculadora/Calculadora.test.jsx` | Seleccion obligatoria, imagen ilustrativa, `pasoRespondido`, persistencia del progreso, toast y modal de confirmacion |
 | `frontend/src/features/calculadora/progresoGuardado.test.js` | Lectura, escritura, validacion y errores de localStorage del progreso |
+| `frontend/src/features/comunidad/Comunidad.test.jsx` | Montaje, titulo hero, subtitulo, tres publicaciones y badges de tipo |
+| `frontend/src/features/guiaReciclaje/GuiaReciclaje.test.jsx` | Montaje, titulo, principios de las 3 R, categorias de beneficios, enlace externo |
+| `frontend/src/features/landing/LandingPage.contrast.test.js` | Contraste WCAG 2.1 AA de los pares texto/fondo de LandingPage (calculo sin renderizar) |
+| `frontend/src/features/landing/LandingPage.test.jsx` | Contenido y estructura de la pagina de inicio |
+| `frontend/src/features/mapa/Mapa.test.jsx` | Montaje, titulo "Mapa de Reciclaje", contador de 21 puntos y subtitulo del campus |
+| `frontend/src/hooks/useScrollReveal.test.jsx` | Hook useScrollReveal: observacion, revelado al intersectar y fallback sin IntersectionObserver |
 
 ### Pruebas E2E
 
@@ -68,10 +74,11 @@ Archivos existentes:
 
 | Archivo | Que cubre |
 |---------|-----------|
-| `backend/src/validacion/respuestas.test.ts` | Validacion de las respuestas del cuestionario con Zod (rangos, opciones, textos, identidad tomada de la sesion) |
+| `backend/src/app.test.ts` | Rutas HTTP con una base de datos simulada: sesion, 401/400/409/500, CORS, metadatos SAML y salud |
+| `backend/src/auth/correo.test.ts` | Normalizacion del correo institucional (`normalizarCorreo`) y validacion de dominio permitido (`dominioPermitido`) |
 | `backend/src/config/cargar.test.ts` | Configuracion tipada: conversion de variables, valores invalidos y secretos obligatorios en produccion |
 | `backend/src/openapi/especificacion.test.ts` | La especificacion OpenAPI coincide con el codigo: todas las rutas de Express documentadas, obligatorios iguales a los del esquema Zod, ejemplo valido, `docs/openapi.json` al dia y rutas `/openapi.json` y `/docs` (esta ultima solo fuera de produccion) |
-| `backend/src/app.test.ts` | Rutas HTTP con una base de datos simulada: sesion, 401/400/409/500, CORS, metadatos SAML y salud |
+| `backend/src/validacion/respuestas.test.ts` | Validacion de las respuestas del cuestionario con Zod (rangos, opciones, textos, identidad tomada de la sesion) |
 
 Se ejecutan con `npm test` desde `backend/` (corren TypeScript con `tsx`, sin MySQL ni el IdP) y en el CI (job `backend`, junto con `npm run typecheck` y `npm run build`).
 
