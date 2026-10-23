@@ -24,10 +24,15 @@ Documentacion detallada de cada vista del frontend:
 ## Pruebas
 
 - [Guia de pruebas](testing/README.md) -- inicio rapido, filosofia, cuando agregar pruebas
+- [Indice de pruebas](testing/index.md) -- indice de todas las suites y respuesta a la revision
 - [Pruebas de componentes con Vitest](testing/vitest-guidelines.md)
 - [Pruebas E2E con Playwright](testing/playwright-e2e.md)
 - [Pruebas de rendimiento](testing/rendimiento.md)
 - [Reportes del servidor de produccion](testing/produccion/README.md)
+- [WebPageTest: pagina de inicio](testing/produccion/webpagetest.md)
+- [Resultados: Georreferenciacion de contenedores](testing/produccion/resultados/georreferencia-validacion.md)
+- [Resultados: Lighthouse](testing/produccion/resultados/lighthouse-resumen.md)
+- [Resultados: Red del navegador](testing/produccion/resultados/red-resumen.md)
 
 ## API
 
