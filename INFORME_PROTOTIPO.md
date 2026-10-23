@@ -311,6 +311,72 @@ Ademas existe un paso especial de infraestructura previo a la seccion C donde se
 
 **Seleccion obligatoria:** el boton "Siguiente" / "Finalizar" permanece deshabilitado hasta que el paso actual tenga respuesta.
 
+---
+
+### Listado completo de preguntas
+
+**Seccion A: Alimentos (Q1 a Q15)**
+
+| ID | Pregunta | Opciones (label — puntos) |
+| :--- | :--- | :--- |
+| Q1 | ¿Cuantas raciones de fruta consumes a la semana? (racion de 200 g) | Menos de una — 0; 1-2 — 2; 2-4 — 4; 4-6 — 6; 6-8 — 9 |
+| Q2 | ¿Cuantas raciones de verdura consumes a la semana? (racion de 200 g) | Menos de una — 0; 1-2 — 1; 2-4 — 2; 4-6 — 4; 6-8 — 6 |
+| Q3 | ¿Cuantas piezas de pan (dulce y/o salado) consumes a la semana? | No consumo pan — 0; 1-2 piezas — 27; 2-4 — 55; 4-6 — 93; 6-8 — 131; 8-10 — 170 |
+| Q4 | ¿Que cantidad de tortilla consumes en promedio al dia (piezas)? | No consumo tortilla — 0; 1-2 piezas/dia — 91; 2-4 — 182; 4-6 — 295; 6-8 — 422; 8-10 — 542 |
+| Q5 | ¿Cuantas veces a la semana consumes carne de res? | No como — 0; 1-2 veces/semana — 57; 2-4 — 121; 4-6 — 190; 6-8 — 267; 8-10 — 343 |
+| Q6 | ¿Cuantas veces a la semana consumes carne de pollo? | No como — 0; 1-2 veces/semana — 234; 2-4 — 470; 4-6 — 789; 6-8 — 1,107 |
+| Q7 | ¿Cuantas veces a la semana consumes carne de cerdo? | No como — 0; 1-2 veces/semana — 12; 2-4 — 25; 4-6 — 41; 6-8 — 140; 8-10 — 155 |
+| Q8 | ¿Cuantas veces al mes consumes pescado y/o mariscos? | No como — 0; 1-2 veces/mes — 217; 2-4 — 425; 4-6 — 711; 6-8 — 998; 8-10 — 1,298 |
+| Q9 | ¿Cuantas veces a la semana consumes yoghurt? (racion individual) | No consumo — 0; 1-2 veces/semana — 104; 3-4 — 243; 5-6 — 382; 7-8 — 521; 9-10 — 660 |
+| Q10 | ¿Cuantas veces a la semana tomas leche? (racion de 250 mL) | No tomo — 0; 1-2 veces/semana — 130; 3-4 — 304; 5-6 — 478; 7-8 — 651; 9-10 — 825 |
+| Q11 | ¿Cuales de los siguientes alimentos consumes durante una semana promedio? (puntos por vez/semana, se multiplica por las veces indicadas) | Cacahuates 60 g — 50; Papas fritas o frituras — 22; Quesadillas/tortas/gorditas — 347; Tacos orden de 3 — 240; Jugo de naranja natural — 242 |
+| Q12 | ¿Cuantas veces a la semana tomas refresco? (base: lata de 355 mL) | No consumo — 0; 1-2 veces/semana — 1; 2-4 — 2; 4-6 — 4; 6-8 — 5; 8-10 — 7 |
+| Q13 | ¿Cuantos cigarrillos fumas al dia? | No fumo — 0; 1 al dia — 3; 2-5 — 10; 6-10 — 24; 11-15 — 37; 16-20 — 52 |
+| Q14 | ¿En cuanto estimas tu consumo semanal de cerveza? (base: lata de 355 mL) | No consumo — 0; 1-2/semana — 40; 2-4 — 79; 4-6 — 131; 6-8 — 186; 8-10 — 239 |
+| Q15 | ¿Cuantos litros de agua embotellada consumes aproximadamente a la semana? | No consumo — 0; 1-2 L — 4; 3-4 — 10; 5-6 — 14; 7-8 — 20; 9-10 — 25 |
+
+**Seccion B: Transporte (Q16 a Q20)**
+
+| ID | Pregunta | Opciones (label — puntos) |
+| :--- | :--- | :--- |
+| Q16 | ¿Cuantos km recorres diariamente en el Sistema Colectivo Metro? (ida y vuelta) | No uso — 0; 2-6 km/dia — 68; 7-12 — 160; 13-18 — 260; 19-24 — 360; 25-30 — 470 |
+| Q17 | ¿Cuantos km recorres diariamente en transporte colectivo (combi, microbus o autobus)? (ida y vuelta) | No uso — 0; 5-7 km/dia — 250; 8-10 — 380; 11-13 — 510; 14-16 — 630; 17-20 — 780 |
+| Q18 | ¿Cuantas horas, en promedio, viajas en avion al año? (ida y vuelta) | No viajo — 0; menos de 2 h — 1,100; 2-7 h — 4,400; 7-15 h — 8,800; 15-25 h — 11,100; mas de 25 h — 22,200 |
+| Q19 | ¿Cuentas con auto propio? | Si — 12,000; No — 0 |
+| Q20 | ¿Que distancia recorres (km) en auto propio o taxi, diariamente? (ida y vuelta) | No uso — 0; 2-6 km/dia — 520; 7-12 — 1,200; 13-18 — 2,000; 19-24 — 2,800; 25-30 — 3,500 |
+
+**Paso especial de infraestructura (antes de Q21)**
+
+| Dato | Uso |
+| :--- | :--- |
+| Numero de habitantes del hogar (input numerico, minimo 1) | Divisor de las preguntas Q21 + Q22 + Q23 |
+
+**Seccion C: Energia (Q21 a Q29)**
+
+Nota de calculo: Q21 + Q22 + Q23 se suman entre si y el resultado se divide entre el numero de habitantes del hogar.
+
+| ID | Pregunta | Opciones (label — puntos) |
+| :--- | :--- | :--- |
+| Q21 | De los siguientes electrodomesticos, si cuentas con ellos suma la cantidad indicada (checkbox multiple) | Plancha — 10; Licuadora — 11; Extractor de jugos — 6; Microondas — 56; Refrigerador — 4,400; Lavadora — 35 |
+| Q22 | ¿Cuantos focos convencionales hay en tu casa? | No hay — 0; 1-3 — 190; 4-6 — 480; 7-9 — 780; 10-12 — 1,000; 13-15 — 1,300 |
+| Q23 | ¿Cuantos focos ahorradores hay en tu casa? | No hay — 0; 1-3 — 78; 4-6 — 190; 7-9 — 310; 10-12 — 430; 13-15 — 540 |
+| Q24 | ¿Cuentas con telefono celular propio? (si tienes mas de 1, multiplica por el numero de dispositivos) | Si (valor por dispositivo) — 76; No — 0 |
+| Q25 | ¿Cuanto tiempo a la semana mantienes encendidos los siguientes aparatos electronicos? (se suman los 4 valores) | **Televisor:** 7h o menos — 28; 8-12h — 70; 13-17h — 100; 18-22h — 140; 23-28h — 170 / **Computadora:** 15-20h — 120; 21-25h — 160; 26-30h — 190; 31-35h — 230; 36-40h — 260 / **DVD:** 2-3h — 3; 4-6h — 6; 7-9h — 9; 10-12h — 12; 13-15h — 16 / **Estereo:** 2-3h — 9; 4-6h — 17; 7-9h — 28; 10-12h — 38; 13-15h — 48 |
+| Q26 | Tu calentador o "boiler" utiliza: | No tengo — 0; Gas LP — 500; Gas natural — 400; Electricidad — 300 |
+| Q27 | ¿Cuanto tiempo tardas en banarte? | Mas de 20 min — 910; 10-20 min — 450; 5-10 min — 223; Solo 5 min — 149 |
+| Q28 | Cuando me lavo los dientes… | Dejo correr el agua — 6; Utilizo un vaso de agua — 1 |
+| Q29 | ¿Cuantas veces por dia vacias el escusado o WC? | 2-3 veces/dia — 55; 4-6 — 108; 7-9 — 176; 10-12 — 240 |
+
+**Seccion D: Forestal (Q30)**
+
+| ID | Pregunta | Opciones (label — puntos) |
+| :--- | :--- | :--- |
+| Q30 | ¿Cuantas libretas profesionales de 100 hojas usas en un semestre? | No uso — 0; 2-3 libretas — 58; 3-4 — 81; 4-5 — 105; 5-6 — 128; 6-7 — 151 |
+
+**Infraestructura**
+
+Valor fijo de **6,400 puntos** que se suma una sola vez al puntaje total, independientemente de las respuestas.
+
 **Calculo y resultado**
 
 La funcion `calcularHuellaEcologica` recibe el objeto de respuestas y retorna `totalGeneral`, `totalAlimentos`, `totalTransporte`, `totalEnergia`, `totalForestal`, `infraestructura` e `interpretacion`.
