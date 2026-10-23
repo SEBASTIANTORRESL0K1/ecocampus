@@ -33,16 +33,32 @@ Solo se importan explicitamente las utilidades de React Testing Library y los co
 
 `react-leaflet` es un paquete ESM puro. Vitest no puede transformarlo en el entorno jsdom y lanzara un error si algun componente lo importa directamente o de forma transitiva.
 
-**Solucion:** mockear el componente que importa `react-leaflet` antes de renderizarlo.
+Hay dos patrones segun donde se usa el mock:
+
+**Patron 1 — mockear el componente que usa react-leaflet** (cuando se prueba un componente padre que importa `Mapa` de forma transitiva):
 
 ```js
 vi.mock('./features/mapa/Mapa', () => ({ default: () => null }));
 ```
 
-Reglas del mock:
-- La factory devuelve `{ default: () => null }` — sintaxis de modulo ES, no una funcion directa.
+Se usa en `App.test.jsx` porque `App` importa `Mapa` a traves del router.
+
+**Patron 2 — mockear react-leaflet directamente** (cuando se prueba el propio componente `Mapa`):
+
+```js
+vi.mock("react-leaflet", () => ({
+  MapContainer: () => null,
+  TileLayer: () => null,
+  Marker: () => null,
+  Popup: () => null,
+}));
+```
+
+Se usa en `Mapa.test.jsx` para que el componente pueda montarse sin intentar cargar el mapa real.
+
+Reglas comunes a los dos patrones:
+- La factory devuelve un objeto con las exportaciones — sintaxis de modulo ES, no una funcion directa.
 - Colocar `vi.mock(...)` en el nivel superior del archivo de prueba, fuera de cualquier `describe` o `test`.
-- En `App.test.jsx` se mockea `Mapa` porque `App` lo importa de forma transitiva a traves del router.
 
 ---
 
@@ -169,6 +185,59 @@ Incluye pruebas de persistencia: respuestas que sobreviven a desmontar y montar,
 ### `frontend/src/features/calculadora/progresoGuardado.test.js`
 
 Pruebas unitarias del modulo de persistencia: ida y vuelta guardar/cargar, JSON corrupto o con forma invalida, limites de `pasoActual`, localStorage que lanza errores (con `vi.spyOn(Storage.prototype, ...)`) y equivalencia del calculo con claves numericas convertidas a texto.
+
+### `frontend/src/features/auth/LoginGate.test.jsx`
+
+Mockea `../../config/experiment` para controlar `API_URL` y `LOGIN_REQUERIDO`, y simula `fetch` con una funcion auxiliar que devuelve respuestas configurables para `/api/me` y `/api/acceso/correo`.
+
+- Modo `saml`: sin sesion muestra el enlace de login con la UCOL; cuenta no permitida muestra el aviso; sesion valida muestra el contenido protegido.
+- Modo `correo`: sin sesion muestra el campo de correo; envio valido llama a la API con `credentials: "include"` y muestra el contenido; dominio no permitido o correo invalido muestran un `role="alert"`; boton deshabilitado sin texto.
+- Error de red: ofrece el boton "Reintentar".
+
+### `frontend/src/features/comunidad/Comunidad.test.jsx`
+
+Mockea `useScrollReveal` y los iconos de `lucide-react` para aislar el componente.
+
+- Smoke test: monta sin errores.
+- Titulo `<h1>` con el texto "Comunidad EcoCampus".
+- Subtitulo descriptivo del hero.
+- Tres `<h2>` con los titulos de las publicaciones (limpieza de playa, nueva estacion de reciclaje, taller de compostaje).
+- Badges de tipo: al menos tres elementos con el texto "Evento" o "Noticia".
+- Fechas de las tres publicaciones.
+
+### `frontend/src/features/guiaReciclaje/GuiaReciclaje.test.jsx`
+
+Mockea `useScrollReveal` y los iconos de `lucide-react`.
+
+- Smoke test y titulo `<h1>` "Guia de Reciclaje".
+- Los tres encabezados de las 3 R (Reciclar, Reutilizar, Reducir).
+- Las tres categorias de beneficios (Ambientales, Economicos, Sociales).
+- El enlace "Conoce mas" apunta a `https://portal.ucol.mx/siga/reforestaccion/` y tiene `rel="noopener noreferrer"`.
+
+### `frontend/src/features/mapa/Mapa.test.jsx`
+
+Mockea `react-leaflet` directamente (patron 2), `useScrollReveal`, `lucide-react` y el CSS de Leaflet.
+
+- Smoke test: monta sin errores.
+- `<h1>` con el texto "Mapa de Reciclaje".
+- Texto "21 puntos de reciclaje".
+- Subtitulo con "Campus Central".
+
+### `frontend/src/features/landing/LandingPage.contrast.test.js`
+
+Prueba puramente computacional: no renderiza componentes ni importa React. Implementa la formula de contraste WCAG 2.1 (luminancia relativa, alpha compositing) y verifica los pares texto/fondo de `LandingPage.jsx`.
+
+- Suite `getContrastRatio`: negro sobre blanco = 21:1; color sobre si mismo = 1:1; simetria; hex corto y rgba; semitransparente mezclado sobre blanco.
+- Suite `LandingPage — contraste WCAG AA`: hero (H1, subtitulo, descripcion, boton y hover del boton), seccion About (subtitulo, H2, parrafos, `strong`, numeros estadisticos, etiquetas), seccion Services y tarjetas de herramientas.
+
+Si los colores del componente cambian, actualizar las constantes de color al inicio del archivo de prueba.
+
+### `frontend/src/hooks/useScrollReveal.test.jsx`
+
+Sustituye `IntersectionObserver` con una implementacion simulada que permite disparar intersecciones a mano con `act()`.
+
+- Un elemento que se monta despues del primer render (como la pantalla de resultado de la calculadora) queda observado y recibe la clase `is-visible` al intersectar.
+- Sin `IntersectionObserver` disponible el contenido se muestra directamente (fallback).
 
 ---
 
