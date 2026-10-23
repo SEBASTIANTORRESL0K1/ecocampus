@@ -323,6 +323,29 @@ La funcion `calcularHuellaEcologica` recibe el objeto de respuestas y retorna `t
 | 16,000 a 32,000 | 1.6 a 3.2 hag | Entre 1 y 2 planetas | En riesgo |
 | Mas de 32,000 | Mas de 3.2 hag | Mas de 2 planetas | No sostenible |
 
+**Tabla de conversion de puntos a hectareas globales y planetas:**
+
+La formula de conversion es: `hag = puntos / 10,000` y `planetas = hag / 1.6`.
+
+| Puntos totales | Hectareas globales (hag) | Planetas equivalentes | Nivel |
+| ---: | ---: | ---: | :--- |
+| 5,000 | 0.5 | 0.31 | Sostenible |
+| 8,000 | 0.8 | 0.50 | Sostenible |
+| 10,000 | 1.0 | 0.63 | Sostenible |
+| 12,000 | 1.2 | 0.75 | Sostenible |
+| 14,000 | 1.4 | 0.88 | Sostenible |
+| **16,000** | **1.6** | **1.00** | **Limite sostenible / en riesgo** |
+| 20,000 | 2.0 | 1.25 | En riesgo |
+| 24,000 | 2.4 | 1.50 | En riesgo |
+| 28,000 | 2.8 | 1.75 | En riesgo |
+| **32,000** | **3.2** | **2.00** | **Limite en riesgo / no sostenible** |
+| 36,000 | 3.6 | 2.25 | No sostenible |
+| 40,000 | 4.0 | 2.50 | No sostenible |
+| 48,000 | 4.8 | 3.00 | No sostenible |
+| 56,000 | 5.6 | 3.50 | No sostenible |
+
+Nota: el `totalGeneral` incluye un valor fijo de infraestructura de 6,400 puntos (calculado segun el numero de habitantes del hogar), por lo que el puntaje minimo posible no es 0.
+
 **Persistencia en localStorage**
 
 - Clave: `ecocampus:calculadora:v1`
