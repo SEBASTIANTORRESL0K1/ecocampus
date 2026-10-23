@@ -13,6 +13,7 @@ backend/src/
   routes/              saml (login federado), acceso (por correo), sesion (/api/me), respuestas, salud y docs
   validacion/          esquema Zod de las respuestas: valida y genera el tipo de la fila a insertar
   openapi/             especificacion OpenAPI de la API y el generador de docs/openapi.json
+  types/               declaraciones de tipos de TypeScript (extiende el tipo Request de Express)
   db.ts, logger.ts
 ```
 
