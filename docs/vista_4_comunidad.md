@@ -14,31 +14,28 @@ Tablon de noticias y eventos ambientales orientado a mantener informada y conect
 
 ## Estructura de la Vista
 
-### Encabezado
+### Hero
 
-Bloque de fondo gris oscuro (`bg-gray-800`) con texto blanco centrado. Contiene:
+Usa el componente `PageHero` con imagen de fondo (foto de reciclaje de Unsplash), altura minima del 42% del viewport (`minHeight: "42vh"`). Contiene:
 
+- Eyebrow: "Noticias y eventos ambientales"
 - Titulo: "Comunidad EcoCampus"
-- Subtitulo: "Mantente informado sobre eventos y noticias ambientales"
+- Descripcion: "Mantente informado sobre eventos y noticias ambientales"
+
+El `PageLayout` recibe la prop `navTransparent`.
 
 ### Cuadricula de tarjetas
 
-Las publicaciones se presentan en una cuadricula responsiva:
+Las publicaciones se presentan en una cuadricula de 3 columnas (`repeat(3, 1fr)`) con espaciado de `1.5rem`, dentro de un `SectionWrapper` con fondo `var(--color-section-alt)`. En movil (max-width: 768px) se colapsa a 1 columna.
 
-- 1 columna en movil
-- 2 columnas en escritorio (`md:grid-cols-2`)
-- Espaciado de `gap-6` entre tarjetas
+Cada tarjeta es un `FeatureCard` con animacion escalonada de 80 ms por indice (`reveal-card`). Contiene:
 
-Cada tarjeta muestra:
-
-| Campo | Descripcion |
+| Elemento | Descripcion |
 | :--- | :--- |
-| Titulo | Nombre del evento o noticia, en verde (`text-green-700`) |
-| Fecha | Texto en gris italico |
+| Badge de tipo | Pastilla redondeada con icono (`Newspaper` o `CalendarDays`) y texto ("Noticia" / "Evento") en verde (`bg: #e8f4ec`, `color: #2d6a2d`) |
+| Titulo | Nombre del evento o noticia en verde oscuro (`color: #2d6a2d`, `font-weight: 700`) |
+| Fecha | Texto en gris italico con icono `Calendar` a la izquierda |
 | Descripcion | Parrafo con el detalle de la publicacion |
-| Tipo | Etiqueta ("Evento" o "Noticia") con fondo verde claro |
-
-Las tarjetas tienen efecto de sombra al pasar el cursor (`hover:shadow-lg transition-shadow`).
 
 ---
 
@@ -68,16 +65,28 @@ Los datos estan definidos de forma estatica en el archivo fuente. Para agregar n
 
 ---
 
+## Animaciones
+
+El hook `useScrollReveal` observa el contenedor de la cuadricula y aplica la clase `reveal-card` con retraso escalonado de 80 ms a cada tarjeta al entrar en el viewport.
+
+---
+
 ## Componentes Utilizados
 
 | Componente | Archivo | Funcion |
 | :--- | :--- | :--- |
-| `PageLayout` | `src/components/layout/PageLayout.jsx` | Estructura global con Navbar y Footer |
+| `PageLayout` | `src/components/layout/PageLayout.jsx` | Estructura global con Navbar y Footer; recibe `navTransparent` |
+| `PageHero` | `src/components/ui/PageHero.jsx` | Bloque hero con imagen de fondo, eyebrow, titulo y descripcion |
+| `SectionWrapper` | `src/components/ui/SectionWrapper.jsx` | Contenedor de seccion con padding y fondo configurables |
+| `FeatureCard` | `src/components/ui/FeatureCard.jsx` | Tarjeta blanca de caracteristica para cada noticia o evento |
+| `useScrollReveal` | `src/hooks/useScrollReveal.js` | Hook para animaciones de entrada de la cuadricula |
+| `Calendar`, `Newspaper`, `CalendarDays` | lucide-react | Iconos de fecha y tipo en las tarjetas |
 
 ---
 
 ## Diseno
 
-- El encabezado gris oscuro es compartido con la Vista 5 (Guia de Reciclaje), creando consistencia visual entre las secciones de contenido editorial.
-- Las tarjetas usan bordes sutiles (`border-gray-200`) con fondo blanco para maximizar la legibilidad.
-- La etiqueta de tipo usa colores verdes (`bg-green-100 text-green-800`) que refuerzan la identidad de sustentabilidad del proyecto.
+- El hero con imagen de fondo crea consistencia visual con las demas vistas que usan `PageHero`.
+- Las tarjetas usan `FeatureCard` (fondo blanco, borde redondeado, sombra sutil) para maximizar la legibilidad.
+- La pastilla de tipo con icono diferencia visualmente noticias de eventos sin depender solo del texto.
+- La cuadricula de 3 columnas aprovecha el espacio en escritorio; en movil cada tarjeta ocupa el ancho completo.

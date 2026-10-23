@@ -217,6 +217,7 @@ La funcion `calcularHuellaEcologica` (definida en `preguntas.js`) recibe el obje
 | `resultado` | Objeto devuelto por `calcularHuellaEcologica`; no se persiste, se recalcula al restaurar |
 | `avisoRecuperado` | Booleano que monta el toast "Recuperamos tus respuestas guardadas."; pasa a false cuando el toast termina de cerrarse o al borrar |
 | `modalBorrarAbierto` | Booleano que abre el modal de confirmacion de borrado |
+| `inputHabitantes` | String controlado del campo de texto del paso `habitantesHogar`; se sincroniza con `respuestas.habitantesHogar` al confirmar (blur o avanzar) |
 
 `pasoActual`, `respuestas` y `verResultado` se inicializan de forma perezosa desde `progresoInicial`. Ver la seccion "Persistencia en localStorage".
 
@@ -240,20 +241,24 @@ Claves especiales en `respuestas`:
 | `ImagenTema` | `src/features/calculadora/ImagenTema.jsx` | Imagen ilustrativa del tema de cada paso (LoremFlickr) con espacio reservado y respaldo "Imagen no disponible" |
 | `ToastAviso` | `src/features/calculadora/ToastAviso.jsx` | Aviso flotante con cierre automatico (5 s), pausa al pasar el cursor o enfocar, boton "Cerrar aviso" y accion opcional |
 | `ModalConfirmacion` | `src/features/calculadora/ModalConfirmacion.jsx` | Dialogo modal de confirmacion sobre `<dialog>` nativo (`showModal()`, Escape via `cancel`, clic en el fondo, foco en Cancelar, bloqueo de scroll) |
+| `CuestionarioExperimento` | `src/features/calculadora/CuestionarioExperimento.jsx` | Cuestionario del experimento a pantalla completa (solo con `EXPERIMENTO_ACTIVO`) |
+| `useScrollReveal` | `src/hooks/useScrollReveal.js` | Hook para animaciones de entrada al hacer scroll (barra de progreso, tarjeta de pregunta, resultados) |
+| `Trash2` | lucide-react | Icono del boton "Borrar respuestas" |
 
 ---
 
 ## Diseno
 
-- Fondo crema (`bg-[#f4f1ec]`) para toda la vista, diferenciandola de las demas.
-- Barra de progreso verde lima en la parte superior que avanza con cada pregunta.
-- Tarjeta blanca centrada con sombra que contiene cada pregunta.
-- Opciones seleccionadas se resaltan en verde lima (`bg-lime-500`).
+- Fondo crema (`bg-[#f7f9f4]`) para toda la vista, diferenciandola de las demas.
+- Barra de progreso verde (`bg-[#4a7c59]`) en la parte superior que avanza con cada pregunta.
+- Tarjeta blanca centrada con sombra verde sutil (`shadow-[0_4px_16px_rgba(34,85,44,0.1)]`, `rounded-[12px]`) que contiene cada pregunta.
+- Opciones seleccionadas se resaltan en verde bosque (`bg-[#4a7c59] border-[#4a7c59] text-white`).
 - Imagen ilustrativa de 160 px de alto (`h-40 object-cover`) en la parte superior de la tarjeta.
 - Boton "Siguiente" / "Finalizar" semitransparente y no clicable mientras el paso no tenga respuesta.
 - La pantalla de resultados usa una tarjeta amplia con tipografia grande para destacar el total.
 - El toast de progreso recuperado es una tarjeta blanca flotante con borde izquierdo lima y sombra, en la esquina superior derecha debajo del navbar (ver "Toast de progreso recuperado").
-- El boton "Anterior" es un boton secundario: fondo blanco, texto `gray-900`, borde de 2 px `border-gray-900`, `rounded` y `font-semibold`, con la misma altura que "Siguiente" (`py-1.5` mas el borde equivale a `py-2`). Al pasar el cursor se rellena con la paleta lima (`hover:bg-lime-100 hover:border-lime-700 hover:text-lime-900`). Deshabilitado en la pregunta 1 (`disabled:opacity-50 disabled:cursor-not-allowed`, sin cambio al pasar el cursor).
+- El boton "Anterior" es un boton secundario: fondo blanco, texto verde (`text-[#2d6a2d]`), borde de 2 px `border-[#2d6a2d]`, `rounded` y `font-semibold`, con altura minima de 44 px (`min-h-[44px]`). Al pasar el cursor se rellena con verde claro (`hover:bg-[#e8f4ec]`). Deshabilitado en la pregunta 1 (`disabled:opacity-50 disabled:cursor-not-allowed`, sin cambio al pasar el cursor).
+- Animaciones de entrada con `useScrollReveal`: la barra de progreso, la tarjeta de pregunta y la pantalla de resultados entran con la clase `reveal`.
 - "Borrar respuestas" es un boton grande rojo con borde (ver "Borrar respuestas durante el cuestionario"); el modal es un `<dialog>` blanco centrado (`m-auto`, necesario porque el reset de Tailwind quita el margen automatico) con fondo `backdrop:bg-black/50`, que entra y sale con transicion de opacidad y escala (`duration-200`).
 - "Contestar de nuevo" es un boton con borde lima junto a "Volver al Inicio"; "Revisar mis respuestas" es texto gris subrayado.
 
@@ -299,4 +304,16 @@ Al terminar el cuestionario (despues de ver el resultado) se envia `POST {VITE_A
 
 ### Tipos de pregunta del cuestionario
 
-`opcion_unica`, `select`, `numero` (con `min` y `max`), `texto_corto`, `texto_largo` y `escala_likert` (1 a 5). Las listas de opciones deben coincidir con `backend/src/validacion/respuestas.ts`.
+`opcion_unica`, `select`, `numero` (con `min` y `max`), `texto_largo` y `escala_likert` (1 a 5). Las listas de opciones deben coincidir con `backend/src/validacion/respuestas.ts`.
+
+### Secciones del cuestionario del experimento (definidas en `src/config/experiment.js`)
+
+| ID | Titulo | Contenido |
+| :--- | :--- | :--- |
+| `consentimiento` | Consentimiento informado | Texto de consentimiento + pregunta C1 ("¿Aceptas participar?", `opcion_unica`). Si el participante elige "No, gracias" (`onCompletar(null)`), vuelve a resultados. |
+| `datos_generales` | Parte 1. Datos generales | Edad (`numero`), sexo (`select`), carrera (`select`), semestre (`select`), conocimiento previo (`opcion_unica`) |
+| `tarea` | Parte 2. Tarea | Completitud del calculo (`opcion_unica`), pregunta abierta opcional sobre dificultades (`texto_largo`) |
+| `usabilidad` | Parte 3. Usabilidad | 10 afirmaciones del cuestionario SUS en escala Likert 1-5 |
+| `conciencia` | Parte 4. Conciencia percibida | 4 afirmaciones en escala Likert 1-5 sobre impacto percibido |
+| `intencion` | Parte 5. Intencion y utilidad | 2 afirmaciones en escala Likert 1-5 sobre intencion de cambio |
+| `abiertas` | Parte 6. Preguntas abiertas | 3 preguntas opcionales de `texto_largo` sobre habitos, mejoras y comentarios |

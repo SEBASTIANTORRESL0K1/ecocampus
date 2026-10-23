@@ -13,6 +13,27 @@ Mapa interactivo que muestra la ubicacion exacta de los 21 contenedores de recic
 
 ---
 
+## Estructura de la Vista
+
+### Hero compacto
+
+Bloque con imagen de fondo (foto de reciclaje de Pexels), altura fija de 280 px, con superposicion semitransparente verde oscuro. Contiene:
+
+- Titulo: "Mapa de Reciclaje"
+- Subtitulo en italica: "Localiza los contenedores en el Campus Central de la Universidad de Colima"
+
+Entra con animacion `reveal-load` al cargar la pagina. El `PageLayout` recibe la prop `navTransparent`.
+
+### Contador de puntos
+
+Franja con fondo `#f7f9f4` debajo del hero. Muestra el texto "21 puntos de reciclaje en el campus" con un icono `MapPin` de lucide-react a la izquierda. Entra con animacion `reveal` al hacer scroll.
+
+### Mapa interactivo
+
+Contenedor centrado con fondo blanco, `maxWidth: 1100px`, `height: 520px`, borde redondeado de 12 px y sombra verde (`0 8px 32px rgba(34,85,44,0.15)`). Entra con animacion `reveal` al hacer scroll.
+
+---
+
 ## Implementacion del Mapa
 
 La vista usa la biblioteca **React Leaflet** con tiles de **OpenStreetMap**.
@@ -78,21 +99,15 @@ Los 21 puntos cubren las siguientes zonas del campus:
 | `TileLayer` | react-leaflet | Carga los tiles de OpenStreetMap |
 | `Marker` | react-leaflet | Representa cada punto de reciclaje |
 | `Popup` | react-leaflet | Muestra nombre e imagen al hacer clic |
-| `PageLayout` | `src/components/layout/PageLayout.jsx` | Estructura global con Navbar y Footer |
+| `PageLayout` | `src/components/layout/PageLayout.jsx` | Estructura global con Navbar y Footer; recibe `navTransparent` |
+| `useScrollReveal` | `src/hooks/useScrollReveal.js` | Hook para animaciones de entrada del contador y el mapa |
+| `MapPin` | lucide-react | Icono en el contador de puntos |
 
 ---
 
 ## Imagenes de los Depositos
 
 Las fotografias estan almacenadas en `public/Depositos/` y se referencian mediante `` `${import.meta.env.BASE_URL}${punto.imagen.slice(1)}` ``. `BASE_URL` incluye el trailing slash y resuelve a `/ecocampus/` en produccion y `/` en desarrollo, garantizando rutas correctas en ambos entornos.
-
----
-
-## Diseno
-
-- Mapa con bordes redondeados (`rounded-lg`) y sombra (`shadow-lg`).
-- Alto fijo de `500px` para garantizar visibilidad sin desplazamiento vertical excesivo.
-- Ancho del `91.67%` del contenedor (`w-11/12`) con maxima responsividad.
 
 ---
 
