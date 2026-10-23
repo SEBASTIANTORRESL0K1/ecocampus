@@ -263,9 +263,20 @@ Cuestionario interactivo de 30 preguntas que evalua el impacto ecologico persona
 
 Metodologia basada en: **Ibarra-Cisneros, J.M. & Monroy-Ata, A. (2014)**, adaptada al contexto mexicano.
 
-**Captura de pantalla:**
+**Vista 1 — Acceso (modo experimento activo)**
 
-![Calculadora](docs/img/vista-calculadora.png)
+Cuando `VITE_EXPERIMENTO_ACTIVO=true`, la ruta `/calculadora` muestra primero un formulario de acceso antes de permitir responder las preguntas. Segun el valor de `REQUIERE_LOGIN`:
+
+- `false` (modo correo): el participante escribe su correo institucional (`@ucol.mx`). El correo se normaliza (minusculas, sin `+alias`) y se valida contra `CORREO_DOMINIOS_PERMITIDOS`. No se envia ningun codigo de verificacion.
+- `true` (modo SAML): el participante inicia sesion con su cuenta UCOL a traves del boton de login federado. Solo pasan cuentas con `uTipo = Estudiante`.
+
+![LoginGate — acceso por correo](docs/img/vista-calculadora-login.png)
+
+**Vista 2 — Cuestionario**
+
+Una vez autenticado (o sin modo experimento), se muestra el cuestionario paso a paso:
+
+![Calculadora — cuestionario](docs/img/vista-calculadora.png)
 
 **Secciones del cuestionario**
 
