@@ -2,10 +2,8 @@ const AvisoPrivacidad = ({ aceptado, onChange }) => {
   return (
     <div className="mb-6">
       <h3 className="text-lg font-semibold text-gray-800 mb-2">Aviso de privacidad</h3>
-      <div
+      <section
         className="max-h-48 overflow-y-auto border border-gray-200 rounded-md p-4 mb-4 text-sm text-gray-700 leading-relaxed bg-gray-50"
-        tabIndex={0}
-        role="region"
         aria-label="Aviso de privacidad"
       >
         <p className="mb-3">
@@ -31,7 +29,7 @@ const AvisoPrivacidad = ({ aceptado, onChange }) => {
           Al marcar la casilla de abajo, confirmas que leíste este aviso y aceptas participar
           de manera voluntaria.
         </p>
-      </div>
+      </section>
       <label className="flex items-start gap-3 cursor-pointer select-none group">
         <input
           type="checkbox"
