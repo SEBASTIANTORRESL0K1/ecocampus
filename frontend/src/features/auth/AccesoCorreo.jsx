@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { API_URL } from "../../config/experiment";
+import AvisoPrivacidad from "./AvisoPrivacidad";
 
 // Acceso con solo el correo institucional (backend con REQUIERE_LOGIN=false). No se verifica que el correo
 // sea de quien lo escribe; el backend solo comprueba que sea de un dominio permitido.
@@ -7,6 +8,7 @@ const AccesoCorreo = ({ alEntrar }) => {
   const [correo, setCorreo] = useState("");
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [privacidadAceptada, setPrivacidadAceptada] = useState(false);
 
   const enviar = async (evento) => {
     evento.preventDefault();
@@ -39,34 +41,41 @@ const AccesoCorreo = ({ alEntrar }) => {
         Escribe tu correo institucional de la Universidad de Colima. Se guardará junto con tus respuestas para
         que cada persona participe una sola vez; no se guarda tu nombre ni tu número de cuenta.
       </p>
-      <label htmlFor="correo-acceso" className="block text-left text-sm text-gray-700 mb-1">
-        Correo institucional
-      </label>
-      <input
-        id="correo-acceso"
-        type="email"
-        autoComplete="email"
-        inputMode="email"
-        required
-        value={correo}
-        onChange={(e) => setCorreo(e.target.value)}
-        placeholder="alumno@ucol.mx"
-        aria-invalid={error ? "true" : "false"}
-        aria-describedby={error ? "correo-acceso-error" : undefined}
-        className="w-full border border-gray-300 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-lime-600"
-      />
-      {error && (
-        <p id="correo-acceso-error" role="alert" className="text-left text-sm text-red-700 mb-3">
-          {error}
-        </p>
-      )}
-      <button
-        type="submit"
-        disabled={enviando || correo.trim() === ""}
-        className="px-6 py-3 bg-lime-600 text-white text-lg rounded hover:bg-lime-800 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {enviando ? "Entrando..." : "Continuar"}
-      </button>
+
+      <AvisoPrivacidad aceptado={privacidadAceptada} onChange={setPrivacidadAceptada} />
+
+      <fieldset disabled={!privacidadAceptada} className="transition-opacity duration-200">
+        <div className={!privacidadAceptada ? "opacity-50" : ""}>
+          <label htmlFor="correo-acceso" className="block text-left text-sm text-gray-700 mb-1">
+            Correo institucional
+          </label>
+          <input
+            id="correo-acceso"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            required
+            value={correo}
+            onChange={(e) => setCorreo(e.target.value)}
+            placeholder="alumno@ucol.mx"
+            aria-invalid={error ? "true" : "false"}
+            aria-describedby={error ? "correo-acceso-error" : undefined}
+            className="w-full border border-gray-300 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-lime-600"
+          />
+          {error && (
+            <p id="correo-acceso-error" role="alert" className="text-left text-sm text-red-700 mb-3">
+              {error}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={enviando || correo.trim() === ""}
+            className="px-6 py-3 bg-lime-600 text-white text-lg rounded hover:bg-lime-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {enviando ? "Entrando..." : "Continuar"}
+          </button>
+        </div>
+      </fieldset>
     </form>
   );
 };
