@@ -1,6 +1,6 @@
 # EcoCampus
 
-[![Run Tests](https://github.com/SEBASTIANTORRESL0K1/ecocampus/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/SEBASTIANTORRESL0K1/ecocampus/actions/workflows/test.yml)
+[![Run Tests](https://github.com/SEBASTIANTORRESL0K1/ecocampus/actions/workflows/test.yml/badge.svg?branch=pages)](https://github.com/SEBASTIANTORRESL0K1/ecocampus/actions/workflows/test.yml)
 
 Aplicación web para fomentar el reciclaje y la sostenibilidad en el campus de la Universidad de Colima. Permite calcular la huella ecológica personal, ubicar los puntos de reciclaje del campus en un mapa interactivo, consultar una guía de reciclaje y mantenerse informado sobre noticias y eventos ambientales de la comunidad universitaria.
 
@@ -95,11 +95,11 @@ Otros scripts disponibles dentro de `frontend/`:
 - `react-leaflet` es ESM puro, por lo que las pruebas que renderizan `App` mockean el mapa con `vi.mock('./features/mapa/Mapa', () => ({ default: () => null }))`.
 - Guías: [docs/testing/README.md](docs/testing/README.md), [docs/testing/vitest-guidelines.md](docs/testing/vitest-guidelines.md) y [docs/testing/playwright-e2e.md](docs/testing/playwright-e2e.md).
 
-El workflow `.github/workflows/test.yml` corre en cada push o pull request a `main` y `dev`, con dos jobs: `unit` (`npm test`) y `e2e` (Playwright en Chromium; sube el reporte y los traces si falla).
+El workflow `.github/workflows/test.yml` corre en cada push o pull request a `pages` y `dev`, con dos jobs: `unit` (`npm test`) y `e2e` (Playwright en Chromium; sube el reporte y los traces si falla).
 
 ## Despliegue
 
-El despliegue a GitHub Pages es automático mediante `.github/workflows/deploy.yml` en cada push a `main`: usa Node 20, ejecuta `npm ci` y `npm run build`, y publica `frontend/dist`.
+El despliegue a GitHub Pages es automático mediante `.github/workflows/deploy.yml` en cada push a `pages`: usa Node 20, ejecuta `npm ci` y `npm run build`, y publica `frontend/dist`.
 
 La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `basename` del Router. Para que las rutas de la SPA funcionen en GitHub Pages se usa la técnica de [spa-github-pages](https://github.com/rafgraph/spa-github-pages): `public/404.html` redirige a la raíz y un script en `frontend/index.html` restaura la ruta original.
 
