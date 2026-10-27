@@ -1,0 +1,33 @@
+name: Flujo de ramas
+
+# Flujos de PR permitidos:
+#   dev -> pages
+#   dev -> production
+#   pages -> production
+# Cualquier otro (en especial production -> pages) falla. Ver docs/flujo-de-ramas.md
+on:
+  pull_request:
+    branches: [pages, production]
+
+jobs:
+  validar:
+    name: Validar origen del PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comprobar rama de origen y destino
+        env:
+          ORIGEN: ${{ github.head_ref }}
+          DESTINO: ${{ github.base_ref }}
+          FORK: ${{ github.event.pull_request.head.repo.fork }}
+        run: |
+          permitido=false
+          if [ "$FORK" != "true" ]; then
+            case "$ORIGEN -> $DESTINO" in
+              "dev -> pages"|"dev -> production"|"pages -> production") permitido=true ;;
+            esac
+          fi
+          if [ "$permitido" != "true" ]; then
+            echo "::error::Flujo no permitido: $ORIGEN -> $DESTINO. Permitidos: dev -> pages, dev -> production, pages -> production."
+            exit 1
+          fi
+          echo "Flujo permitido: $ORIGEN -> $DESTINO"
