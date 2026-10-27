@@ -1,6 +1,6 @@
 # EcoCampus
 
-[![Run Tests](https://github.com/SEBASTIANTORRESL0K1/ecocampus/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/SEBASTIANTORRESL0K1/ecocampus/actions/workflows/test.yml)
+[![Run Tests](https://github.com/SEBASTIANTORRESL0K1/ecocampus/actions/workflows/test.yml/badge.svg?branch=pages)](https://github.com/SEBASTIANTORRESL0K1/ecocampus/actions/workflows/test.yml)
 
 Aplicación web para fomentar el reciclaje y la sostenibilidad en el campus de la Universidad de Colima. Permite calcular la huella ecológica personal, ubicar los puntos de reciclaje del campus en un mapa interactivo, consultar una guía de reciclaje y mantenerse informado sobre noticias y eventos ambientales de la comunidad universitaria.
 
@@ -315,7 +315,7 @@ La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `b
 - Antes de la primera ejecución de Playwright hay que instalar los navegadores: `npx playwright install chromium firefox webkit`.
 - Playwright levanta su propio servidor de desarrollo en el puerto 5174 con el modo experimento apagado, para que la calculadora muestre su resultado al finalizar.
 - `react-leaflet` es ESM puro, por lo que las pruebas que renderizan `App` mockean el mapa con `vi.mock('./features/mapa/Mapa', () => ({ default: () => null }))`.
-- El workflow `.github/workflows/test.yml` corre en cada push o pull request a `main` y `dev`, con cinco jobs: `unit` (frontend), `backend` (typecheck, pruebas y build), `contrast` (contraste WCAG de la landing), `e2e` (la calculadora en Chromium; sube el reporte y los traces si falla) y `compatibilidad` (los 5 perfiles de navegador y dispositivo; instala Chromium, Firefox y WebKit y sube `compatibilidad.json` con las versiones probadas).
+- El workflow `.github/workflows/test.yml` corre en cada push o pull request a `pages` y `dev`, con cinco jobs: `unit` (frontend), `backend` (typecheck, pruebas y build), `contrast` (contraste WCAG de la landing), `e2e` (la calculadora en Chromium; sube el reporte y los traces si falla) y `compatibilidad` (los 5 perfiles de navegador y dispositivo; instala Chromium, Firefox y WebKit y sube `compatibilidad.json` con las versiones probadas).
 
 ## Documentación
 
