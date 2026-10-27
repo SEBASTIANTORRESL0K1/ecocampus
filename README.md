@@ -33,7 +33,7 @@ Proyecto de tesis — Universidad de Colima.
 
 El proyecto funciona de dos maneras:
 
-- **Sitio público (GitHub Pages):** SPA que corre solo en el cliente, sin backend ni API. Es lo que se publica en cada push a `main`.
+- **Sitio público (GitHub Pages):** SPA que corre solo en el cliente, sin backend ni API. Es lo que se publica en cada push a `pages`.
 - **Modo experimento (Docker):** la misma SPA más un backend, una base MySQL y el login institucional. Al terminar la calculadora, los participantes (solo estudiantes de la UCOL) ven su resultado y despues responden un cuestionario que se guarda en MySQL. Se activa con `VITE_EXPERIMENTO_ACTIVO=true`; sin esa variable la calculadora funciona normal.
 
 En el modo experimento:
@@ -141,7 +141,7 @@ Las filas anteriores quedan como `saml`. Si ya se había aplicado, MySQL respond
 | [Desarrollo](#desarrollo) | Trabajar con recarga en vivo, base de datos y herramientas a mano | `docker-compose.yml` + `docker-compose.dev.yml` | `.env.dev.example` | `docker compose up --build` |
 | [Producción](#producción) | Servidor real (VM) con un solo punto de entrada | `docker-compose.yml` + `docker-compose.prod.yml` | `.env.prod.example` | `docker compose up -d --build` |
 | [Pruebas de carga](#pruebas-de-carga) | Medir el rendimiento en un entorno aislado | `docker-compose.yml` + `docker-compose.loadtest.yml` | `.env.loadtest.example` | ver la sección |
-| [Sitio público](#sitio-público-github-pages) | Publicar solo el frontend | no usa Docker | ninguna | automático al hacer push a `main` |
+| [Sitio público](#sitio-público-github-pages) | Publicar solo el frontend | no usa Docker | ninguna | automático al hacer push a `pages` |
 
 ### Configuración común
 
@@ -298,7 +298,7 @@ docker compose start
 
 ## Sitio público (GitHub Pages)
 
-El despliegue es automático mediante `.github/workflows/deploy.yml` en cada push a `main`: usa Node 20, ejecuta `npm ci --ignore-scripts` y `npm run build`, y publica `frontend/dist`. No define variables de entorno, así que el modo experimento queda apagado y el sitio es solo el frontend.
+El despliegue es automático mediante `.github/workflows/deploy.yml` en cada push a `pages`: usa Node 20, ejecuta `npm ci --ignore-scripts` y `npm run build`, y publica `frontend/dist`. No define variables de entorno, así que el modo experimento queda apagado y el sitio es solo el frontend.
 
 La ruta base es `/ecocampus/`, definida en `base` de `vite.config.js` y en el `basename` del Router. Para que las rutas de la SPA funcionen en GitHub Pages se usa la técnica de [spa-github-pages](https://github.com/rafgraph/spa-github-pages): `public/404.html` redirige a la raíz y un script en `frontend/index.html` restaura la ruta original.
 
