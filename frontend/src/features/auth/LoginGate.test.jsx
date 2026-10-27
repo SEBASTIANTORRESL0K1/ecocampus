@@ -43,6 +43,10 @@ describe("modo saml", () => {
 describe("modo correo", () => {
   const sinSesion = { authenticated: false, permitido: false, modoAcceso: "correo", participante: null };
 
+  async function aceptarPrivacidad() {
+    await userEvent.click(await screen.findByRole("checkbox", { name: /he leído el aviso/i }));
+  }
+
   test("sin sesion pide el correo y no ofrece el login con UCOL", async () => {
     simularApi({ me: sinSesion });
     renderizar();
@@ -50,9 +54,17 @@ describe("modo correo", () => {
     expect(screen.queryByRole("link", { name: /iniciar sesión con ucol/i })).not.toBeInTheDocument();
   });
 
+  test("el correo y el boton estan deshabilitados sin aceptar el aviso de privacidad", async () => {
+    simularApi({ me: sinSesion });
+    renderizar();
+    expect(await screen.findByLabelText(/correo institucional/i)).toBeDisabled();
+    expect(screen.getByRole("button", { name: /continuar/i })).toBeDisabled();
+  });
+
   test("al enviar un correo valido envia la peticion con cookies y muestra el contenido", async () => {
     simularApi({ me: sinSesion });
     renderizar();
+    await aceptarPrivacidad();
     await userEvent.type(await screen.findByLabelText(/correo institucional/i), "alumno@ucol.mx");
     await userEvent.click(screen.getByRole("button", { name: /continuar/i }));
     expect(await screen.findByText("contenido protegido")).toBeInTheDocument();
@@ -63,6 +75,7 @@ describe("modo correo", () => {
   test("un dominio no permitido muestra el error y no deja pasar", async () => {
     simularApi({ me: sinSesion, acceso: () => json({ success: false, error: "dominio-no-permitido", dominios: ["ucol.mx"] }, 403) });
     renderizar();
+    await aceptarPrivacidad();
     await userEvent.type(await screen.findByLabelText(/correo institucional/i), "alguien@gmail.com");
     await userEvent.click(screen.getByRole("button", { name: /continuar/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent("@ucol.mx");
@@ -72,15 +85,16 @@ describe("modo correo", () => {
   test("un correo invalido muestra el error", async () => {
     simularApi({ me: sinSesion, acceso: () => json({ success: false, error: "correo-invalido" }, 400) });
     renderizar();
+    await aceptarPrivacidad();
     await userEvent.type(await screen.findByLabelText(/correo institucional/i), "x");
     await userEvent.click(screen.getByRole("button", { name: /continuar/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent(/correo válido/i);
   });
 
-  test("el boton esta deshabilitado mientras no haya texto", async () => {
+  test("el boton esta deshabilitado mientras no haya texto aunque se acepte la privacidad", async () => {
     simularApi({ me: sinSesion });
     renderizar();
-    await screen.findByLabelText(/correo institucional/i);
+    await aceptarPrivacidad();
     expect(screen.getByRole("button", { name: /continuar/i })).toBeDisabled();
   });
 

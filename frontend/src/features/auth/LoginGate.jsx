@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PageLayout from "../../components/layout/PageLayout";
 import AccesoCorreo from "./AccesoCorreo";
+import AvisoPrivacidad from "./AvisoPrivacidad";
 import { API_URL, LOGIN_REQUERIDO } from "../../config/experiment";
 
 // Pide acceso antes de mostrar a los hijos, solo cuando LOGIN_REQUERIDO. El backend decide el modo
@@ -9,6 +10,7 @@ import { API_URL, LOGIN_REQUERIDO } from "../../config/experiment";
 const LoginGate = ({ children }) => {
   const [estado, setEstado] = useState(LOGIN_REQUERIDO ? "cargando" : "libre");
   const [modo, setModo] = useState("saml");
+  const [privacidadAceptada, setPrivacidadAceptada] = useState(false);
 
   useEffect(() => {
     if (!LOGIN_REQUERIDO) return;
@@ -31,7 +33,7 @@ const LoginGate = ({ children }) => {
   return (
     <PageLayout className="bg-[#f4f1ec]">
       <div className="flex-grow flex flex-col items-center justify-center p-6">
-        <div className="bg-white p-8 rounded-md shadow-lg w-full max-w-md text-center">
+        <div className="bg-white p-8 rounded-md shadow-lg w-full max-w-lg text-center">
           {estado === "cargando" && <p className="text-gray-600">Verificando sesión...</p>}
 
           {estado === "sin-sesion" && modo === "correo" && <AccesoCorreo alEntrar={() => setEstado("autenticado")} />}
@@ -43,12 +45,17 @@ const LoginGate = ({ children }) => {
                 Usa tu cuenta institucional de la Universidad de Colima. Tu correo institucional se guardará
                 junto con tus respuestas; no se guarda tu nombre ni tu número de cuenta.
               </p>
-              <a
-                href={`${API_URL}/login`}
-                className="inline-block px-6 py-3 bg-lime-600 text-white text-lg rounded hover:bg-lime-800"
-              >
-                Iniciar sesión con UCOL
-              </a>
+              <AvisoPrivacidad aceptado={privacidadAceptada} onChange={setPrivacidadAceptada} />
+              <div className={`transition-opacity duration-200 ${!privacidadAceptada ? "opacity-50 pointer-events-none" : ""}`}>
+                <a
+                  href={`${API_URL}/login`}
+                  tabIndex={privacidadAceptada ? 0 : -1}
+                  aria-disabled={!privacidadAceptada}
+                  className="inline-block px-6 py-3 bg-lime-600 text-white text-lg rounded hover:bg-lime-800"
+                >
+                  Iniciar sesión con UCOL
+                </a>
+              </div>
             </>
           )}
 
