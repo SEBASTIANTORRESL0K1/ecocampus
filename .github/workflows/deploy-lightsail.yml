@@ -5,7 +5,7 @@ name: Deploy to Lightsail
 # Guia de configuracion (secrets, environment y servidor): docs/despliegue-lightsail.md
 on:
   push:
-    branches: [experiment/survey-questions]
+    branches: [production]
     paths-ignore:
       - "docs/**"
       - "loadtest/**"

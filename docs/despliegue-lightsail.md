@@ -3,7 +3,7 @@
 Guia para configurar el despliegue con GitHub Actions en una instancia de Lightsail. El flujo es:
 
 ```
-push a experiment/survey-questions
+push a production
    -> job "pruebas" (typecheck y pruebas del backend)
    -> aprobacion manual (Environment "production")
    -> job "desplegar": SSH al servidor, git checkout del commit, docker compose up -d --build
@@ -55,7 +55,7 @@ ssh -i ruta/a/LightsailDefaultKey.pem ubuntu@TU_IP
 Descarga el script, revisalo y ejecutalo pasandole la **llave publica** de despliegue:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/SEBASTIANTORRESL0K1/ecocampus/experiment/survey-questions/deploy/preparar-servidor.sh -o preparar-servidor.sh
+curl -fsSL https://raw.githubusercontent.com/SEBASTIANTORRESL0K1/ecocampus/production/deploy/preparar-servidor.sh -o preparar-servidor.sh
 less preparar-servidor.sh
 sudo bash preparar-servidor.sh "ssh-ed25519 AAAA...contenido de deploy_key.pub... github-actions-ecocampus"
 ```
@@ -117,7 +117,7 @@ Settings > Environments > New environment, con el nombre **`production`**, y act
 
 ## 6. Como funciona un despliegue
 
-1. Haces push a `experiment/survey-questions` (los cambios que solo tocan `docs/`, `loadtest/` o archivos `.md` no lo disparan).
+1. Haces push a `production` (los cambios que solo tocan `docs/`, `loadtest/` o archivos `.md` no lo disparan).
 2. Corren `typecheck` y las pruebas del backend. Si fallan, no se despliega.
 3. GitHub espera tu aprobacion.
 4. El workflow entra al servidor, hace checkout del commit exacto y ejecuta `docker compose up -d --build`. Nunca usa `down` ni `-v`: los datos de MySQL se conservan.
@@ -130,7 +130,7 @@ Los logs de cada paso se ven en la pestana Actions. En el servidor: `docker comp
 
 - **Esquema de la base de datos:** `db/schema.sql` solo se aplica al crear el volumen la primera vez. Si cambias la tabla, el despliegue automatico **no** migra los datos: hay que aplicar el cambio a mano (con respaldo antes).
 - **Respaldos:** hazlos antes de iniciar el estudio y periodicamente (comandos en el README, seccion "Respaldo y restauracion de MySQL"). Los snapshots de Lightsail ayudan, pero un `mysqldump` es mas facil de restaurar.
-- **Rama desplegada:** hoy es `experiment/survey-questions`. Cuando el experimento llegue a `main`, cambia `branches` en `.github/workflows/deploy-lightsail.yml` (y la rama del clon en el servidor, con `git -C /opt/ecocampus checkout main`).
+- **Rama desplegada:** hoy es `production`. Cuando el experimento llegue a `main`, cambia `branches` en `.github/workflows/deploy-lightsail.yml` (y la rama del clon en el servidor, con `git -C /opt/ecocampus checkout main`).
 - **Ejecucion manual:** el workflow tiene `workflow_dispatch`, pero GitHub solo lo muestra en la pestana Actions cuando el archivo existe en la rama por defecto (`main`).
 - **Rotar la llave:** genera otra con `ssh-keygen`, reemplaza la linea en `/home/deploy/.ssh/authorized_keys` y actualiza el secret `LIGHTSAIL_SSH_KEY`.
 - **El usuario `deploy` pertenece al grupo `docker`**, lo que equivale a acceso de administrador en ese servidor: por eso la llave es dedicada, y su acceso queda protegido por fail2ban y la contrasena desactivada.

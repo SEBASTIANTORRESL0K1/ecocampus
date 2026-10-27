@@ -13,7 +13,7 @@ LLAVE_PUBLICA="${1:?uso: sudo bash preparar-servidor.sh \"<llave publica SSH de 
 case "$LLAVE_PUBLICA" in ssh-ed25519\ *|ssh-rsa\ *|ecdsa-sha2-*) ;; *) echo "La llave publica no parece valida"; exit 1 ;; esac
 
 REPO="${REPO:-https://github.com/SEBASTIANTORRESL0K1/ecocampus.git}"
-RAMA="${RAMA:-experiment/survey-questions}"
+RAMA="${RAMA:-production}"
 DIR="${DIR:-/opt/ecocampus}"
 USUARIO="${USUARIO:-deploy}"
 
